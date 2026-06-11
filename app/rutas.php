@@ -8,6 +8,7 @@ $rutas = [
 
     /* Usuarios */
     'registro' => ['controlador' => 'registroCtrl', 'metodo' => 'index'],
+    'registro/usuarios' => ['controlador' => 'registroCtrl', 'metodo' => 'index']
 
     /* Voluntarios */
 

@@ -2,7 +2,6 @@
 include_once "../app/models/Usuario.php";
 
 class Voluntario extends Usuario{
-    private $bd;
 
     public function __construct() {
         parent::__construct();
@@ -50,7 +49,7 @@ class Voluntario extends Usuario{
         return $this->bd->resultado();
     }
 
-    public function obtenerVoluntarioPorEmail( string $email ) :array {
+    /* public function obtenerVoluntarioPorEmail( string $email ) :array {
         $consulta = "SELECT u.id as 'id', CONCAT(u.nombre, ' ', v.apellido) as 'nombre completo', u.email as 'email', u.telefono, u.ubicacion, v.telefono_emergencia, v.disponibilidad_horaria, u.img_perfil 
                         FROM usuarios u JOIN voluntarios v ON u.id = v.usuario_id
                         WHERE u.email = :email;";
@@ -60,15 +59,19 @@ class Voluntario extends Usuario{
         $this->bd->ejecutar();
 
         return $this->bd->resultado();
-    }
+    } */
 
 
     /* -------------------- INSERTAR DATOS -------------------- */
     public function nuevoVoluntario( string $nombre, string $apellido, string $email, string $clave, string $telefono, ?string $telefonoEmergencia = null, ?string $ubicacion = null ) :bool {
         
         parent::nuevoUsuario($nombre, $email, $clave, $telefono, $ubicacion);
-        $usuario = $this->obtenerVoluntarioPorEmail($email);
-        $usuarioID = $usuario['id'];
+
+        $sql = "SELECT id FROM usuarios u WHERE u.email = :email";
+        $this->bd->consulta($sql);
+        $this->bd->asignar(":email", $email);
+        $this->bd->ejecutar();
+        $usuarioID = $this->bd->resultado()['id'];
 
         $consulta = "INSERT INTO `voluntarios`(`usuario_id`, `apellido`, `telefono_emergencia`) 
                         VALUES (:us_id, :apell, :telefono_eme)";

@@ -1,6 +1,6 @@
 <?php
 abstract class Usuario {
-    private $bd;    /* Se declara el atributo privado para mantener la conexión a la BD  */
+    protected $bd;    /* Se declara el atributo privado para mantener la conexión a la BD  */
     protected $camposUsuario = ['nombre', 'email', 'descripcion', 'telefono', 'ubicacion', 'img_perfil'];
 
     public function __construct() {

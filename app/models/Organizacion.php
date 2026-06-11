@@ -2,7 +2,6 @@
 include_once "../app/models/Usuario.php";
 
 class Organizacion extends Usuario {
-    private $bd;
 
     public function __construct() {
         parent::__construct();
@@ -39,7 +38,7 @@ class Organizacion extends Usuario {
 
     public function obtenerIDOrganizacion ( int $idUsuario ) :array {
         $consulta = "SELECT o.id 
-                        FROM organizacion o JOIN usuarios u ON u.id = o.usuario_id
+                        FROM organizaciones o JOIN usuarios u ON u.id = o.usuario_id
                         WHERE u.id = :id_usuario";
     
         $this->bd->consulta($consulta);
@@ -49,9 +48,9 @@ class Organizacion extends Usuario {
         return $this->bd->resultado();
     }
 
-    public function obtenerOrganizacionPorEmail( string $email ) :array {
+    /* public function obtenerOrganizacionPorEmail( string $email ) :array {
         $consulta = "SELECT u.id as 'id', u.nombre as 'nombre', u.email as 'email', u.telefono, u.ubicacion, u.img_perfil 
-                        FROM usuarios u JOIN organizacion o ON u.id = v.usuario_id
+                        FROM usuarios u JOIN organizaciones o ON u.id = o.usuario_id
                         WHERE u.email = :email";
     
         $this->bd->consulta($consulta);
@@ -59,16 +58,19 @@ class Organizacion extends Usuario {
         $this->bd->ejecutar();
 
         return $this->bd->resultado();
-    }
+    } */
 
     /* -------------------- INSERTAR DATOS -------------------- */
     public function nuevaOrganizacion( string $nombre, string $email, string $clave, string $telefono, ?string $ubicacion = null ) :bool {
         
         parent::nuevoUsuario($nombre, $email, $clave, $telefono, $ubicacion);
-        $usuario = $this->obtenerOrganizacionPorEmail($email);
-        $usuarioID = $usuario['id'];
+        $sql = "SELECT id FROM usuarios u WHERE u.email = :email";
+        $this->bd->consulta($sql);
+        $this->bd->asignar(":email", $email);
+        $this->bd->ejecutar();
+        $usuarioID = $this->bd->resultado()['id'];
 
-        $consulta = "INSERT INTO `organizacion`(`usuario_id`) 
+        $consulta = "INSERT INTO `organizaciones`(`usuario_id`) 
                         VALUES (:us_id)";
         $this->bd->consulta($consulta);
 
