@@ -78,75 +78,7 @@
   </div>
 </section>
 
-<!-- QUÉ HACEMOS -->
-<section class="section section-bg-alt" id="que-hacemos">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">Nuestras Soluciones</span>
-      <h2 class="section-title">¿Cómo construimos el cambio?</h2>
-      <p class="section-subtitle">Diseñamos una plataforma integral pensada para potenciar las dinámicas del trabajo social y el voluntariado moderno.</p>
-    </div>
-    
-    <div class="what-grid">
-      <!-- Row 1: Organizations Publish -->
-      <div class="what-row">
-        <div class="what-col-content">
-          <div class="what-icon-badge">
-            <i data-lucide="megaphone"></i>
-          </div>
-          <h3>Las organizaciones publican campañas</h3>
-          <p>Las ONGs y colectivos sociales pueden visibilizar sus proyectos y necesidades en minutos. Desde colectas de alimentos hasta tutorías o reforestación.</p>
-          <ul class="what-bullet-list">
-            <li><i data-lucide="check"></i> Formulario ágil de creación de campañas</li>
-            <li><i data-lucide="check"></i> Definición clara del perfil de voluntario buscado</li>
-            <li><i data-lucide="check"></i> Panel de control para seguir las postulaciones</li>
-          </ul>
-        </div>
-        <div class="what-col-img">
-          <img src="<?= BASE_URL ?>img/campaign_park.png" alt="Personas plantando árboles en un parque local" class="what-illustration">
-        </div>
-      </div>
-      
-      <!-- Row 2: Volunteers Find -->
-      <div class="what-row">
-        <div class="what-col-img">
-          <img src="<?= BASE_URL ?>img/campaign_tutoring.png" alt="Voluntario sonriente enseñando a un niño con una notebook" class="what-illustration">
-        </div>
-        <div class="what-col-content">
-          <div class="what-icon-badge">
-            <i data-lucide="search"></i>
-          </div>
-          <h3>Los voluntarios encuentran su causa</h3>
-          <p>Explorá oportunidades de voluntariado de acuerdo a tus intereses, disponibilidad horaria, habilidades o cercanía geográfica.</p>
-          <ul class="what-bullet-list">
-            <li><i data-lucide="check"></i> Buscador avanzado con filtros por categorías</li>
-            <li><i data-lucide="check"></i> Postulación en un solo clic desde tu perfil</li>
-            <li><i data-lucide="check"></i> Alertas personalizadas según tus preferencias</li>
-          </ul>
-        </div>
-      </div>
-      
-      <!-- Row 3: Collaboration -->
-      <div class="what-row">
-        <div class="what-col-content">
-          <div class="what-icon-badge">
-            <i data-lucide="users-2"></i>
-          </div>
-          <h3>Colaboración inter-organizacional</h3>
-          <p>Promovemos la sinergia entre ONGs. Creemos que el impacto se multiplica cuando las organizaciones comparten recursos, ideas y campañas conjuntas.</p>
-          <ul class="what-bullet-list">
-            <li><i data-lucide="check"></i> Red interna de comunicación entre organizaciones</li>
-            <li><i data-lucide="check"></i> Alianzas estratégicas para campañas masivas</li>
-            <li><i data-lucide="check"></i> Intercambio de aprendizajes y mejores prácticas</li>
-          </ul>
-        </div>
-        <div class="what-col-img">
-          <img src="<?= BASE_URL ?>img/campaign_food.png" alt="Grupo de voluntarios clasificando cajas de comida en un banco de alimentos" class="what-illustration">
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+
 
 <!-- CÓMO FUNCIONA -->
 <section class="section" id="como-funciona" style="background-color: var(--color-surface);">
@@ -294,15 +226,7 @@
             <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
             <p class="camp-desc"><?= htmlspecialchars($camp['descripcion']) ?></p>
             
-            <div class="camp-progress">
-              <div class="camp-progress-text">
-                <span>Progreso Voluntarios</span>
-                <span class="camp-pct-text"><?= $camp['progreso'] ?>%</span>
-              </div>
-              <div class="camp-progress-bar-bg">
-                <div class="camp-progress-bar" style="width: <?= $camp['progreso'] ?>%;"></div>
-              </div>
-            </div>
+            
             
             <div class="camp-meta-list">
               <div class="camp-meta-item"><i data-lucide="users"></i> <span><?= $camp['registrados'] ?> / <?= $camp['requeridos'] ?> voluntarios</span></div>
