@@ -51,7 +51,7 @@ class Organizacion extends Usuario {
 
     public function obtenerOrganizacionPorEmail( string $email ) :array {
         $consulta = "SELECT u.id as 'id', u.nombre as 'nombre', u.email as 'email', u.telefono, u.ubicacion, u.img_perfil 
-                        FROM usuarios u JOIN organizacion o ON u.id = v.usuario_id
+                        FROM usuarios u JOIN organizacion o ON u.id = o.usuario_id
                         WHERE u.email = :email";
     
         $this->bd->consulta($consulta);

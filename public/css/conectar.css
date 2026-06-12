@@ -1,0 +1,36 @@
+/* ==========================================================================
+   Conectar Page specific styles
+   ========================================================================== */
+
+/* Filter button styling */
+.filter-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 550;
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-btn:hover {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.filter-btn.active {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Specific Search Form responsiveness */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}

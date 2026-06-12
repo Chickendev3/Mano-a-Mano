@@ -10,6 +10,9 @@ class App {
     //Parámetros para que sean usador por los métodos.
 
     public function __construct() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $urlPartes = $this->parseUrl();
 
         require_once '../app/rutas.php';

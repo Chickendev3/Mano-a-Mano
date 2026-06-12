@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Contacto Page specific styles
+   ========================================================================== */
+
+/* FAQ Accordion Styling using CSS Grid height transition */
+.faq-section {
+  background-color: var(--color-background);
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.accordion-item {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.accordion-item:hover {
+  border-color: rgba(54, 124, 158, 0.3);
+  box-shadow: var(--shadow-md);
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.accordion-header:hover {
+  color: var(--color-primary);
+}
+
+.accordion-header i {
+  color: var(--color-text-muted);
+  transition: transform var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--transition-normal);
+}
+
+.accordion-inner {
+  overflow: hidden;
+  padding: 0 24px 20px 24px;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Active Accordion States */
+.accordion-item.active {
+  border-color: var(--color-primary);
+}
+
+.accordion-item.active .accordion-header {
+  color: var(--color-primary);
+}
+
+.accordion-item.active .accordion-header i {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+
+.accordion-item.active .accordion-content {
+  grid-template-rows: 1fr;
+}
+
+/* Contact form checkbox styling */
+.form-checkbox {
+  cursor: pointer;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .accordion-header {
+    padding: 16px 20px;
+    font-size: 15px;
+  }
+  .accordion-inner {
+    padding: 0 20px 16px 20px;
+    font-size: 14px;
+  }
+}
