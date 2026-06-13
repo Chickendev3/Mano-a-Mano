@@ -241,12 +241,6 @@
       <?php endforeach; ?>
     </div>
     
-    <!-- Option to create campaign for organizations (Visible action) -->
-    <div style="text-align: center; margin-top: 50px;">
-      <button class="btn btn-secondary" id="direct-create-campaign-btn">
-        <i data-lucide="plus"></i> ¿Querés publicar tu propia campaña? Crearla acá
-      </button>
-    </div>
   </div>
 </section>
 
@@ -259,7 +253,6 @@
     <p>Ya somos miles de personas construyendo redes más humanas y solidarias. Tu grano de arena puede cambiar vidas hoy mismo.</p>
     <div class="cta-buttons">
       <a href="<?= BASE_URL ?>registro" class="btn cta-btn-white" id="cta-action-btn">Quiero ser parte</a>
-      <a href="<?= BASE_URL ?>contacto" class="btn cta-btn-outline">Saber más</a>
     </div>
   </div>
 </section>
@@ -288,39 +281,7 @@
         <p id="detail-skills-text">Empatía, trabajo en equipo, buena predisposición física.</p>
       </div>
       
-      <div class="camp-detail-sidebar">
-        <h4>Datos claves</h4>
-        <div class="detail-sidebar-card">
-          <div class="sidebar-info-item">
-            <i data-lucide="map-pin"></i>
-            <div class="sidebar-info-text">
-              <h5>Ubicación</h5>
-              <p id="detail-location">Buenos Aires, CABA</p>
-            </div>
-          </div>
-          <div class="sidebar-info-item">
-            <i data-lucide="calendar"></i>
-            <div class="sidebar-info-text">
-              <h5>Fecha</h5>
-              <p id="detail-date">14 Jun, 2026</p>
-            </div>
-          </div>
-          <div class="sidebar-info-item">
-            <i data-lucide="clock"></i>
-            <div class="sidebar-info-text">
-              <h5>Horario</h5>
-              <p id="detail-time">09:00 - 13:00</p>
-            </div>
-          </div>
-          <div class="sidebar-info-item">
-            <i data-lucide="users"></i>
-            <div class="sidebar-info-text">
-              <h5>Voluntarios requeridos</h5>
-              <p id="detail-volunteers-stat">14 de 20 inscriptos</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </div>
     
     <!-- Apply Form / Trigger Button -->

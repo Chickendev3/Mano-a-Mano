@@ -8,11 +8,6 @@ const campaignsData = [
     desc: 'Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia y personas que disfruten del trabajo al aire libre.',
     skills: 'Empatía, trabajo físico básico, buena predisposición y ganas de trabajar en equipo.',
     location: 'Buenos Aires',
-    date: '14 Jun, 2026',
-    time: '09:00 - 13:00',
-    volunteersRequired: 20,
-    volunteersRegistered: 14,
-    progress: 70,
     img: 'img/campaign_park.png'
   },
   {
@@ -411,15 +406,7 @@ function appendCampaignCardToDOM(camp) {
       <h3 class="camp-title">${camp.title}</h3>
       <p class="camp-desc">${camp.desc}</p>
       
-      <div class="camp-progress">
-        <div class="camp-progress-text">
-          <span>Progreso Voluntarios</span>
-          <span class="camp-pct-text">${camp.progress}%</span>
-        </div>
-        <div class="camp-progress-bar-bg">
-          <div class="camp-progress-bar" style="width: ${camp.progress}%;"></div>
-        </div>
-      </div>
+      
       
       <div class="camp-meta-list">
         <div class="camp-meta-item"><i data-lucide="users"></i> <span>${camp.volunteersRegistered} / ${camp.volunteersRequired} voluntarios</span></div>
