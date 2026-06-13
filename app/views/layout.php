@@ -15,28 +15,10 @@
 
     <!-- Carga de CSS según vistas-->
 </head>
-    <p>HEADER ACÁ</p>
-    <div>
-        <button type="button" onclick="window.location.href='<?= BASE_URL ?>'">
-            Ir a inicio
-        </button>
-
-        <button type="button" onclick="window.location.href='<?= BASE_URL ?>registro'">
-            Ir a registro
-        </button>
-
-        <?php if (isset($_SESSION['id_usuario'])): ?>
-        <button type="button" onclick="window.location.href='<?= BASE_URL ?>cerrar-sesion'">
-            Cerrar Sesión
-        </button>
-        <?php else: ?>
-        <button type="button" onclick="window.location.href='<?= BASE_URL ?>sesion'">
-            Ir a sesión
-        </button>
-        <?php endif; ?>
-    </div>
 <header>
-    
+    <?php
+        require_once '../app/views/componentes/header.php'; 
+    ?>
 </header>
 <body>
     <!-- Acá se incluye la localización del archivo PHP de './app/views/' seguido del valor de $rutaVista + extensión '.php' -->
@@ -46,7 +28,9 @@
     <!-- Carga de JS globales-->
 
 <footer>
-    <p>FOOTER ACÁ</p>
+    <?php
+        require_once '../app/views/componentes/footer.php';
+    ?>
 </footer>
 
 </html>
