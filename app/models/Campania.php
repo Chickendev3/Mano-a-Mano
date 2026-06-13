@@ -65,11 +65,11 @@ class Campania {
 
 
     /* ------------------------ INSERTAR DATOS ------------------------ */
-    public function crearNuevaCampania (int $idUsuario, string $tipoConvocatoria, string $titulo, string $fechaFinalizacion, ?string $descripcion = null, ?string $infoAdicional = null ) :bool {
+    public function crearNuevaCampania (int $idUsuario, string $tipoConvocatoria, string $titulo, string $fechaFinalizacion, string $fechaInicio, string $ubicacion, ?string $descripcion = null, ?string $infoAdicional = null ) :bool {
         $idTipo = $this->obtenerIDTipoPorNombre( $tipoConvocatoria );
         
-        $consulta = "INSERT INTO `campanias`(`usuario_id`, `tipo_id`, `titulo`, `descripcion`, `fecha_finalizacion`, `info_adicional`) 
-                        VALUES (:usu_id, :tipo_id, :titulo, :descripcion, :fecha_fin, :info_ad)";
+        $consulta = "INSERT INTO `campanias`(`usuario_id`, `tipo_id`, `titulo`, `descripcion`, `fecha_finalizacion`, `fecha_inicio`, `ubicacion`, `info_adicional`) 
+                        VALUES (:usu_id, :tipo_id, :titulo, :descripcion, :fecha_fin, :fecha_ini, :ubicacion,  :info_ad)";
         $this->bd->consulta($consulta);
 
         $this->bd->asignar(":usu_id", $idUsuario);
@@ -77,6 +77,8 @@ class Campania {
         $this->bd->asignar(":titulo", $titulo);
         $this->bd->asignar(":descripcion", $descripcion);
         $this->bd->asignar(":fecha_fin", $fechaFinalizacion);
+        $this->bd->asignar(":fecha_ini", $fechaInicio);
+        $this->bd->asignar(":ubicacion", $ubicacion);
         $this->bd->asignar(":info_ad", $infoAdicional);
 
 
@@ -99,6 +101,10 @@ class Campania {
             $campos[] = "descripcion = :descripcion";
         if(isset($datos['fecha_finalizacion']))
             $campos[] = "fecha_finalizacion = :fecha_finalizacion";
+        if(isset($datos['fecha_inicio']))
+            $campos[] = "fecha_inicio = :fecha_inicio";
+        if(isset($datos['ubicacion']))
+            $campos[] = "ubicacion = :ubicacion";
         if(isset($datos['info_adicional']))
             $campos[] = "info_adicional = :info_adicional";
 

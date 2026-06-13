@@ -48,8 +48,8 @@ class Organizacion extends Usuario {
         return $this->bd->resultado();
     }
 
-    /* public function obtenerOrganizacionPorEmail( string $email ) :array {
-        $consulta = "SELECT u.id as 'id', u.nombre as 'nombre', u.email as 'email', u.telefono, u.ubicacion, u.img_perfil 
+    public function obtenerOrganizacionPorEmail( string $email ) :array|bool {
+        $consulta = "SELECT u.id as 'id_usuario', o.id as 'id_organizacion', u.nombre, u.email, u.clave, u.telefono, u.ubicacion, u.img_perfil 
                         FROM usuarios u JOIN organizaciones o ON u.id = o.usuario_id
                         WHERE u.email = :email";
     
@@ -58,7 +58,7 @@ class Organizacion extends Usuario {
         $this->bd->ejecutar();
 
         return $this->bd->resultado();
-    } */
+    }
 
     /* -------------------- INSERTAR DATOS -------------------- */
     public function nuevaOrganizacion( string $nombre, string $email, string $clave, string $telefono, ?string $ubicacion = null ) :bool {

@@ -49,8 +49,8 @@ class Voluntario extends Usuario{
         return $this->bd->resultado();
     }
 
-    /* public function obtenerVoluntarioPorEmail( string $email ) :array {
-        $consulta = "SELECT u.id as 'id', CONCAT(u.nombre, ' ', v.apellido) as 'nombre completo', u.email as 'email', u.telefono, u.ubicacion, v.telefono_emergencia, v.disponibilidad_horaria, u.img_perfil 
+    public function obtenerVoluntarioPorEmail( string $email ) :array|bool {
+        $consulta = "SELECT u.id as 'id_usuario', v.id as 'id_voluntario', u.nombre, v.apellido, u.email as 'email', u.clave, u.telefono, u.ubicacion, v.telefono_emergencia, v.disponibilidad_horaria, u.img_perfil 
                         FROM usuarios u JOIN voluntarios v ON u.id = v.usuario_id
                         WHERE u.email = :email;";
     
@@ -59,7 +59,7 @@ class Voluntario extends Usuario{
         $this->bd->ejecutar();
 
         return $this->bd->resultado();
-    } */
+    }
 
 
     /* -------------------- INSERTAR DATOS -------------------- */

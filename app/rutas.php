@@ -3,12 +3,11 @@
 $rutas = [
     '' => ['controlador' => 'inicioCtrl', 'metodo' => 'index'],
 
-    /* Sesión */
-    'sesion' => ['controlador' => 'sesionCtrl', 'metodo' => 'index'],
-
-    /* Usuarios */
+    /* Registro y Sesión */
     'registro' => ['controlador' => 'registroCtrl', 'metodo' => 'index'],
-    'registro/usuarios' => ['controlador' => 'registroCtrl', 'metodo' => 'index']
+    'sesion' => ['controlador' => 'sesionCtrl', 'metodo' => 'index'],
+    'cerrar-sesion' => ['controlador' => 'sesionCtrl', 'metodo' => 'cerrarSesion']
+
 
     /* Voluntarios */
 

@@ -21,7 +21,7 @@ class registroCtrl extends Controlador{
 
                 if ($error !== null) {
                     $datos['error'] = $error;
-                    $this->cargarVista('registro', $datos);
+                    $this->cargarVista('registro', $datos);     // Fijarse acá si está bien al momento de hacer la unión con la VISTA
                     return;
                 }
 
@@ -41,7 +41,7 @@ class registroCtrl extends Controlador{
 
                 if ($error !== null) {
                     $datos['error'] = $error;
-                    $this->cargarVista('registro', $datos);
+                    $this->cargarVista('registro', $datos);     // Fijarse acá si está bien al momento de hacer la unión con la VISTA
                     return;
                 }
 

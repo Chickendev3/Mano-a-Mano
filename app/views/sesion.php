@@ -29,6 +29,9 @@
 			<div>
 				<button type="submit">Ingresar</button>
 			</div>
+			<?php if (!empty($msj)) : ?>
+				<p><?= htmlspecialchars($msj) ?></p>
+			<?php endif; ?>
 		</form>
 	</section>
 </main>

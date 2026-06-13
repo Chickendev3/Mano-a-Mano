@@ -20,7 +20,7 @@
 
     <section id="formulario-voluntario" <?= $mostrarVoluntario ? '' : 'hidden' ?>>
         <h2>Registro de Voluntario</h2>
-        <form action="<?= BASE_URL?>registro/usuarios" method="post">
+        <form action="<?= BASE_URL?>registro" method="post">
             <div>
                 <label for="voluntario-nombre">Nombre*</label>
                 <input type="text" maxlength=50 id="voluntario-nombre" name="nombre" required>
@@ -65,7 +65,7 @@
 
     <section id="formulario-organizacion" <?= $mostrarOrganizacion ? '' : 'hidden' ?>>
         <h2>Registro de Organización</h2>
-        <form action="<?= BASE_URL?>registro/usuarios" method="post">
+        <form action="<?= BASE_URL?>registro" method="post">
             <div>
                 <label for="organizacion-nombre">Nombre de la Organización</label>
                 <input type="text" maxlength=50 id="organizacion-nombre" name="nombre" required>
