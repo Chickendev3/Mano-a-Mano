@@ -409,8 +409,7 @@
     
     <div style="display: flex; justify-content: flex-end; gap: 12px;">
       <button class="btn btn-ghost" onclick="closeModal('modal-org-profile')">Cerrar</button>
-      <!-- "Más información" / "Ver perfil completo" button redirects to mock complete profile view -->
-      <a href="<?= BASE_URL ?>organizacion/perfil" class="btn btn-primary" id="org-profile-full-btn">Ver perfil completo</a>
+      <a href="<?= BASE_URL ?>organizacion/perfil/vista" class="btn btn-primary" id="org-profile-full-btn">Ver perfil completo</a>
     </div>
   </div>
 </div>

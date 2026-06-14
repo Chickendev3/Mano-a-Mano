@@ -25,7 +25,10 @@
             <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 2px;"></i>
           </button>
           <div class="nav-dropdown-menu" role="menu">
-            <a href="<?= BASE_URL ?>organizacion/perfil" class="nav-dropdown-item" role="menuitem">Ver perfil</a>
+            <?php 
+              $perfil_url = (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'voluntario') ? 'voluntario/perfil/vista' : 'organizacion/perfil/vista';
+            ?>
+            <a href="<?= BASE_URL . $perfil_url ?>" class="nav-dropdown-item" role="menuitem">Ver perfil</a>
             <a href="<?= BASE_URL ?>sesion/salir" class="nav-dropdown-item" role="menuitem">Cerrar sesión</a>
           </div>
         </div>
