@@ -101,5 +101,15 @@ class inicioCtrl extends Controlador {
         $datos = [];
         $this->cargarVista('perfil_pendiente', $datos, 'Perfil en Desarrollo | Mano a Mano');
     }
+
+    public function perfilOrganizacion() : void {
+        $datos = [];
+        $this->cargarVista('perfil_organizacion_vista', $datos, 'Perfil de la Organización | Mano a Mano');
+    }
+
+    public function perfilVoluntario() : void {
+        $datos = [];
+        $this->cargarVista('perfil_voluntario_vista', $datos, 'Perfil del Voluntario | Mano a Mano');
+    }
 }
 ?>
