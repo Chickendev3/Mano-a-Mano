@@ -26,7 +26,7 @@
           </button>
           <div class="nav-dropdown-menu" role="menu">
             <?php 
-              $perfil_url = (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'voluntario') ? 'perfil_voluntario_vista' : 'perfil_organizacion_vista';
+              $perfil_url = (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'voluntario') ? 'perfil_voluntario_logueado' : 'perfil_organizacion_vista';
             ?>
             <a href="<?= BASE_URL . $perfil_url ?>" class="nav-dropdown-item" role="menuitem">Ver perfil</a>
             <a href="<?= BASE_URL ?>sesion/salir" class="nav-dropdown-item" role="menuitem">Cerrar sesión</a>

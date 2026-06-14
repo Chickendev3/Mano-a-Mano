@@ -1,0 +1,428 @@
+<?php
+/**
+ * Vista de Perfil de Voluntario (Logueado - Dashboard Privado)
+ * Mano a Mano MVC
+ */
+?>
+<main class="profile-view-container">
+  
+  <!-- PROFILE HEADER -->
+  <section class="profile-header-sec">
+    <div class="container profile-header-grid">
+      <!-- Left: Photo Placeholder (Editable) -->
+      <div class="profile-avatar-wrapper">
+        <div class="profile-avatar-circle editable" id="profile-avatar-clickable" onclick="document.getElementById('edit-avatar-input').click()">
+          <img id="avatar-img-view" src="" alt="Avatar voluntario" style="display: none;">
+          <i data-lucide="image" class="avatar-placeholder-icon" id="avatar-icon-placeholder"></i>
+          <div class="avatar-edit-overlay">
+            <i data-lucide="camera"></i>
+            <span>Cambiar foto</span>
+          </div>
+        </div>
+        <input type="file" id="edit-avatar-input" accept="image/*" style="display: none;">
+      </div>
+      
+      <!-- Right: Name, Personal Desc, Statistics/Insignias (Editable) -->
+      <div class="profile-info-content">
+        
+        <!-- READ-ONLY STATE (Visible by default) -->
+        <div id="profile-view-state">
+          <h1 class="profile-name" id="view-profile-name">Cargando...</h1>
+          
+          <p class="profile-desc-text" id="view-profile-desc">
+            Cargando descripción...
+          </p>
+
+          <div class="profile-meta-row">
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span id="view-profile-location">Cargando ubicación...</span>
+            </div>
+            <div class="profile-meta-item">
+              <i data-lucide="mail"></i>
+              <span id="view-profile-email">Cargando email...</span>
+            </div>
+          </div>
+
+          <!-- Insignias and Statistics (Static - Not editable by user) -->
+          <div class="profile-badges-container">
+            <div class="badge-row-item">
+              <i data-lucide="award" class="badge-icon-gold"></i>
+              <span>Insignia de Voluntariado Fijo en organización: Techo Verde</span>
+            </div>
+            <div class="badge-row-item">
+              <i data-lucide="award" class="badge-icon-gold"></i>
+              <span>Insignia de Voluntariado Fijo en organización: Mentes Brillantes</span>
+            </div>
+            <div class="badge-row-item">
+              <i data-lucide="check-square" class="badge-icon-blue"></i>
+              <span>Asistencia a voluntariado: +7</span>
+            </div>
+            <div class="badge-row-item skills-list-row">
+              <i data-lucide="bookmark" class="badge-icon-tag"></i>
+              <div class="skills-badges" id="view-skills-badges">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-ghost" id="edit-profile-btn" style="margin-top: 16px;">
+            <i data-lucide="edit-3"></i> Editar perfil
+          </button>
+        </div>
+
+        <!-- INLINE EDIT STATE (Hidden by default) -->
+        <div class="profile-info-edit-form" id="profile-edit-state" style="display: none;">
+          <div class="edit-row">
+            <label for="edit-name">Nombre</label>
+            <input type="text" id="edit-name" class="edit-input">
+          </div>
+          <div class="edit-row">
+            <label for="edit-desc">Descripción</label>
+            <textarea id="edit-desc" class="edit-input" rows="4"></textarea>
+          </div>
+          <div class="edit-row">
+            <label for="edit-location">Ubicación</label>
+            <input type="text" id="edit-location" class="edit-input">
+          </div>
+          <div class="edit-row">
+            <label for="edit-email">Email</label>
+            <input type="email" id="edit-email" class="edit-input">
+          </div>
+          <div class="edit-row">
+            <label>Habilidades / Profesiones (Selección con buscador)</label>
+            <div class="edit-tags-container" id="edit-tags-list">
+              <!-- Populated dynamically -->
+            </div>
+            <div class="tag-search-wrapper">
+              <input type="text" id="tag-search-input" class="edit-input" placeholder="Buscar habilidades (ej: Cocinero, Profesor, Logística...)">
+              <ul class="tag-suggestions-list" id="tag-suggestions">
+                <!-- Suggestions dropdown populated by JS -->
+              </ul>
+            </div>
+          </div>
+          <div class="camp-card-actions" style="margin-top: 16px;">
+            <button class="btn btn-primary" id="save-profile-btn">Guardar</button>
+            <button class="btn btn-ghost" id="cancel-profile-btn">Cancelar</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERNAL NAVIGATION TABS -->
+  <section class="profile-tabs-sec">
+    <div class="container">
+      <div class="tabs-nav-bar">
+        <button class="profile-tab-btn active" id="tab-btn-gestionar" aria-controls="pane-gestionar" aria-selected="true">
+          Gestionar campañas
+        </button>
+        <button class="profile-tab-btn" id="tab-btn-postulaciones" aria-controls="pane-postulaciones" aria-selected="false">
+          Postulaciones
+        </button>
+        <button class="profile-tab-btn" id="tab-btn-invitaciones" aria-controls="pane-invitaciones" aria-selected="false">
+          Invitaciones
+        </button>
+        <button class="profile-tab-btn" id="tab-btn-voluntariado" aria-controls="pane-voluntariado" aria-selected="false">
+          Voluntariado
+        </button>
+      </div>
+
+      <!-- DYNAMIC PANES CONTAINER -->
+      <div class="dynamic-panes-wrapper">
+        
+        <!-- PANE: GESTIONAR CAMPAÑAS (ABM) -->
+        <div class="profile-pane active" id="pane-gestionar" role="tabpanel">
+          <div class="pane-header-actions">
+            <h2>Campañas</h2>
+            <button class="btn btn-primary" id="btn-create-campaign-modal">
+              <i data-lucide="plus" style="width: 16px; height: 16px; margin-right: 4px;"></i> Crear campaña
+            </button>
+          </div>
+
+          <!-- FILTER AND SORT (Mockup controls) -->
+          <div class="tabs-filters-bar">
+            <div class="filter-group">
+              <select class="filter-select" id="filter-campaigns-select" aria-label="Filtrar por">
+                <option value="">Filtrar por (Todas)</option>
+                <option value="convocatoria">Campaña con postulaciones (Convocatorias)</option>
+                <option value="informativa">Campaña informativa (sin postulaciones)</option>
+              </select>
+              <select class="filter-select" id="sort-campaigns-select" aria-label="Ordenar por">
+                <option value="">Ordenar por (Por defecto)</option>
+                <option value="reciente">Más recientes</option>
+                <option value="antiguas">Más antiguas</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Alternating Campaigns List Grid -->
+          <div class="alternating-grid" id="my-campaigns-grid">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- PAGINATION CONTROLS -->
+          <div class="pagination-container" id="campaigns-pagination">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- PANE: POSTULACIONES (Placeholder) -->
+        <div class="profile-pane" id="pane-postulaciones" role="tabpanel">
+          <div class="placeholder-pane-content">
+            <i data-lucide="clipboard-list"></i>
+            <h3>Mis Postulaciones</h3>
+            <p>Aquí aparecerán las campañas a las que te postules para realizar voluntariados y el estado del proceso de selección por parte de las organizaciones.</p>
+          </div>
+        </div>
+
+        <!-- PANE: INVITACIONES (Placeholder) -->
+        <div class="profile-pane" id="pane-invitaciones" role="tabpanel">
+          <div class="placeholder-pane-content">
+            <i data-lucide="mail-open"></i>
+            <h3>Invitaciones Recibidas</h3>
+            <p>Aquí podrás ver y responder a las invitaciones que te envíen las organizaciones para sumarte a sus proyectos y causas de impacto.</p>
+          </div>
+        </div>
+
+        <!-- PANE: VOLUNTARIADO (Placeholder) -->
+        <div class="profile-pane" id="pane-voluntariado" role="tabpanel">
+          <div class="placeholder-pane-content">
+            <i data-lucide="award"></i>
+            <h3>Mis Voluntariados</h3>
+            <p>Aquí se listará tu historial de voluntariados fijos realizados, insignias obtenidas y horas de impacto social certificadas por las organizaciones asociadas.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ==========================================
+     MODALS SECTION
+     ========================================== -->
+
+<!-- 1. CAMPAIGN DETAILS VIEW MODAL (SHARED) -->
+<?php include '../app/views/componentes/modal_campana.php'; ?>
+
+<!-- 2. CREATE CAMPAIGN MODAL -->
+<div class="modal-overlay" id="modal-create-campaign" role="dialog" aria-modal="true" aria-labelledby="create-camp-title">
+  <div class="modal-box modal-box-large">
+    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeModal('modal-create-campaign')">
+      <i data-lucide="x"></i>
+    </button>
+    
+    <h3 class="modal-title" id="create-camp-title" style="margin-bottom: 24px;">Crear nueva campaña</h3>
+    
+    <form class="campaign-modal-form" id="create-camp-form" onsubmit="event.preventDefault(); handleCreateCampaignSubmit();">
+      
+      <!-- Campaign Type -->
+      <div class="edit-row">
+        <label>Elija el tipo de campaña:</label>
+        <div class="radio-group-type">
+          <label class="radio-label">
+            <input type="radio" name="create-camp-type" value="convocatoria" checked onchange="toggleCreateAddInfoField()">
+            <span>Campaña con postulaciones</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="create-camp-type" value="informativa" onchange="toggleCreateAddInfoField()">
+            <span>Campaña informativa (sin postulaciones)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Campaign Title -->
+      <div class="edit-row">
+        <label for="create-title">Nombre de la campaña</label>
+        <input type="text" id="create-title" class="edit-input" placeholder="Ingrese el nombre de la campaña" required>
+      </div>
+
+      <!-- Campaign Short Description -->
+      <div class="edit-row">
+        <label for="create-desc">Breve descripción</label>
+        <textarea id="create-desc" class="edit-input" rows="2" placeholder="Ingrese una descripción corta para las tarjetas del listado" required></textarea>
+      </div>
+
+      <!-- Category Tags Selection -->
+      <div class="form-group-row">
+        <div class="edit-row">
+          <label for="create-category">Categoría principal</label>
+          <select id="create-category" class="edit-input" required>
+            <option value="medio-ambiente">Medio Ambiente</option>
+            <option value="educacion">Educación</option>
+            <option value="accion-social">Acción Social</option>
+            <option value="salud">Salud</option>
+            <option value="cultura">Cultura</option>
+          </select>
+        </div>
+        <div class="edit-row">
+          <label for="create-location">Ubicación</label>
+          <input type="text" id="create-location" class="edit-input" placeholder="Ej: Rosario, Santa Fe" required>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="form-group-row">
+        <div class="edit-row">
+          <label for="create-start-date">Fecha de inicio</label>
+          <input type="date" id="create-start-date" class="edit-input" required>
+        </div>
+        <div class="edit-row">
+          <label for="create-end-date">Fecha de finalización</label>
+          <input type="date" id="create-end-date" class="edit-input" required>
+        </div>
+      </div>
+
+      <!-- Important Information / Detailed content -->
+      <div class="edit-row">
+        <label for="create-details">Información importante (Detalle de la campaña)</label>
+        <textarea id="create-details" class="edit-input" rows="4" placeholder="Ingrese las actividades a realizar, horarios específicos y detalles del proyecto" required></textarea>
+      </div>
+
+      <!-- Additional Info (Conditional for Convocatoria) -->
+      <div class="edit-row" id="create-additional-info-group">
+        <label for="create-additional">Información adicional (Solo visible para postulantes aceptados)</label>
+        <textarea id="create-additional" class="edit-input" rows="3" placeholder="Ej: Dirección exacta, teléfono del coordinador, herramientas a traer..."></textarea>
+      </div>
+
+      <!-- Images (Mockup simulation) -->
+      <div class="edit-row">
+        <label>Imágenes de la campaña (Opcional)</label>
+        <div class="image-upload-simulation" onclick="simulateCreateCampaignImageUpload()">
+          <div class="image-upload-simulation-content">
+            <i data-lucide="image-plus"></i>
+            <span>+ Agregar imágenes (Simulado)</span>
+          </div>
+        </div>
+        <div class="uploaded-images-grid" id="create-images-preview-grid">
+          <!-- Dynamically populated mock image previews -->
+        </div>
+      </div>
+
+      <div class="modal-footer-actions" style="margin-top: 16px;">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-create-campaign')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear campaña</button>
+      </div>
+      
+    </form>
+  </div>
+</div>
+
+<!-- 3. MODIFY CAMPAIGN MODAL -->
+<div class="modal-overlay" id="modal-modify-campaign" role="dialog" aria-modal="true" aria-labelledby="modify-camp-title">
+  <div class="modal-box modal-box-large">
+    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeModal('modal-modify-campaign')">
+      <i data-lucide="x"></i>
+    </button>
+    
+    <h3 class="modal-title" id="modify-camp-title" style="margin-bottom: 24px;">Modificar campaña</h3>
+    
+    <form class="campaign-modal-form" id="modify-camp-form" onsubmit="event.preventDefault(); handleModifyCampaignSubmit();">
+      
+      <!-- Campaign Type -->
+      <div class="edit-row">
+        <label>Elija el tipo de campaña:</label>
+        <div class="radio-group-type">
+          <label class="radio-label">
+            <input type="radio" name="modify-camp-type" value="convocatoria" id="modify-type-convocatoria" onchange="toggleModifyAddInfoField()">
+            <span>Campaña con postulaciones</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="modify-camp-type" value="informativa" id="modify-type-informativa" onchange="toggleModifyAddInfoField()">
+            <span>Campaña informativa (sin postulaciones)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Campaign Title -->
+      <div class="edit-row">
+        <label for="modify-title">Nombre de la campaña</label>
+        <input type="text" id="modify-title" class="edit-input" required>
+      </div>
+
+      <!-- Campaign Short Description -->
+      <div class="edit-row">
+        <label for="modify-desc">Breve descripción</label>
+        <textarea id="modify-desc" class="edit-input" rows="2" required></textarea>
+      </div>
+
+      <!-- Category Tags Selection -->
+      <div class="form-group-row">
+        <div class="edit-row">
+          <label for="modify-category">Categoría principal</label>
+          <select id="modify-category" class="edit-input" required>
+            <option value="medio-ambiente">Medio Ambiente</option>
+            <option value="educacion">Educación</option>
+            <option value="accion-social">Acción Social</option>
+            <option value="salud">Salud</option>
+            <option value="cultura">Cultura</option>
+          </select>
+        </div>
+        <div class="edit-row">
+          <label for="modify-location">Ubicación</label>
+          <input type="text" id="modify-location" class="edit-input" required>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="form-group-row">
+        <div class="edit-row">
+          <label for="modify-start-date">Fecha de inicio</label>
+          <input type="date" id="modify-start-date" class="edit-input" required>
+        </div>
+        <div class="edit-row">
+          <label for="modify-end-date">Fecha de finalización</label>
+          <input type="date" id="modify-end-date" class="edit-input" required>
+        </div>
+      </div>
+
+      <!-- Important Information / Detailed content -->
+      <div class="edit-row">
+        <label for="modify-details">Información importante (Detalle de la campaña)</label>
+        <textarea id="modify-details" class="edit-input" rows="4" required></textarea>
+      </div>
+
+      <!-- Additional Info (Conditional for Convocatoria) -->
+      <div class="edit-row" id="modify-additional-info-group">
+        <label for="modify-additional">Información adicional (Solo visible para postulantes aceptados)</label>
+        <textarea id="modify-additional" class="edit-input" rows="3"></textarea>
+      </div>
+
+      <!-- Images (Mockup simulation) -->
+      <div class="edit-row">
+        <label>Imágenes de la campaña (Opcional)</label>
+        <div class="image-upload-simulation" onclick="simulateModifyCampaignImageUpload()">
+          <div class="image-upload-simulation-content">
+            <i data-lucide="image-plus"></i>
+            <span>+ Agregar imágenes (Simulado)</span>
+          </div>
+        </div>
+        <div class="uploaded-images-grid" id="modify-images-preview-grid">
+          <!-- Dynamically populated mock image previews -->
+        </div>
+      </div>
+
+      <div class="modal-footer-actions" style="margin-top: 16px;">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-modify-campaign')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+      </div>
+      
+    </form>
+  </div>
+</div>
+
+<!-- 4. DELETE CONFIRMATION MODAL -->
+<div class="modal-overlay" id="modal-delete-confirm" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title">
+  <div class="modal-box modal-box-small" style="max-width: 400px; padding: 24px; text-align: center;">
+    <h3 class="modal-title" id="delete-confirm-title" style="color: #EF4444; font-size: 18px; margin-bottom: 12px;">¿Eliminar campaña?</h3>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; line-height: 1.5;">Esta acción no se puede deshacer. La campaña se borrará permanentemente de tu perfil.</p>
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-delete-confirm')">Cancelar</button>
+      <button class="btn btn-primary" id="confirm-delete-btn" style="background-color: #EF4444; border-color: #EF4444; color: #ffffff;">Eliminar</button>
+    </div>
+  </div>
+</div>

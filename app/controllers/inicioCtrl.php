@@ -107,5 +107,15 @@ class inicioCtrl extends Controlador {
         $datos = [];
         $this->cargarVista('perfil_voluntario_vista', $datos, 'Perfil del Voluntario | Mano a Mano');
     }
+
+    public function perfilVoluntarioLogueado() : void {
+        // Enforce login for this dashboard route
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            header('Location: ' . BASE_URL . 'sesion');
+            exit;
+        }
+        $datos = [];
+        $this->cargarVista('perfil_voluntario_logueado', $datos, 'Mi Perfil | Mano a Mano');
+    }
 }
 ?>

@@ -52,5 +52,14 @@
         }
         echo '<script src="' . BASE_URL . 'js/' . $base_js . '.js"></script>';
     ?>
+    <!-- Global Toast Notification Container -->
+    <div class="toast" id="global-toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-icon"></div>
+      <div class="toast-content">
+        <h4 id="toast-title"></h4>
+        <p id="toast-message"></p>
+      </div>
+    </div>
+
 </body>
 </html>
