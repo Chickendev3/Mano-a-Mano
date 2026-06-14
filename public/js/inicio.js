@@ -199,7 +199,7 @@ window.openCampaignDetails = function(campaignId) {
   // Update view based on selected radio button state
   updateModalStateBasedOnRadio();
 
-  openModal('modal-camp-detail');
+  openModal('modal-profile-camp-detail');
 };
 
 function getCategoryLabel(cat) {
@@ -227,7 +227,7 @@ function initializePostulationBtn() {
         if (typeof showToast !== 'undefined') {
           showToast('Inicio de sesión requerido', 'Tenés que iniciar sesión para postularte a las campañas.', false);
         }
-        closeModal('modal-camp-detail');
+        closeModal('modal-profile-camp-detail');
         setTimeout(() => {
           window.location.href = BASE_URL + 'sesion';
         }, 1500);

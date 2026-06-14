@@ -413,6 +413,8 @@
   gap: 12px;
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition-fast);
+  text-decoration: none;
+  color: inherit;
 }
 
 .vol-carousel-card:hover {

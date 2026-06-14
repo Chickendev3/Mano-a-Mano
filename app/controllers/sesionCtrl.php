@@ -12,12 +12,13 @@ class sesionCtrl extends Controlador {
             $_SESSION['usuario_nombre'] = 'Usuario de Prueba';
             $_SESSION['usuario_email'] = $email ?: 'prueba@manoamano.org';
 
-            // Set role based on email hint for testing both profiles:
-            // Email containing "org" -> Organizacion, otherwise -> Voluntario
-            if (strpos(strtolower($email), 'org') !== false) {
+            $emailLower = strtolower($email);
+            if ($emailLower === 'organizacion@gmail.com') {
                 $_SESSION['usuario_rol'] = 'organizacion';
+                $_SESSION['usuario_nombre'] = 'Organización de Prueba';
             } else {
                 $_SESSION['usuario_rol'] = 'voluntario';
+                $_SESSION['usuario_nombre'] = 'Voluntario de Prueba';
             }
 
             header('Location: ' . BASE_URL);
