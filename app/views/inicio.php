@@ -171,14 +171,13 @@
       <?php foreach ($organizaciones as $org): ?>
         <div class="org-card">
           <div class="org-card-header">
-            <!-- If organization has an image, render it, otherwise render colored initials avatar -->
-            <?php if (!empty($org['imagen'])): ?>
-              <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0;">
+            <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0; background-color: var(--color-background); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center;">
+              <?php if (!empty($org['imagen'])): ?>
                 <img src="<?= BASE_URL . $org['imagen'] ?>" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
-              </div>
-            <?php else: ?>
-              <div class="org-logo-avatar <?= $org['avatar_clase'] ?>" aria-label="Logo de <?= htmlspecialchars($org['nombre']) ?>"><?= $org['iniciales'] ?></div>
-            <?php endif; ?>
+              <?php else: ?>
+                <img src="<?= BASE_URL ?>img/org_placeholder.png" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+              <?php endif; ?>
+            </div>
             <div class="org-info">
               <h4><?= htmlspecialchars($org['nombre']) ?></h4>
               <span class="org-tag"><?= htmlspecialchars($org['categoria']) ?></span>
@@ -229,10 +228,8 @@
             
             
             <div class="camp-meta-list">
-              <div class="camp-meta-item"><i data-lucide="users"></i> <span><?= $camp['registrados'] ?> / <?= $camp['requeridos'] ?> voluntarios</span></div>
               <div class="camp-meta-item"><i data-lucide="map-pin"></i> <span><?= htmlspecialchars($camp['ubicacion']) ?></span></div>
               <div class="camp-meta-item"><i data-lucide="calendar"></i> <span><?= htmlspecialchars($camp['fecha']) ?></span></div>
-              <div class="camp-meta-item"><i data-lucide="clock"></i> <span><?= htmlspecialchars($camp['horario']) ?></span></div>
             </div>
             
             <button class="btn btn-primary" onclick="openCampaignDetails(<?= $camp['id'] ?>)">Ver campaña</button>
