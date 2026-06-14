@@ -73,6 +73,55 @@ let campaigns = [
   }
 ];
 
+// Postulations Mock Database
+let postulations = [
+  {
+    id: 501,
+    campaignId: 1,
+    title: "Reforestación Parque Central",
+    desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia.",
+    status: "aceptado",
+    category: "medio-ambiente",
+    startDate: "2026-06-14",
+    endDate: "2026-06-21",
+    location: "Parque Central, Buenos Aires",
+    details: "Actividades de plantación, riego y tutorado de 50 plantines autóctonos. Se proveen herramientas y guantes.",
+    additionalInfo: "Dirección: Av. Sarmiento 2300 (junto al lago). Coordinador: Martín Silva (+54 11 9876-5432).",
+    images: ["img/campaign_park.png"]
+  },
+  {
+    id: 502,
+    campaignId: 2,
+    title: "Clases de Apoyo Digital",
+    desc: "Buscamos tutores para enseñar el uso de herramientas de oficina básicas y programación web inicial a jóvenes.",
+    status: "rechazado",
+    category: "educacion",
+    startDate: "2026-06-18",
+    endDate: "2026-07-18",
+    location: "San Martín, Rosario",
+    details: "Tutorías presenciales de herramientas de oficina básicas (Word, Excel) y nociones iniciales de HTML/CSS para jóvenes de 12 a 18 años.",
+    additionalInfo: "Dirección: Belgrano 1200, Rosario. Coordinadora: Clara Gómez (+54 341 555-4321).",
+    images: ["img/campaign_tutoring.png"]
+  },
+  {
+    id: 503,
+    campaignId: 3,
+    title: "Colecta de Alimentos",
+    desc: "Ayudanos a clasificar, empaquetar y distribuir las donaciones del banco de alimentos destinadas a comedores.",
+    status: "pendiente",
+    category: "accion-social",
+    startDate: "2026-06-21",
+    endDate: "2026-06-30",
+    location: "Centro, Córdoba",
+    details: "Recepción, control de vencimiento y clasificación por rubros de alimentos no perecederos. Distribución posterior a comedores infantiles.",
+    additionalInfo: "Dirección: Deán Funes 450, Córdoba. Coordinador: Juan Pérez (+54 351 444-1234).",
+    images: ["img/campaign_food.png"]
+  }
+];
+
+let currentCancelPostulationId = null;
+let currentPostulationsPage = 1;
+
 // ABM State variables
 let currentEditCampaignId = null;
 let currentDeleteCampaignId = null;
@@ -88,6 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupProfileEditEvents();
   setupTabs();
   setupCampaignsGrid();
+  setupPostulationsGrid();
   setupMockUploads();
 });
 
@@ -338,6 +388,10 @@ function setupTabs() {
       if (targetId === "pane-gestionar") {
         currentPage = 1;
         renderCampaigns();
+      }
+      if (targetId === "pane-postulaciones") {
+        currentPostulationsPage = 1;
+        renderPostulations();
       }
 
       // Re-render Lucide icons
@@ -852,4 +906,361 @@ window.openDeleteConfirmModal = function(id) {
 
 function setupMockUploads() {
   // Empty helper to configure simulation triggers
+  
+  // Initialize radio selection listeners in details modal
+  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      updateModalStateBasedOnRadio();
+    });
+  });
 }
+
+// ==========================================
+// 4b. POSTULATIONS LISTS & FILTERS
+// ==========================================
+function setupPostulationsGrid() {
+  const filterSelect = document.getElementById("filter-postulations-select");
+  const sortSelect = document.getElementById("sort-postulations-select");
+
+  if (filterSelect) {
+    filterSelect.addEventListener("change", () => {
+      currentPostulationsPage = 1;
+      renderPostulations();
+    });
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      currentPostulationsPage = 1;
+      renderPostulations();
+    });
+  }
+
+  // Confirm cancel postulation button
+  const confirmCancelBtn = document.getElementById("confirm-cancel-postulation-btn");
+  if (confirmCancelBtn) {
+    confirmCancelBtn.addEventListener("click", () => {
+      if (currentCancelPostulationId) {
+        postulations = postulations.filter(p => p.id !== currentCancelPostulationId);
+        closeModal("modal-cancel-postulation-confirm");
+        currentCancelPostulationId = null;
+        
+        currentPostulationsPage = 1; // reset page
+        renderPostulations();
+
+        if (typeof showToast !== "undefined") {
+          showToast("Postulación cancelada", "Tu postulación ha sido cancelada y retirada de la lista.", true);
+        }
+      }
+    });
+  }
+}
+
+function renderPostulations() {
+  const grid = document.getElementById("my-postulations-grid");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-postulations-select")?.value || "";
+  const sortVal = document.getElementById("sort-postulations-select")?.value || "";
+
+  // 1. Filter
+  let filtered = [...postulations];
+  if (filterVal) {
+    filtered = filtered.filter(p => p.status === filterVal);
+  }
+
+  // 2. Sort
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  // 3. Paginate
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentPostulationsPage > totalPages && totalPages > 0) {
+    currentPostulationsPage = totalPages;
+  }
+
+  const startIndex = (currentPostulationsPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  // 4. Render Grid HTML
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+        No se encontraron postulaciones registradas.
+      </div>
+    `;
+    renderPostulationsPagination(0);
+    return;
+  }
+
+  paginated.forEach((post, index) => {
+    const isReverse = index % 2 !== 0;
+    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
+    
+    // Choose image
+    const imgUrl = post.images && post.images.length > 0 ? post.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${post.title}" style="width:100%; height:100%; object-fit:cover;">` 
+      : `<i data-lucide="image"></i>`;
+
+    // Map status text and class
+    let statusLabel = "";
+    let statusClass = "";
+    if (post.status === "aceptado") {
+      statusLabel = "Aceptado";
+      statusClass = "aceptado";
+    } else if (post.status === "pendiente") {
+      statusLabel = "Pendiente";
+      statusClass = "pendiente";
+    } else if (post.status === "rechazado") {
+      statusLabel = "Rechazado";
+      statusClass = "rechazado";
+    }
+
+    const article = document.createElement("article");
+    article.className = cardClass;
+    article.style.cursor = "pointer";
+    article.addEventListener("click", () => {
+      openPostulationDetailsView(post.id);
+    });
+
+    article.innerHTML = `
+      <div class="alt-card-img-col">
+        <div class="alt-card-img-placeholder">
+          ${imgHTML}
+        </div>
+      </div>
+      <div class="alt-card-content-col" style="position: relative; display: flex; flex-direction: row; align-items: center; width: 100%; gap: 24px; box-sizing: border-box;">
+        <div style="flex: 1; display: flex; flex-direction: column; height: 100%;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
+            <h3 class="alt-card-title">${post.title}</h3>
+            <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
+              ${getCategoryLabel(post.category)}
+            </span>
+          </div>
+          <p class="alt-card-desc" style="margin-bottom: auto;">${post.desc}</p>
+        </div>
+        
+        <div class="postulation-actions-col">
+          <button class="postulation-status-btn ${statusClass}" type="button" style="pointer-events: none;">
+            ${statusLabel}
+          </button>
+          
+          <button class="post-cancel-btn" type="button" onclick="event.stopPropagation(); openCancelPostulationConfirmModal(${post.id});">
+            Cancelar postulación
+          </button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderPostulationsPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderPostulationsPagination(totalPages) {
+  const container = document.getElementById("postulations-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  // Previous button
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentPostulationsPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentPostulationsPage > 1) {
+      currentPostulationsPage--;
+      renderPostulations();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentPostulationsPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentPostulationsPage = i;
+      renderPostulations();
+      scrollToCampaigns();
+    });
+    container.appendChild(numBtn);
+  }
+
+  // Next button
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentPostulationsPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentPostulationsPage < totalPages) {
+      currentPostulationsPage++;
+      renderPostulations();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+window.openCancelPostulationConfirmModal = function(id) {
+  currentCancelPostulationId = id;
+  openModal("modal-cancel-postulation-confirm");
+};
+
+function openPostulationDetailsView(postulationId) {
+  const post = postulations.find(p => p.id === postulationId);
+  if (!post) return;
+
+  // Prefill shared modal labels
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = post.title;
+  
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${post.desc}</p>
+      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${post.details}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${post.location}</p>
+      <p><strong>Período:</strong> ${post.startDate} al ${post.endDate}</p>
+    `;
+  }
+
+  // Tags
+  if (mTags) {
+    mTags.innerHTML = "";
+    const tags = [getCategoryLabel(post.category), "Convocatoria"];
+    tags.forEach(tag => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
+      mTags.appendChild(span);
+    });
+  }
+
+  // Reset simulated states and badges based on the real postulation status
+  if (mBadge) {
+    mBadge.style.display = "none";
+  }
+  if (mSensitive) {
+    mSensitive.style.display = "none";
+  }
+
+  // Make the simulated dev choices card visible inside the modal for review
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) {
+    devStateCard.style.display = "block";
+    
+    // Select the correct radio option based on status
+    let radioVal = "no-login";
+    if (post.status === "aceptado") {
+      radioVal = "registrado-aceptado";
+    } else if (post.status === "pendiente") {
+      radioVal = "registrado-pendiente";
+    } else if (post.status === "rechazado") {
+      radioVal = "registrado-rechazado";
+    }
+    
+    const radio = document.querySelector(`input[name="dev-state-choice"][value="${radioVal}"]`);
+    if (radio) {
+      radio.checked = true;
+    }
+  }
+
+  // Configure postulation button
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = "block";
+  }
+
+  // Trigger simulated choice display updates
+  updateModalStateBasedOnRadio();
+
+  openModal("modal-profile-camp-detail");
+  
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function updateModalStateBasedOnRadio() {
+  const selectedState = document.querySelector('input[name="dev-state-choice"]:checked')?.value || 'no-login';
+  
+  const badge = document.getElementById('m-camp-accepted-badge');
+  const infoBox = document.getElementById('m-camp-sensitive-info');
+  const postulateBtn = document.getElementById('m-camp-postulate-btn');
+  
+  if (!postulateBtn) return;
+
+  // Reset standard state
+  if (badge) {
+    badge.style.display = 'none';
+    badge.className = 'modal-status-badge';
+  }
+  if (infoBox) infoBox.style.display = 'none';
+  postulateBtn.disabled = false;
+  postulateBtn.className = 'btn btn-primary';
+  postulateBtn.textContent = 'Postularme';
+
+  if (selectedState === 'no-login') {
+    // Normal state
+  } else if (selectedState === 'registrado-pendiente') {
+    if (badge) {
+      badge.textContent = 'PENDIENTE';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'var(--color-primary-light)';
+      badge.style.color = 'var(--color-primary-dark)';
+      badge.style.border = '1px solid var(--color-primary)';
+      badge.style.display = 'inline-block';
+    }
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Pendiente ✓';
+  } else if (selectedState === 'registrado-aceptado') {
+    if (badge) {
+      badge.textContent = 'ACEPTADO';
+      badge.className = 'modal-status-badge accepted-pill';
+      badge.style.display = 'inline-block';
+      badge.style.backgroundColor = '';
+      badge.style.color = '';
+      badge.style.border = '';
+    }
+    if (infoBox) infoBox.style.display = 'block';
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Aceptada ✓';
+  } else if (selectedState === 'registrado-rechazado') {
+    if (badge) {
+      badge.textContent = 'RECHAZADO';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+      badge.style.color = '#EF4444';
+      badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      badge.style.display = 'inline-block';
+    }
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Rechazada';
+  }
+}
+

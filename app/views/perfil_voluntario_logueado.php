@@ -168,12 +168,37 @@
           </div>
         </div>
 
-        <!-- PANE: POSTULACIONES (Placeholder) -->
+        <!-- PANE: POSTULACIONES -->
         <div class="profile-pane" id="pane-postulaciones" role="tabpanel">
-          <div class="placeholder-pane-content">
-            <i data-lucide="clipboard-list"></i>
-            <h3>Mis Postulaciones</h3>
-            <p>Aquí aparecerán las campañas a las que te postules para realizar voluntariados y el estado del proceso de selección por parte de las organizaciones.</p>
+          <div class="pane-header-actions">
+            <h2>Postulaciones</h2>
+          </div>
+
+          <!-- FILTER AND SORT -->
+          <div class="tabs-filters-bar">
+            <div class="filter-group">
+              <select class="filter-select" id="filter-postulations-select" aria-label="Filtrar por">
+                <option value="">Filtrar por (Todas)</option>
+                <option value="aceptado">Aceptadas</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="rechazado">Rechazadas</option>
+              </select>
+              <select class="filter-select" id="sort-postulations-select" aria-label="Ordenar por">
+                <option value="">Ordenar por (Por defecto)</option>
+                <option value="reciente">Más recientes</option>
+                <option value="antiguas">Más antiguas</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Postulations List Grid -->
+          <div class="alternating-grid" id="my-postulations-grid">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- PAGINATION CONTROLS -->
+          <div class="pagination-container" id="postulations-pagination">
+            <!-- Populated dynamically via JS -->
           </div>
         </div>
 
@@ -423,6 +448,18 @@
     <div style="display: flex; gap: 12px; justify-content: center;">
       <button class="btn btn-ghost" onclick="closeModal('modal-delete-confirm')">Cancelar</button>
       <button class="btn btn-primary" id="confirm-delete-btn" style="background-color: #EF4444; border-color: #EF4444; color: #ffffff;">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. CANCEL POSTULATION CONFIRMATION MODAL -->
+<div class="modal-overlay" id="modal-cancel-postulation-confirm" role="dialog" aria-modal="true" aria-labelledby="cancel-postulation-title">
+  <div class="modal-box modal-box-small" style="max-width: 400px; padding: 24px; text-align: center;">
+    <h3 class="modal-title" id="cancel-postulation-title" style="color: #EF4444; font-size: 18px; margin-bottom: 12px;">¿Cancelar postulación?</h3>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; line-height: 1.5;">Esta acción retirará tu postulación de la campaña y ya no aparecerá en tu lista.</p>
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-cancel-postulation-confirm')">Volver</button>
+      <button class="btn btn-primary" id="confirm-cancel-postulation-btn" style="background-color: #EF4444; border-color: #EF4444; color: #ffffff;">Cancelar postulación</button>
     </div>
   </div>
 </div>

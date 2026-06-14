@@ -375,3 +375,59 @@
   max-width: 450px;
   line-height: 1.5;
 }
+
+/* Postulations layout and badges */
+.postulation-status-btn {
+  display: inline-block;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-weight: 700;
+  text-align: center;
+  width: 140px;
+  padding: 10px 16px;
+  border: none;
+  font-size: 14px;
+  text-transform: capitalize;
+  cursor: default;
+  box-shadow: var(--shadow-sm);
+}
+
+.postulation-status-btn.aceptado {
+  background-color: var(--color-success);
+}
+
+.postulation-status-btn.rechazado {
+  background-color: #EF4444;
+}
+
+.postulation-status-btn.pendiente {
+  background-color: #6B7280;
+}
+
+.post-cancel-btn {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: center;
+  display: block;
+  width: 140px;
+  transition: color var(--transition-fast);
+}
+
+.post-cancel-btn:hover {
+  color: #EF4444;
+}
+
+.postulation-actions-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
