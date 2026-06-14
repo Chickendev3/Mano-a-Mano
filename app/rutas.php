@@ -20,6 +20,7 @@ $rutas = [
 
     'perfil_organizacion_vista' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilOrganizacion'],
     'perfil_voluntario_vista' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilVoluntario'],
-    'perfil_voluntario_logueado' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilVoluntarioLogueado']
+    'perfil_voluntario_logueado' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilVoluntarioLogueado'],
+    'perfil_organizacion_logueado' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilOrganizacionLogueado']
 ];
 ?>
