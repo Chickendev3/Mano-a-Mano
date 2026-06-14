@@ -431,3 +431,115 @@
   margin-left: auto;
 }
 
+/* Invitation cards layout styles (strictly image on the left) */
+.invite-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  gap: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.invite-card:hover {
+  transform: scale(1.01);
+}
+
+.invite-card-img-col {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.invite-card-img-col.campaign-img {
+  border-radius: var(--radius-md);
+}
+
+.invite-card-img-col.user-avatar {
+  border-radius: 50%;
+}
+
+.invite-card-img-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.invite-card-img-col i {
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-muted);
+}
+
+.invite-card-content-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.invite-card-actions-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.invite-meta-link {
+  font-size: 13px;
+  color: var(--color-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.invite-meta-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* Custom Acceptance and Rejection button colors */
+.aceptar-invite-btn {
+  background-color: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+  color: #ffffff !important;
+  width: 140px;
+}
+
+.rechazar-invite-btn {
+  background-color: transparent !important;
+  border-color: #EF4444 !important;
+  color: #EF4444 !important;
+  width: 140px;
+}
+
+.rechazar-invite-btn:hover {
+  background-color: rgba(239, 68, 68, 0.05) !important;
+}
+
+

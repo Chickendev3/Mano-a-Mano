@@ -122,6 +122,102 @@ let postulations = [
 let currentCancelPostulationId = null;
 let currentPostulationsPage = 1;
 
+// Received Invitations Mock Database (Campaña | Invitador | etc.)
+let receivedInvitations = [
+  {
+    id: 701,
+    campaignId: 401,
+    title: "Clases de Pintura Infantil",
+    desc: "Buscamos voluntarios para dictar talleres recreativos de dibujo y pintura a niños del barrio.",
+    category: "cultura",
+    startDate: "2026-07-05",
+    endDate: "2026-07-26",
+    location: "Rosario, Santa Fe",
+    details: "Talleres grupales los domingos para fomentar la expresión artística e integración de los niños de la zona.",
+    images: ["img/camp_placeholder.png"]
+  },
+  {
+    id: 702,
+    campaignId: 402,
+    title: "Limpieza de Río Luján",
+    desc: "Jornada ecológica para recolectar plásticos, vidrios y residuos en las costas del río.",
+    category: "medio-ambiente",
+    startDate: "2026-07-12",
+    endDate: "2026-07-12",
+    location: "Tigre, Buenos Aires",
+    details: "Limpieza participativa en la costa del río con provisión de bolsas de residuos, pinzas de agarre y chalecos.",
+    images: ["img/campaign_park.png"]
+  }
+];
+
+// Sent Invitations Mock Database (Destinatario | Estado | Campaña)
+let sentInvitations = [
+  {
+    id: 801,
+    name: "Brian Clark",
+    type: "voluntario",
+    status: "pendiente",
+    campaignId: 301,
+    campaignTitle: "Apoyo Escolar Primario",
+    campaignDesc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
+    campaignCategory: "educacion",
+    campaignStartDate: "2026-06-20",
+    campaignEndDate: "2026-12-20",
+    campaignLocation: "San Martín, Buenos Aires",
+    campaignDetails: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
+    avatar: "img/org_placeholder.png"
+  },
+  {
+    id: 802,
+    name: "Techo Verde",
+    type: "organizacion",
+    status: "aceptado",
+    campaignId: 302,
+    campaignTitle: "Taller de Huertas Comunitarias",
+    campaignDesc: "Aprende sobre agricultura urbana, compostaje y cuidado del medio ambiente en nuestro taller semanal.",
+    campaignCategory: "medio-ambiente",
+    campaignStartDate: "2026-06-25",
+    campaignEndDate: "2026-08-25",
+    campaignLocation: "Villa Crespo, CABA",
+    campaignDetails: "Un espacio interactivo y gratuito para todos los vecinos donde se aprende a crear huertas orgánicas.",
+    avatar: "img/org_placeholder.png"
+  },
+  {
+    id: 803,
+    name: "María Inés",
+    type: "voluntario",
+    status: "rechazado",
+    campaignId: 301,
+    campaignTitle: "Apoyo Escolar Primario",
+    campaignDesc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
+    campaignCategory: "educacion",
+    campaignStartDate: "2026-06-20",
+    campaignEndDate: "2026-12-20",
+    campaignLocation: "San Martín, Buenos Aires",
+    campaignDetails: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
+    avatar: "img/org_placeholder.png"
+  },
+  {
+    id: 804,
+    name: "Mentes Brillantes",
+    type: "organizacion",
+    status: "pendiente",
+    campaignId: 303,
+    campaignTitle: "Colecta y Clasificación de Ropa",
+    campaignDesc: "Ayudanos a recibir y clasificar donaciones de ropa y abrigo que serán enviadas a comedores.",
+    campaignCategory: "accion-social",
+    campaignStartDate: "2026-07-01",
+    campaignEndDate: "2026-07-15",
+    campaignLocation: "Palermo, CABA",
+    campaignDetails: "Campaña de invierno para clasificar abrigos, calzado y frazadas recibidas.",
+    avatar: "img/org_placeholder.png"
+  }
+];
+
+let currentCancelInvitationId = null;
+let currentReceivedPage = 1;
+let currentSentPage = 1;
+
 // ABM State variables
 let currentEditCampaignId = null;
 let currentDeleteCampaignId = null;
@@ -138,6 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTabs();
   setupCampaignsGrid();
   setupPostulationsGrid();
+  setupInvitationsGrid();
   setupMockUploads();
 });
 
@@ -392,6 +489,12 @@ function setupTabs() {
       if (targetId === "pane-postulaciones") {
         currentPostulationsPage = 1;
         renderPostulations();
+      }
+      if (targetId === "pane-invitaciones") {
+        currentReceivedPage = 1;
+        currentSentPage = 1;
+        renderReceivedInvitations();
+        renderSentInvitations();
       }
 
       // Re-render Lucide icons
@@ -1263,4 +1366,481 @@ function updateModalStateBasedOnRadio() {
     postulateBtn.textContent = 'Postulación Rechazada';
   }
 }
+
+// ==========================================
+// 4c. INVITATIONS LISTS & FILTERS (RECEIVED & SENT)
+// ==========================================
+function setupInvitationsGrid() {
+  const filterReceived = document.getElementById("filter-received-select");
+  const sortReceived = document.getElementById("sort-received-select");
+  const filterSent = document.getElementById("filter-sent-select");
+  const sortSent = document.getElementById("sort-sent-select");
+
+  if (filterReceived) {
+    filterReceived.addEventListener("change", () => {
+      currentReceivedPage = 1;
+      renderReceivedInvitations();
+    });
+  }
+
+  if (sortReceived) {
+    sortReceived.addEventListener("change", () => {
+      currentReceivedPage = 1;
+      renderReceivedInvitations();
+    });
+  }
+
+  if (filterSent) {
+    filterSent.addEventListener("change", () => {
+      currentSentPage = 1;
+      renderSentInvitations();
+    });
+  }
+
+  if (sortSent) {
+    sortSent.addEventListener("change", () => {
+      currentSentPage = 1;
+      renderSentInvitations();
+    });
+  }
+
+  // Confirm cancel sent invitation button
+  const confirmCancelBtn = document.getElementById("confirm-cancel-invitation-btn");
+  if (confirmCancelBtn) {
+    confirmCancelBtn.addEventListener("click", () => {
+      if (currentCancelInvitationId) {
+        sentInvitations = sentInvitations.filter(inv => inv.id !== currentCancelInvitationId);
+        closeModal("modal-cancel-invitation-confirm");
+        currentCancelInvitationId = null;
+        
+        currentSentPage = 1; // reset page
+        renderSentInvitations();
+
+        if (typeof showToast !== "undefined") {
+          showToast("Invitación cancelada", "La invitación enviada ha sido retirada.", true);
+        }
+      }
+    });
+  }
+}
+
+function renderReceivedInvitations() {
+  const grid = document.getElementById("received-invitations-list");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-received-select")?.value || "";
+  const sortVal = document.getElementById("sort-received-select")?.value || "";
+
+  // 1. Filter
+  let filtered = [...receivedInvitations];
+  if (filterVal) {
+    filtered = filtered.filter(inv => inv.category === filterVal);
+  }
+
+  // 2. Sort
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  // 3. Paginate
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentReceivedPage > totalPages && totalPages > 0) {
+    currentReceivedPage = totalPages;
+  }
+
+  const startIndex = (currentReceivedPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  // 4. Render Grid HTML
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+        No tienes invitaciones recibidas pendientes.
+      </div>
+    `;
+    renderReceivedPagination(0);
+    return;
+  }
+
+  paginated.forEach(inv => {
+    // Square/rounded campaigns details, strictly on the left
+    const imgUrl = inv.images && inv.images.length > 0 ? inv.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${inv.title}">` 
+      : `<i data-lucide="image"></i>`;
+
+    const article = document.createElement("article");
+    article.className = "invite-card";
+    article.addEventListener("click", () => {
+      openReceivedCampaignDetailsView(inv.id);
+    });
+
+    article.innerHTML = `
+      <div class="invite-card-img-col campaign-img">
+        ${imgHTML}
+      </div>
+      <div class="invite-card-content-col">
+        <span style="font-size: 11px; font-weight: 700; color: var(--color-primary); display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+          <i data-lucide="mail" style="width:12px; height:12px;"></i> ¡Te invitaron a una campaña!
+        </span>
+        <h3 class="alt-card-title">${inv.title}</h3>
+        <p class="alt-card-desc">${inv.desc}</p>
+        <span style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px; display: block;">
+          <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${inv.location}
+        </span>
+      </div>
+      
+      <div class="invite-card-actions-col">
+        <button class="btn btn-primary aceptar-invite-btn" type="button" onclick="event.stopPropagation(); acceptReceivedInvitation(${inv.id});">
+          Aceptar
+        </button>
+        <button class="btn btn-ghost rechazar-invite-btn" type="button" onclick="event.stopPropagation(); rejectReceivedInvitation(${inv.id});">
+          Rechazar
+        </button>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderReceivedPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderReceivedPagination(totalPages) {
+  const container = document.getElementById("received-invitations-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentReceivedPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentReceivedPage > 1) {
+      currentReceivedPage--;
+      renderReceivedInvitations();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentReceivedPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentReceivedPage = i;
+      renderReceivedInvitations();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentReceivedPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentReceivedPage < totalPages) {
+      currentReceivedPage++;
+      renderReceivedInvitations();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+window.acceptReceivedInvitation = function(id) {
+  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
+  renderReceivedInvitations();
+
+  if (typeof showToast !== "undefined") {
+    showToast("Invitación aceptada", "Te has unido a la campaña. Ya está programada en tu voluntariado.", true);
+  }
+};
+
+window.rejectReceivedInvitation = function(id) {
+  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
+  renderReceivedInvitations();
+
+  if (typeof showToast !== "undefined") {
+    showToast("Invitación rechazada", "Has rechazado la invitación.", true);
+  }
+};
+
+function renderSentInvitations() {
+  const grid = document.getElementById("sent-invitations-list");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-sent-select")?.value || "";
+  const sortVal = document.getElementById("sort-sent-select")?.value || "";
+
+  // 1. Filter
+  let filtered = [...sentInvitations];
+  if (filterVal) {
+    filtered = filtered.filter(inv => inv.status === filterVal);
+  }
+
+  // 2. Sort
+  if (sortVal === "antiguas") {
+    filtered.reverse();
+  }
+
+  // 3. Paginate
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentSentPage > totalPages && totalPages > 0) {
+    currentSentPage = totalPages;
+  }
+
+  const startIndex = (currentSentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  // 4. Render Grid HTML
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+        No has enviado invitaciones aún.
+      </div>
+    `;
+    renderSentPagination(0);
+    return;
+  }
+
+  paginated.forEach(inv => {
+    // Circular user/org avatar strictly on the left
+    const avatarHTML = inv.avatar 
+      ? `<img src="${BASE_URL + inv.avatar}" alt="${inv.name}">` 
+      : `<i data-lucide="user"></i>`;
+
+    const profileUrl = inv.type === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+    const labelType = inv.type === "voluntario" ? "Voluntario" : "Organización";
+
+    // Status mapping
+    let statusLabel = "";
+    let statusClass = "";
+    if (inv.status === "aceptado") {
+      statusLabel = "Aceptado";
+      statusClass = "aceptado";
+    } else if (inv.status === "pendiente") {
+      statusLabel = "Pendiente";
+      statusClass = "pendiente";
+    } else if (inv.status === "rechazado") {
+      statusLabel = "Rechazado";
+      statusClass = "rechazado";
+    }
+
+    const cancelHTML = (inv.status === "pendiente" || inv.status === "aceptado")
+      ? `<button class="post-cancel-btn" type="button" onclick="event.stopPropagation(); openCancelInvitationConfirmModal(${inv.id});">
+          Cancelar invitación
+         </button>`
+      : "";
+
+    const article = document.createElement("article");
+    article.className = "invite-card";
+    // Clicking card opens the public profile of the user/organization
+    article.addEventListener("click", () => {
+      window.location.href = BASE_URL + profileUrl;
+    });
+
+    article.innerHTML = `
+      <div class="invite-card-img-col user-avatar">
+        ${avatarHTML}
+      </div>
+      <div class="invite-card-content-col">
+        <h3 class="alt-card-title" style="margin-bottom: 2px;">${inv.name}</h3>
+        <span style="font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase;">${labelType}</span>
+        
+        <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
+          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
+            <i data-lucide="user" style="width:12px; height:12px;"></i> Ir al perfil de ${inv.name}
+          </a>
+          <button type="button" class="invite-meta-link" onclick="event.stopPropagation(); openSentCampaignDetailsView(${inv.id});">
+            <i data-lucide="external-link" style="width:12px; height:12px;"></i> Campaña invitada: <strong>${inv.campaignTitle}</strong>
+          </button>
+        </div>
+      </div>
+      
+      <div class="invite-card-actions-col">
+        <button class="postulation-status-btn ${statusClass}" type="button" style="pointer-events: none;">
+          ${statusLabel}
+        </button>
+        ${cancelHTML}
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderSentPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderSentPagination(totalPages) {
+  const container = document.getElementById("sent-invitations-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentSentPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentSentPage > 1) {
+      currentSentPage--;
+      renderSentInvitations();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentSentPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentSentPage = i;
+      renderSentInvitations();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentSentPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentSentPage < totalPages) {
+      currentSentPage++;
+      renderSentInvitations();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+window.openCancelInvitationConfirmModal = function(id) {
+  currentCancelInvitationId = id;
+  openModal("modal-cancel-invitation-confirm");
+};
+
+function openReceivedCampaignDetailsView(invitationId) {
+  const inv = receivedInvitations.find(i => i.id === invitationId);
+  if (!inv) return;
+
+  // Prefill shared modal labels
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = inv.title;
+  
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${inv.desc}</p>
+      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${inv.details}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.location}</p>
+      <p><strong>Período:</strong> ${inv.startDate} al ${inv.endDate}</p>
+    `;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const tags = [getCategoryLabel(inv.category), "Convocatoria"];
+    tags.forEach(tag => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
+      mTags.appendChild(span);
+    });
+  }
+
+  // Hidden developer state choices card since we're viewing received invitation details
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  // Hide postulation button as they should either Aceptar/Rechazar from the invitations dashboard
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = "none";
+  }
+
+  openModal("modal-profile-camp-detail");
+  
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function openSentCampaignDetailsView(invitationId) {
+  const inv = sentInvitations.find(i => i.id === invitationId);
+  if (!inv) return;
+
+  // Prefill shared modal labels
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = inv.campaignTitle;
+  
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${inv.campaignDesc}</p>
+      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${inv.campaignDetails}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.campaignLocation}</p>
+      <p><strong>Período:</strong> ${inv.campaignStartDate} al ${inv.campaignEndDate}</p>
+    `;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const tags = [getCategoryLabel(inv.campaignCategory), "Convocatoria"];
+    tags.forEach(tag => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
+      mTags.appendChild(span);
+    });
+  }
+
+  // Hidden dev selector
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  // Hide postulation button
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = "none";
+  }
+
+  openModal("modal-profile-camp-detail");
+  
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
 
