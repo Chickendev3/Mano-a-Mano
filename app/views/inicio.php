@@ -409,7 +409,7 @@
     
     <div style="display: flex; justify-content: flex-end; gap: 12px;">
       <button class="btn btn-ghost" onclick="closeModal('modal-org-profile')">Cerrar</button>
-      <a href="<?= BASE_URL ?>organizacion/perfil/vista" class="btn btn-primary" id="org-profile-full-btn">Ver perfil completo</a>
+      <a href="<?= BASE_URL ?>perfil_organizacion_vista" class="btn btn-primary" id="org-profile-full-btn">Ver perfil completo</a>
     </div>
   </div>
 </div>

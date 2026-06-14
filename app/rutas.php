@@ -18,9 +18,7 @@ $rutas = [
     /* Conectar */
     'conectar' => ['controlador' => 'conectarCtrl', 'metodo' => 'index'],
 
-    /* Perfiles */
-    'organizacion/perfil' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilDesarrollo'],
-    'organizacion/perfil/vista' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilOrganizacion'],
-    'voluntario/perfil/vista' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilVoluntario']
+    'perfil_organizacion_vista' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilOrganizacion'],
+    'perfil_voluntario_vista' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilVoluntario']
 ];
 ?>
