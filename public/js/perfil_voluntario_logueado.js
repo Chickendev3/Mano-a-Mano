@@ -218,6 +218,72 @@ let currentCancelInvitationId = null;
 let currentReceivedPage = 1;
 let currentSentPage = 1;
 
+// Volunteering Mock Database
+let volunteering = [
+  {
+    id: 901,
+    title: "Reforestación Parque Central",
+    desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad.",
+    category: "medio-ambiente",
+    startDate: "2026-06-14",
+    endDate: "2026-06-21",
+    location: "Parque Central, Buenos Aires",
+    status: "activa",
+    ownerName: "Techo Verde",
+    ownerType: "organizacion",
+    images: ["img/campaign_park.png"],
+    details: "Actividades de plantación, riego y tutorado de 50 plantines autóctonos. Se proveen herramientas y guantes.",
+    additionalInfo: "Dirección: Av. Sarmiento 2300 (junto al lago). Coordinador: Martín Silva (+54 11 9876-5432)."
+  },
+  {
+    id: 902,
+    title: "Apoyo Escolar Primario",
+    desc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
+    category: "educacion",
+    startDate: "2026-06-20",
+    endDate: "2026-12-20",
+    location: "San Martín, Buenos Aires",
+    status: "activa",
+    ownerName: "Mentes Brillantes",
+    ownerType: "organizacion",
+    images: ["img/campaign_tutoring.png"],
+    details: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
+    additionalInfo: "Dirección exacta: Belgrano 456, San Martín. Coordinador: Lucas Gómez (+54 11 5555-1234). Traer cartuchera y cuaderno."
+  },
+  {
+    id: 903,
+    title: "Taller de RCP y Primeros Auxilios",
+    desc: "Taller teórico-práctico de reanimación cardiopulmonar y primeros auxilios básicos para la comunidad.",
+    category: "salud",
+    startDate: "2026-03-01",
+    endDate: "2026-03-15",
+    location: "Salguero 120, CABA",
+    status: "finalizada",
+    ownerName: "Juan Pérez",
+    ownerType: "voluntario",
+    images: ["img/camp_placeholder.png"],
+    details: "Taller interactivo abierto a la comunidad sobre maniobras básicas de reanimación y primeros auxilios.",
+    additionalInfo: "Dirección: Salguero 120, CABA. Coordinador: Juan Pérez (+54 11 3333-7777). Se entrega certificado de asistencia."
+  },
+  {
+    id: 904,
+    title: "Colecta Navideña",
+    desc: "Recepción y empaquetado de juguetes y alimentos navideños para familias necesitadas.",
+    category: "accion-social",
+    startDate: "2025-12-01",
+    endDate: "2025-12-25",
+    location: "Mansilla 2900, CABA",
+    status: "finalizada",
+    ownerName: "Cáritas",
+    ownerType: "organizacion",
+    images: ["img/campaign_food.png"],
+    details: "Campaña para recolectar y clasificar alimentos no perecederos y juguetes para la mesa navideña.",
+    additionalInfo: "Dirección: Mansilla 2900, CABA. Coordinadora: Hermana Teresa (+54 11 2222-1111)."
+  }
+];
+
+let currentVolunteeringPage = 1;
+
 // ABM State variables
 let currentEditCampaignId = null;
 let currentDeleteCampaignId = null;
@@ -235,6 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCampaignsGrid();
   setupPostulationsGrid();
   setupInvitationsGrid();
+  setupVolunteeringGrid();
   setupMockUploads();
 });
 
@@ -495,6 +562,10 @@ function setupTabs() {
         currentSentPage = 1;
         renderReceivedInvitations();
         renderSentInvitations();
+      }
+      if (targetId === "pane-voluntariado") {
+        currentVolunteeringPage = 1;
+        renderVolunteering();
       }
 
       // Re-render Lucide icons
@@ -1835,6 +1906,249 @@ function openSentCampaignDetailsView(invitationId) {
   if (mPostulateBtn) {
     mPostulateBtn.style.display = "none";
   }
+
+  openModal("modal-profile-camp-detail");
+  
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+// ==========================================
+// 4d. VOLUNTEERING LISTS & FILTERS
+// ==========================================
+function setupVolunteeringGrid() {
+  const filterSelect = document.getElementById("filter-volunteering-select");
+  const sortSelect = document.getElementById("sort-volunteering-select");
+
+  if (filterSelect) {
+    filterSelect.addEventListener("change", () => {
+      currentVolunteeringPage = 1;
+      renderVolunteering();
+    });
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      currentVolunteeringPage = 1;
+      renderVolunteering();
+    });
+  }
+}
+
+function renderVolunteering() {
+  const grid = document.getElementById("my-volunteering-grid");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-volunteering-select")?.value || "";
+  const sortVal = document.getElementById("sort-volunteering-select")?.value || "";
+
+  // 1. Filter
+  let filtered = [...volunteering];
+  if (filterVal) {
+    filtered = filtered.filter(item => item.status === filterVal);
+  }
+
+  // 2. Sort
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  // 3. Paginate
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentVolunteeringPage > totalPages && totalPages > 0) {
+    currentVolunteeringPage = totalPages;
+  }
+
+  const startIndex = (currentVolunteeringPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  // 4. Render Grid HTML
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+        No tienes campañas registradas en esta sección.
+      </div>
+    `;
+    renderVolunteeringPagination(0);
+    return;
+  }
+
+  paginated.forEach(item => {
+    // Reuses the invite-card class layout (strictly image on the left)
+    const imgUrl = item.images && item.images.length > 0 ? item.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${item.title}">` 
+      : `<i data-lucide="image"></i>`;
+
+    const statusLabel = item.status === "activa" ? "Activa" : "Finalizada";
+    const statusClass = item.status === "activa" ? "activa" : "finalizada";
+    
+    // Choose redirection URL type based on ownerType
+    const profileUrl = item.ownerType === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+
+    const article = document.createElement("article");
+    article.className = "invite-card";
+    article.addEventListener("click", () => {
+      openVolunteeringDetailsView(item.id);
+    });
+
+    article.innerHTML = `
+      <div class="invite-card-img-col campaign-img">
+        ${imgHTML}
+      </div>
+      <div class="invite-card-content-col">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 2px; flex-wrap: wrap; gap: 8px;">
+          <h3 class="alt-card-title">${item.title}</h3>
+          <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
+            ${getCategoryLabel(item.category)}
+          </span>
+        </div>
+        <p class="alt-card-desc">${item.desc}</p>
+        
+        <div style="display:flex; flex-direction:column; gap:4px; margin-top: auto;">
+          <span style="font-size: 12px; color: var(--color-text-muted);">
+            <i data-lucide="calendar" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> Período: ${item.startDate} al ${item.endDate}
+          </span>
+          <span style="font-size: 12px; color: var(--color-text-muted);">
+            <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${item.location}
+          </span>
+          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
+            <i data-lucide="user" style="width:12px; height:12px;"></i> Creado por: <strong>${item.ownerName}</strong>
+          </a>
+        </div>
+      </div>
+      
+      <div class="invite-card-actions-col">
+        <span class="vol-status-badge ${statusClass}">
+          ${statusLabel}
+        </span>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderVolunteeringPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderVolunteeringPagination(totalPages) {
+  const container = document.getElementById("volunteering-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentVolunteeringPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentVolunteeringPage > 1) {
+      currentVolunteeringPage--;
+      renderVolunteering();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentVolunteeringPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentVolunteeringPage = i;
+      renderVolunteering();
+      scrollToCampaigns();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentVolunteeringPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentVolunteeringPage < totalPages) {
+      currentVolunteeringPage++;
+      renderVolunteering();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+function openVolunteeringDetailsView(volunteeringId) {
+  const item = volunteering.find(v => v.id === volunteeringId);
+  if (!item) return;
+
+  // Prefill shared modal labels
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = item.title;
+  
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${item.desc}</p>
+      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${item.details}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${item.location}</p>
+      <p><strong>Período:</strong> ${item.startDate} al ${item.endDate}</p>
+    `;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const tags = [getCategoryLabel(item.category), "Convocatoria"];
+    tags.forEach(tag => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
+      mTags.appendChild(span);
+    });
+  }
+
+  // Hide or pre-set developer simulation state card inside the details modal
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) {
+    devStateCard.style.display = "block";
+    const radio = document.querySelector('input[name="dev-state-choice"][value="registrado-aceptado"]');
+    if (radio) {
+      radio.checked = true;
+    }
+  }
+
+  // Pre-fill sensitive coordinator info
+  if (mSensitive) {
+    mSensitive.innerHTML = `
+      <h4>Información de Coordinación (Exclusivo Voluntarios)</h4>
+      <div class="info-alert-content">
+        <p style="font-size: 13px; line-height: 1.5; margin: 0; color: var(--color-text-secondary);">
+          ${item.additionalInfo || "No se ha proporcionado información de contacto adicional."}
+        </p>
+      </div>
+    `;
+  }
+
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = "block";
+  }
+
+  // Trigger state simulator update logic (shows accepted badge, unlocks/reveals sensitive info block)
+  updateModalStateBasedOnRadio();
 
   openModal("modal-profile-camp-detail");
   

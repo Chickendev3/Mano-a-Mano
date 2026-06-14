@@ -270,12 +270,36 @@
 
         </div>
 
-        <!-- PANE: VOLUNTARIADO (Placeholder) -->
+        <!-- PANE: VOLUNTARIADO -->
         <div class="profile-pane" id="pane-voluntariado" role="tabpanel">
-          <div class="placeholder-pane-content">
-            <i data-lucide="award"></i>
-            <h3>Mis Voluntariados</h3>
-            <p>Aquí se listará tu historial de voluntariados fijos realizados, insignias obtenidas y horas de impacto social certificadas por las organizaciones asociadas.</p>
+          <div class="pane-header-actions">
+            <h2>Voluntariados</h2>
+          </div>
+
+          <!-- FILTER AND SORT -->
+          <div class="tabs-filters-bar">
+            <div class="filter-group">
+              <select class="filter-select" id="filter-volunteering-select" aria-label="Filtrar por">
+                <option value="">Filtrar por (Todas)</option>
+                <option value="activa">Activas</option>
+                <option value="finalizada">Finalizadas</option>
+              </select>
+              <select class="filter-select" id="sort-volunteering-select" aria-label="Ordenar por">
+                <option value="">Ordenar por (Por defecto)</option>
+                <option value="reciente">Más recientes</option>
+                <option value="antiguas">Más antiguas</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Volunteering List Grid -->
+          <div class="invites-list-container alternating-grid" id="my-volunteering-grid">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- PAGINATION CONTROLS -->
+          <div class="pagination-container" id="volunteering-pagination">
+            <!-- Populated dynamically via JS -->
           </div>
         </div>
 

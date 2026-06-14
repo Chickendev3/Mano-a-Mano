@@ -542,4 +542,30 @@
   background-color: rgba(239, 68, 68, 0.05) !important;
 }
 
+/* Volunteering Status Badges */
+.vol-status-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  min-width: 100px;
+}
+
+.vol-status-badge.activa {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.vol-status-badge.finalizada {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #4B5563;
+  border-color: rgba(107, 114, 128, 0.3);
+}
+
+
 
