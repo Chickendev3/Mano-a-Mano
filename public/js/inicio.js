@@ -407,13 +407,9 @@ function appendCampaignCardToDOM(camp) {
       <h3 class="camp-title">${camp.title}</h3>
       <p class="camp-desc">${camp.desc}</p>
       
-      
-      
       <div class="camp-meta-list">
-        <div class="camp-meta-item"><i data-lucide="users"></i> <span>${camp.volunteersRegistered} / ${camp.volunteersRequired} voluntarios</span></div>
         <div class="camp-meta-item"><i data-lucide="map-pin"></i> <span>${camp.location}</span></div>
         <div class="camp-meta-item"><i data-lucide="calendar"></i> <span>${camp.date}</span></div>
-        <div class="camp-meta-item"><i data-lucide="clock"></i> <span>${camp.time}</span></div>
       </div>
       
       <button class="btn btn-primary" onclick="openCampaignDetails(${camp.id})">Ver campaña</button>
