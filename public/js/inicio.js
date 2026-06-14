@@ -194,7 +194,7 @@ window.openCampaignDetails = function(campaignId) {
     if (appliedCampaigns.has(campaignId)) {
       applyBtn.className = 'btn btn-ghost';
       applyBtn.disabled = true;
-      applyBtn.innerHTML = 'Postulado ✓';
+      applyBtn.innerHTML = 'Pendiente ✓';
     } else {
       applyBtn.className = 'btn btn-success';
       applyBtn.disabled = false;
@@ -254,7 +254,7 @@ function initializePostulationBtn() {
       
       applyCampaignBtn.className = 'btn btn-ghost';
       applyCampaignBtn.disabled = true;
-      applyCampaignBtn.innerHTML = 'Postulado ✓';
+      applyCampaignBtn.innerHTML = 'Pendiente ✓';
       
       // Dynamic DOM update of card
       updateCampaignCardInDOM(currentCampaignContext);

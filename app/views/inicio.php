@@ -8,6 +8,7 @@
       </div>
       <h1 class="hero-title">Conectamos personas con causas que generan impacto</h1>
       <p class="hero-subtitle">Encontrá oportunidades de voluntariado o publicá campañas para sumar personas comprometidas con tu misión.</p>
+      <?php if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true): ?>
       <div class="hero-buttons">
         <a href="<?= BASE_URL ?>registro/voluntario" class="btn btn-primary btn-lg" id="hero-volunteer-btn">
           Quiero ser voluntario <i data-lucide="arrow-right"></i>
@@ -16,6 +17,7 @@
           Soy una organización
         </a>
       </div>
+      <?php endif; ?>
       <div class="hero-stats">
         <div class="stat-item">
           <h3 id="stat-campaigns">+180</h3>

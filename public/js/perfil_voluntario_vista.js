@@ -1,8 +1,16 @@
 // JavaScript for Perfil Voluntario Vista
+let currentCampaignId = null;
+const appliedProfileCampaigns = new Set();
+
+// Pagination State
+const ITEMS_PER_PAGE = 2;
+let currentPage = 1;
+
 document.addEventListener('DOMContentLoaded', () => {
   initializeTabs();
   initializeDevStateListeners();
   initializeCloseModalEvents();
+  renderPagination();
 });
 
 // TAB SYSTEM (Campañas / Voluntariados)
@@ -30,6 +38,10 @@ function initializeTabs() {
         paneCampanas.classList.add('active');
         paneCampanas.style.display = 'block';
       }
+
+      // Reset pagination page
+      currentPage = 1;
+      renderPagination();
     });
     
     tabVoluntariados.addEventListener('click', () => {
@@ -48,6 +60,10 @@ function initializeTabs() {
         paneVoluntariados.classList.add('active');
         paneVoluntariados.style.display = 'block';
       }
+
+      // Reset pagination page
+      currentPage = 1;
+      renderPagination();
     });
   }
 }
@@ -88,6 +104,7 @@ const campaignsDetailsData = {
 
 // OPEN MODAL FOR CAMPAIGNS
 window.openCampaignDetailsModal = function(campaignId) {
+  currentCampaignId = campaignId;
   const camp = campaignsDetailsData[campaignId] || {
     title: 'Campaña Solidaria',
     desc: 'Detalles de la campaña de voluntariado.',
@@ -115,6 +132,20 @@ window.openCampaignDetailsModal = function(campaignId) {
     lucide.createIcons();
   }
   
+  // Preset selector choices based on state
+  if (IS_LOGGED_IN) {
+    if (appliedProfileCampaigns.has(campaignId)) {
+      const radio = document.querySelector('input[name="dev-state-choice"][value="registrado-pendiente"]');
+      if (radio) radio.checked = true;
+    } else {
+      const radio = document.querySelector('input[name="dev-state-choice"][value="no-login"]');
+      if (radio) radio.checked = true;
+    }
+  } else {
+    const radio = document.querySelector('input[name="dev-state-choice"][value="no-login"]');
+    if (radio) radio.checked = true;
+  }
+
   updateModalStateBasedOnRadio();
   openModal('modal-profile-camp-detail');
 };
@@ -148,20 +179,30 @@ function initializeDevStateListeners() {
   const postulateBtn = document.getElementById('m-camp-postulate-btn');
   if (postulateBtn) {
     postulateBtn.addEventListener('click', () => {
-      const selectedState = document.querySelector('input[name="dev-state-choice"]:checked').value;
-      
-      if (selectedState === 'no-login') {
+      if (!IS_LOGGED_IN) {
         if (typeof showToast !== 'undefined') {
-          showToast('Redireccionando...', 'Registrate para poder postularte a las campañas.', false);
+          showToast('Inicio de sesión requerido', 'Tenés que iniciar sesión para postularte a las campañas.', false);
         }
         closeModal('modal-profile-camp-detail');
         setTimeout(() => {
-          window.location.href = BASE_URL + 'registro';
+          window.location.href = BASE_URL + 'sesion';
         }, 1500);
-      } else {
-        if (typeof showToast !== 'undefined') {
-          showToast('Postulación procesada', 'Se ha guardado tu postulación para revisión.', true);
-        }
+        return;
+      }
+
+      // Logged in postulation logic
+      if (currentCampaignId) {
+        appliedProfileCampaigns.add(currentCampaignId);
+      }
+
+      const radioPending = document.querySelector('input[name="dev-state-choice"][value="registrado-pendiente"]');
+      if (radioPending) {
+        radioPending.checked = true;
+      }
+      updateModalStateBasedOnRadio();
+
+      if (typeof showToast !== 'undefined') {
+        showToast('Postulación procesada', 'Se ha guardado tu postulación como pendiente.', true);
       }
     });
   }
@@ -199,7 +240,7 @@ function updateModalStateBasedOnRadio() {
     }
     postulateBtn.disabled = true;
     postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Postulación Pendiente ✓';
+    postulateBtn.textContent = 'Pendiente ✓';
   } else if (selectedState === 'registrado-aceptado') {
     if (badge) {
       badge.textContent = 'ACEPTADO';
@@ -227,3 +268,83 @@ function updateModalStateBasedOnRadio() {
     postulateBtn.textContent = 'Postulación Rechazada';
   }
 }
+
+// CLIENT-SIDE DYNAMIC PAGINATION
+window.renderPagination = function() {
+  const activePane = document.querySelector('.profile-pane.active');
+  if (!activePane) return;
+
+  const cards = activePane.querySelectorAll('.alt-card');
+  const totalItems = cards.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  const pagContainer = document.querySelector('.pagination-container');
+  if (!pagContainer) return;
+  
+  if (totalPages <= 1) {
+    pagContainer.style.display = 'none';
+    cards.forEach(card => card.style.display = 'grid');
+    return;
+  } else {
+    pagContainer.style.display = 'flex';
+  }
+
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  // Show only current page items
+  cards.forEach((card, index) => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    if (index >= start && index < end) {
+      card.style.display = 'grid';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // Re-generate pagination buttons
+  pagContainer.innerHTML = '';
+
+  // Previous page button
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'pag-btn';
+  prevBtn.innerHTML = '&lt; Anterior';
+  if (currentPage === 1) {
+    prevBtn.disabled = true;
+    prevBtn.style.opacity = '0.5';
+    prevBtn.style.cursor = 'not-allowed';
+  }
+  prevBtn.addEventListener('click', () => {
+    currentPage--;
+    renderPagination();
+  });
+  pagContainer.appendChild(prevBtn);
+
+  // Numeric page buttons
+  for (let i = 1; i <= totalPages; i++) {
+    const pageNumBtn = document.createElement('button');
+    pageNumBtn.className = `pag-num ${i === currentPage ? 'active' : ''}`;
+    pageNumBtn.textContent = i;
+    pageNumBtn.addEventListener('click', () => {
+      currentPage = i;
+      renderPagination();
+    });
+    pagContainer.appendChild(pageNumBtn);
+  }
+
+  // Next page button
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'pag-btn';
+  nextBtn.innerHTML = 'Siguiente &gt;';
+  if (currentPage === totalPages) {
+    nextBtn.disabled = true;
+    nextBtn.style.opacity = '0.5';
+    nextBtn.style.cursor = 'not-allowed';
+  }
+  nextBtn.addEventListener('click', () => {
+    currentPage++;
+    renderPagination();
+  });
+  pagContainer.appendChild(nextBtn);
+};
