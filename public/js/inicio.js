@@ -160,51 +160,45 @@ window.openCampaignDetails = function(campaignId) {
   currentCampaignContext = camp;
   
   // Set modal texts
-  const detailTitle = document.getElementById('camp-detail-title');
-  const detailOrg = document.getElementById('detail-org-name');
-  const detailDesc = document.getElementById('detail-desc-text');
-  const detailSkills = document.getElementById('detail-skills-text');
-  const detailLocation = document.getElementById('detail-location');
-  const detailDate = document.getElementById('detail-date');
-  const detailTime = document.getElementById('detail-time');
-  const detailVolunteers = document.getElementById('detail-volunteers-stat');
+  const detailTitle = document.getElementById('m-camp-title');
+  const detailDesc = document.getElementById('m-camp-desc');
+  const mTags = document.getElementById('m-camp-tags');
 
   if (detailTitle) detailTitle.textContent = camp.title;
-  if (detailOrg) detailOrg.textContent = `Publicado por ${camp.org}`;
   if (detailDesc) detailDesc.textContent = camp.desc;
-  if (detailSkills) detailSkills.textContent = camp.skills;
-  if (detailLocation) detailLocation.textContent = camp.location;
-  if (detailDate) detailDate.textContent = camp.date;
-  if (detailTime) detailTime.textContent = camp.time;
-  if (detailVolunteers) detailVolunteers.textContent = `${camp.volunteersRegistered} de ${camp.volunteersRequired} inscriptos`;
   
-  // Category badge color
-  const catBadge = document.getElementById('detail-cat-badge');
-  if (catBadge) {
-    catBadge.textContent = getCategoryLabel(camp.category);
-    catBadge.className = 'camp-detail-cat';
-    if (camp.category === 'medio-ambiente') catBadge.classList.add('badge-env');
-    else if (camp.category === 'educacion') catBadge.classList.add('badge-edu');
-    else catBadge.classList.add('badge-soc');
+  if (mTags) {
+    mTags.innerHTML = '';
+    const tags = [getCategoryLabel(camp.category), 'Comunidad', 'Voluntariado'];
+    tags.forEach(tag => {
+      const span = document.createElement('span');
+      span.className = 'tag-badge';
+      span.innerHTML = tag === 'Comunidad' ? `<i data-lucide="tag"></i> ${tag}` : tag;
+      mTags.appendChild(span);
+    });
   }
-  
-  // Adjust application button state if already applied
-  const applyBtn = document.getElementById('apply-campaign-btn');
-  if (applyBtn) {
+
+  // Preset selector choices based on state
+  if (IS_LOGGED_IN) {
     if (appliedCampaigns.has(campaignId)) {
-      applyBtn.className = 'btn btn-ghost';
-      applyBtn.disabled = true;
-      applyBtn.innerHTML = 'Pendiente ✓';
+      const radio = document.querySelector('input[name="dev-state-choice"][value="registrado-pendiente"]');
+      if (radio) radio.checked = true;
     } else {
-      applyBtn.className = 'btn btn-success';
-      applyBtn.disabled = false;
-      applyBtn.innerHTML = 'Postularme como voluntario <i data-lucide="heart"></i>';
+      const radio = document.querySelector('input[name="dev-state-choice"][value="no-login"]');
+      if (radio) radio.checked = true;
     }
+  } else {
+    const radio = document.querySelector('input[name="dev-state-choice"][value="no-login"]');
+    if (radio) radio.checked = true;
   }
   
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
+
+  // Update view based on selected radio button state
+  updateModalStateBasedOnRadio();
+
   openModal('modal-camp-detail');
 };
 
@@ -217,59 +211,117 @@ function getCategoryLabel(cat) {
   }
 }
 
-// POSTULATE ACTION
+// DEVELOPER MOCK STATE CONTROLLER FOR REVIEW
 function initializePostulationBtn() {
-  const applyCampaignBtn = document.getElementById('apply-campaign-btn');
-  if (applyCampaignBtn) {
-    applyCampaignBtn.addEventListener('click', () => {
-      if (!currentCampaignContext) return;
-      
-      // Verification Rule: Must be logged in to postulate!
+  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      updateModalStateBasedOnRadio();
+    });
+  });
+
+  const postulateBtn = document.getElementById('m-camp-postulate-btn');
+  if (postulateBtn) {
+    postulateBtn.addEventListener('click', () => {
       if (!IS_LOGGED_IN) {
-        // Show error warning toast
-        showToast('Inicio de sesión requerido', 'Tenés que iniciar sesión para postularte a esta campaña.', false);
-        // Close modal
+        if (typeof showToast !== 'undefined') {
+          showToast('Inicio de sesión requerido', 'Tenés que iniciar sesión para postularte a las campañas.', false);
+        }
         closeModal('modal-camp-detail');
-        // Redirect to login after a brief delay
         setTimeout(() => {
           window.location.href = BASE_URL + 'sesion';
-        }, 1800);
+        }, 1500);
         return;
       }
-      
-      const campId = currentCampaignContext.id;
-      if (appliedCampaigns.has(campId)) return;
-      
-      // Mock application update
-      appliedCampaigns.add(campId);
-      currentCampaignContext.volunteersRegistered++;
-      const newProgress = Math.round((currentCampaignContext.volunteersRegistered / currentCampaignContext.volunteersRequired) * 100);
-      currentCampaignContext.progress = newProgress;
-      
-      // Update detail modal
-      const detailVolunteers = document.getElementById('detail-volunteers-stat');
-      if (detailVolunteers) {
-        detailVolunteers.textContent = `${currentCampaignContext.volunteersRegistered} de ${currentCampaignContext.volunteersRequired} inscriptos`;
+
+      if (currentCampaignContext) {
+        const campId = currentCampaignContext.id;
+        if (!appliedCampaigns.has(campId)) {
+          appliedCampaigns.add(campId);
+          currentCampaignContext.volunteersRegistered = (currentCampaignContext.volunteersRegistered || 0) + 1;
+          // Increment general impact hours
+          const statImpact = document.getElementById('stat-impact');
+          if (statImpact) {
+            const currentImpactText = statImpact.textContent;
+            const currentHoursVal = parseInt(currentImpactText.replace('k+', '')) || 12;
+            statImpact.textContent = `${currentHoursVal}.2k+`;
+          }
+          // Dynamic DOM update of card
+          updateCampaignCardInDOM(currentCampaignContext);
+        }
       }
-      
-      applyCampaignBtn.className = 'btn btn-ghost';
-      applyCampaignBtn.disabled = true;
-      applyCampaignBtn.innerHTML = 'Pendiente ✓';
-      
-      // Dynamic DOM update of card
-      updateCampaignCardInDOM(currentCampaignContext);
-      
-      // Celebrate!
-      showToast('¡Postulación enviada!', `¡Gracias por comprometerte con "${currentCampaignContext.title}"! Estate atento al estado de tus Postulaciones.`, true);
-      
-      // Increment general impact hours
-      const statImpact = document.getElementById('stat-impact');
-      if (statImpact) {
-        const currentImpactText = statImpact.textContent;
-        const currentHoursVal = parseInt(currentImpactText.replace('k+', '')) || 12;
-        statImpact.textContent = `${currentHoursVal}.2k+`;
+
+      const radioPending = document.querySelector('input[name="dev-state-choice"][value="registrado-pendiente"]');
+      if (radioPending) {
+        radioPending.checked = true;
+      }
+      updateModalStateBasedOnRadio();
+
+      if (typeof showToast !== 'undefined') {
+        showToast('¡Postulación enviada!', `¡Gracias por comprometerte con "${currentCampaignContext?.title || 'la campaña'}"! Estate atento al estado de tus Postulaciones.`, true);
       }
     });
+  }
+}
+
+function updateModalStateBasedOnRadio() {
+  const selectedState = document.querySelector('input[name="dev-state-choice"]:checked')?.value || 'no-login';
+  
+  const badge = document.getElementById('m-camp-accepted-badge');
+  const infoBox = document.getElementById('m-camp-sensitive-info');
+  const postulateBtn = document.getElementById('m-camp-postulate-btn');
+  
+  if (!postulateBtn) return;
+
+  // Reset standard state
+  if (badge) {
+    badge.style.display = 'none';
+    badge.className = 'modal-status-badge';
+  }
+  if (infoBox) infoBox.style.display = 'none';
+  postulateBtn.disabled = false;
+  postulateBtn.className = 'btn btn-primary';
+  postulateBtn.textContent = 'Postularme';
+
+  if (selectedState === 'no-login') {
+    // Normal state
+  } else if (selectedState === 'registrado-pendiente') {
+    if (badge) {
+      badge.textContent = 'PENDIENTE';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'var(--color-primary-light)';
+      badge.style.color = 'var(--color-primary-dark)';
+      badge.style.border = '1px solid var(--color-primary)';
+      badge.style.display = 'inline-block';
+    }
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Pendiente ✓';
+  } else if (selectedState === 'registrado-aceptado') {
+    if (badge) {
+      badge.textContent = 'ACEPTADO';
+      badge.className = 'modal-status-badge accepted-pill';
+      badge.style.display = 'inline-block';
+      badge.style.backgroundColor = '';
+      badge.style.color = '';
+      badge.style.border = '';
+    }
+    if (infoBox) infoBox.style.display = 'block';
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Aceptada ✓';
+  } else if (selectedState === 'registrado-rechazado') {
+    if (badge) {
+      badge.textContent = 'RECHAZADO';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+      badge.style.color = '#EF4444';
+      badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      badge.style.display = 'inline-block';
+    }
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Rechazada';
   }
 }
 
