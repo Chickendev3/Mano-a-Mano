@@ -423,7 +423,57 @@
 
 /* ==========================================================================
    CAROUSELS (ORGANIZACIONES & CAMPAÑAS)
+   ========================================================================= */
+/* ==========================================================================
+   CAROUSELS (ORGANIZACIONES & CAMPAÑAS)
    ========================================================================== */
+
+/* Wrapper externo que contiene flechas + carrusel */
+.orgs-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Flechas de navegación */
+.carousel-arrow {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  z-index: 2;
+}
+
+.carousel-arrow:hover {
+  background-color: var(--color-primary, #6d5ee4);
+  border-color: var(--color-primary, #6d5ee4);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.carousel-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.carousel-arrow svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+}
+
+/* Carrusel en sí — overflow oculto para no mostrar scrollbar con flechas */
 .orgs-carousel,
 .camps-carousel {
   display: flex;
@@ -433,31 +483,16 @@
   padding: 10px 4px 24px 4px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  /* Ocultar scrollbar cuando hay flechas */
+  scrollbar-width: none;
 }
 
-/* Custom scrollbar style for carousels */
 .orgs-carousel::-webkit-scrollbar,
 .camps-carousel::-webkit-scrollbar {
-  height: 8px;
+  display: none;
 }
 
-.orgs-carousel::-webkit-scrollbar-track,
-.camps-carousel::-webkit-scrollbar-track {
-  background: var(--color-background);
-  border-radius: var(--radius-full);
-}
-
-.orgs-carousel::-webkit-scrollbar-thumb,
-.camps-carousel::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: var(--radius-full);
-}
-
-.orgs-carousel::-webkit-scrollbar-thumb:hover,
-.camps-carousel::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
-}
-
+/* Cards */
 .org-card,
 .camp-card {
   scroll-snap-align: start;
@@ -467,6 +502,50 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
+}
+
+/* Indicadores / dots */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-border);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.carousel-dot.active {
+  background-color: var(--color-primary, #6d5ee4);
+  width: 24px;
+}
+
+/* Responsive: 2 cards en tablet, 1 en mobile */
+@media (max-width: 1024px) {
+  .org-card,
+  .camp-card {
+    flex: 0 0 calc(50% - 12px);
+  }
+}
+
+@media (max-width: 640px) {
+  .org-card,
+  .camp-card {
+    flex: 0 0 calc(100% - 8px);
+  }
+
+  .carousel-arrow {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 @media (max-width: 1024px) {

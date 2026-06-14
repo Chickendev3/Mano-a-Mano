@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeCampaignForm();
   initializeOrgProfileContactLink();
   initializePostulationBtn();
+  initOrgsCarousel(); // 👈 agregá esta línea
 });
 
 // COUNTER COUNTING EFFECT IN HERO
@@ -424,4 +425,96 @@ function appendCampaignCardToDOM(camp) {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
+}
+
+// ==========================================================================
+// CARRUSEL ORGANIZACIONES — flechas + autoplay + dots
+// ==========================================================================
+function initOrgsCarousel() {
+  const carousel      = document.getElementById('orgs-container');
+  const prevBtn       = document.getElementById('orgs-prev');
+  const nextBtn       = document.getElementById('orgs-next');
+  const dotsContainer = document.getElementById('orgs-dots');
+
+  if (!carousel || !prevBtn || !nextBtn) return;
+
+  const AUTOPLAY_INTERVAL = 4000;
+  let autoplayTimer = null;
+  let currentIndex  = 0;
+
+  function getVisibleCount() {
+    const card = carousel.querySelector('.org-card');
+    if (!card) return 1;
+    const cardWidth = card.offsetWidth + 24; // 24 = gap
+    return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
+  }
+
+  function getCards() {
+    return Array.from(carousel.querySelectorAll('.org-card'));
+  }
+
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    const total = Math.ceil(getCards().length / getVisibleCount());
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Ir al grupo ${i + 1}`);
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function updateDots() {
+    if (!dotsContainer) return;
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function goTo(index) {
+    const cards    = getCards();
+    const visible  = getVisibleCount();
+    const maxIndex = Math.ceil(cards.length / visible) - 1;
+
+    currentIndex = Math.max(0, Math.min(index, maxIndex));
+
+    const targetCard = cards[currentIndex * visible];
+    if (targetCard) {
+      carousel.scrollTo({ left: targetCard.offsetLeft - 4, behavior: 'smooth' });
+    }
+
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= maxIndex;
+    updateDots();
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayTimer = setInterval(() => {
+      const maxIndex = Math.ceil(getCards().length / getVisibleCount()) - 1;
+      goTo(currentIndex >= maxIndex ? 0 : currentIndex + 1);
+    }, AUTOPLAY_INTERVAL);
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  }
+
+  prevBtn.addEventListener('click', () => { goTo(currentIndex - 1); stopAutoplay(); startAutoplay(); });
+  nextBtn.addEventListener('click', () => { goTo(currentIndex + 1); stopAutoplay(); startAutoplay(); });
+
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', startAutoplay);
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { buildDots(); goTo(currentIndex); }, 200);
+  });
+
+  buildDots();
+  goTo(0);
+  startAutoplay();
 }

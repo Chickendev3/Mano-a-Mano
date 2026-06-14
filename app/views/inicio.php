@@ -158,6 +158,7 @@
 </section>
 
 <!-- ORGANIZACIONES DESTACADAS (Carrusel) -->
+<!-- ORGANIZACIONES DESTACADAS (Carrusel) -->
 <section class="section section-bg-alt" id="organizaciones">
   <div class="container">
     <div class="section-header">
@@ -165,36 +166,54 @@
       <h2 class="section-title">Organizaciones activas</h2>
       <p class="section-subtitle">Conocé algunas de las ONGs que ya están transformando realidades en la plataforma.</p>
     </div>
-    
-    <!-- Orgs Carousel with Scroll Snap -->
-    <div class="orgs-carousel" id="orgs-container">
-      <?php foreach ($organizaciones as $org): ?>
-        <div class="org-card">
-          <div class="org-card-header">
-            <!-- If organization has an image, render it, otherwise render colored initials avatar -->
-            <?php if (!empty($org['imagen'])): ?>
-              <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0;">
-                <img src="<?= BASE_URL . $org['imagen'] ?>" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+
+    <div class="orgs-carousel-wrapper">
+      <button class="carousel-arrow carousel-arrow-prev" id="orgs-prev" aria-label="Anterior">
+        <i data-lucide="chevron-left"></i>
+      </button>
+
+      <div class="orgs-carousel" id="orgs-container">
+        <?php foreach ($organizaciones as $org): ?>
+          <div class="org-card">
+            <div class="org-card-header">
+              <?php if (!empty($org['imagen'])): ?>
+                <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0;">
+                  <img src="<?= BASE_URL . $org['imagen'] ?>" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+              <?php else: ?>
+                <div class="org-logo-avatar <?= htmlspecialchars($org['avatar_clase']) ?>" aria-label="Logo de <?= htmlspecialchars($org['nombre']) ?>"><?= htmlspecialchars($org['iniciales']) ?></div>
+              <?php endif; ?>
+              <div class="org-info">
+                <h4><?= htmlspecialchars($org['nombre']) ?></h4>
+                <span class="org-tag"><?= htmlspecialchars($org['categoria']) ?></span>
               </div>
-            <?php else: ?>
-              <div class="org-logo-avatar <?= $org['avatar_clase'] ?>" aria-label="Logo de <?= htmlspecialchars($org['nombre']) ?>"><?= $org['iniciales'] ?></div>
-            <?php endif; ?>
-            <div class="org-info">
-              <h4><?= htmlspecialchars($org['nombre']) ?></h4>
-              <span class="org-tag"><?= htmlspecialchars($org['categoria']) ?></span>
             </div>
+            <p class="org-desc"><?= htmlspecialchars($org['descripcion']) ?></p>
+            <div class="org-meta">
+              <span class="org-meta-item"><i data-lucide="calendar"></i> <?= htmlspecialchars($org['campanas_activas']) ?></span>
+              <span class="org-meta-item"><i data-lucide="map-pin"></i> <?= htmlspecialchars($org['ubicacion']) ?></span>
+            </div>
+            <button class="btn btn-outline org-action-btn"
+              onclick="openOrgProfile(
+                '<?= htmlspecialchars($org['nombre'], ENT_QUOTES) ?>',
+                '<?= htmlspecialchars($org['categoria'], ENT_QUOTES) ?>',
+                '<?= htmlspecialchars($org['descripcion'], ENT_QUOTES) ?>',
+                '<?= htmlspecialchars($org['ubicacion'], ENT_QUOTES) ?>',
+                '<?= htmlspecialchars($org['campanas_activas'], ENT_QUOTES) ?>'
+              )">Ver perfil</button>
           </div>
-          <p class="org-desc"><?= htmlspecialchars($org['descripcion']) ?></p>
-          <div class="org-meta">
-            <span class="org-meta-item"><i data-lucide="calendar"></i> <?= htmlspecialchars($org['campanas_activas']) ?></span>
-            <span class="org-meta-item"><i data-lucide="map-pin"></i> <?= htmlspecialchars($org['ubicacion']) ?></span>
-          </div>
-          <button class="btn btn-outline org-action-btn" onclick="openOrgProfile('<?= htmlspecialchars($org['nombre']) ?>', '<?= htmlspecialchars($org['categoria']) ?>', '<?= htmlspecialchars($org['descripcion']) ?>', '<?= htmlspecialchars($org['ubicacion']) ?>', '<?= htmlspecialchars($org['campanas_activas']) ?>')">Ver perfil</button>
-        </div>
-      <?php endforeach; ?>
+        <?php endforeach; ?>
+      </div>
+
+      <button class="carousel-arrow carousel-arrow-next" id="orgs-next" aria-label="Siguiente">
+        <i data-lucide="chevron-right"></i>
+      </button>
     </div>
+
+    <div class="carousel-dots" id="orgs-dots"></div>
   </div>
 </section>
+
 
 <!-- CAMPAÑAS SOLIDARIAS ACTIVAS (Carrusel) -->
 <section class="section" id="campanas" style="background-color: var(--color-surface);">
