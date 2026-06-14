@@ -1,11 +1,11 @@
 <p>HEADER ACÁ</p>
 <div>
     <button type="button" onclick="window.location.href='<?= BASE_URL ?>'">
-        Ir a inicio
+        Inicio
     </button>
 
     <button type="button" onclick="window.location.href='<?= BASE_URL ?>registro'">
-        Ir a registro
+        Registro
     </button>
 
     <?php if (isset($_SESSION['id_usuario'])): ?>
@@ -14,7 +14,11 @@
     </button>
     <?php else: ?>
     <button type="button" onclick="window.location.href='<?= BASE_URL ?>sesion'">
-        Ir a sesión
+        Iniciar Sesión
     </button>
     <?php endif; ?>
+
+    <button type="button" onclick="window.location.href='<?= BASE_URL ?>contacto'">
+        Contacto
+    </button>
 </div>
