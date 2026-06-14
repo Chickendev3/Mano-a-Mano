@@ -39,13 +39,34 @@
               <span id="view-profile-location">Cargando ubicación...</span>
             </div>
             <div class="profile-meta-item">
-              <i data-lucide="mail"></i>
-              <span id="view-profile-email">Cargando email...</span>
+              <i data-lucide="clock"></i>
+              <span id="view-profile-availability">Cargando disponibilidad...</span>
+            </div>
+          </div>
+
+          <!-- Private Information Section (Only visible to the volunteer on their private dashboard) -->
+          <div class="private-info-section" style="margin-top: 16px; padding: 16px; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.12); border-radius: var(--radius-md);">
+            <h4 style="font-size: 13px; font-weight: 700; color: var(--color-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Información Privada (Brindada al aceptar postulaciones)
+            </h4>
+            <div class="profile-meta-row" style="margin-top: 0; gap: 12px 24px;">
+              <div class="profile-meta-item">
+                <i data-lucide="mail"></i>
+                <span id="view-profile-email">Cargando email...</span>
+              </div>
+              <div class="profile-meta-item">
+                <i data-lucide="phone"></i>
+                <span>Tel. Principal: <strong id="view-profile-phone1">Cargando...</strong></span>
+              </div>
+              <div class="profile-meta-item">
+                <i data-lucide="phone-call"></i>
+                <span>Tel. Secundario: <strong id="view-profile-phone2">Cargando...</strong></span>
+              </div>
             </div>
           </div>
 
           <!-- Insignias and Statistics (Static - Not editable by user) -->
-          <div class="profile-badges-container">
+          <div class="profile-badges-container" style="margin-top: 20px;">
             <div class="badge-row-item">
               <i data-lucide="award" class="badge-icon-gold"></i>
               <span>Insignia de Voluntariado Fijo en organización: Techo Verde</span>
@@ -73,34 +94,60 @@
 
         <!-- INLINE EDIT STATE (Hidden by default) -->
         <div class="profile-info-edit-form" id="profile-edit-state" style="display: none;">
-          <div class="edit-row">
-            <label for="edit-name">Nombre</label>
-            <input type="text" id="edit-name" class="edit-input">
+          <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary);">Información Pública</h3>
+          
+          <div class="form-group-row" style="margin-bottom: 12px;">
+            <div class="edit-row">
+              <label for="edit-name">Nombre y Apellido</label>
+              <input type="text" id="edit-name" class="edit-input">
+            </div>
+            <div class="edit-row">
+              <label for="edit-location">Ubicación</label>
+              <input type="text" id="edit-location" class="edit-input">
+            </div>
           </div>
-          <div class="edit-row">
+
+          <div class="edit-row" style="margin-bottom: 12px;">
             <label for="edit-desc">Descripción</label>
-            <textarea id="edit-desc" class="edit-input" rows="4"></textarea>
+            <textarea id="edit-desc" class="edit-input" rows="3"></textarea>
           </div>
-          <div class="edit-row">
-            <label for="edit-location">Ubicación</label>
-            <input type="text" id="edit-location" class="edit-input">
+
+          <div class="edit-row" style="margin-bottom: 12px;">
+            <label for="edit-availability">Horario de Disponibilidad</label>
+            <input type="text" id="edit-availability" class="edit-input" placeholder="Ej: Lunes a Viernes de 9:00 a 13:00 o Sábados todo el día">
           </div>
-          <div class="edit-row">
-            <label for="edit-email">Email</label>
-            <input type="email" id="edit-email" class="edit-input">
-          </div>
-          <div class="edit-row">
-            <label>Habilidades / Profesiones (Selección con buscador)</label>
+
+          <div class="edit-row" style="margin-bottom: 16px;">
+            <label>Etiquetas de oficio (Selección con buscador)</label>
             <div class="edit-tags-container" id="edit-tags-list">
               <!-- Populated dynamically -->
             </div>
             <div class="tag-search-wrapper">
-              <input type="text" id="tag-search-input" class="edit-input" placeholder="Buscar habilidades (ej: Cocinero, Profesor, Logística...)">
+              <input type="text" id="tag-search-input" class="edit-input" placeholder="Buscar oficios (ej: Cocinero, Profesor, Electricista, Plomero...)">
               <ul class="tag-suggestions-list" id="tag-suggestions">
                 <!-- Suggestions dropdown populated by JS -->
               </ul>
             </div>
           </div>
+
+          <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary); margin-top: 20px;">Información Privada (Solo para organizaciones asociadas)</h3>
+
+          <div class="edit-row" style="margin-bottom: 12px;">
+            <label for="edit-email">Email (gmail)</label>
+            <input type="email" id="edit-email" class="edit-input">
+          </div>
+
+          <div class="form-group-row" style="margin-bottom: 16px;">
+            <div class="edit-row">
+              <label for="edit-phone1">Teléfono Principal</label>
+              <input type="text" id="edit-phone1" class="edit-input">
+            </div>
+            <div class="edit-row">
+              <label for="edit-phone2">Teléfono Secundario</label>
+              <input type="text" id="edit-phone2" class="edit-input">
+            </div>
+          </div>
+
           <div class="camp-card-actions" style="margin-top: 16px;">
             <button class="btn btn-primary" id="save-profile-btn">Guardar</button>
             <button class="btn btn-ghost" id="cancel-profile-btn">Cancelar</button>

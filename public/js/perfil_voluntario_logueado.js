@@ -8,7 +8,10 @@ let userProfile = {
   name: "Voluntario de Prueba",
   desc: "Apasionado por la educación y el trabajo social. Busco colaborar en proyectos comunitarios que generen un impacto positivo en la niñez y el medio ambiente.",
   location: "Buenos Aires, Argentina",
+  availability: "Lunes a Viernes de 14:00 a 18:00",
   email: "voluntario@gmail.com",
+  phone1: "+54 11 5555-5678",
+  phone2: "+54 11 9999-1234",
   avatar: "", // Base64 data or URL
   skills: ["Cocinero", "Profesor"]
 };
@@ -16,15 +19,19 @@ let userProfile = {
 const availableSkills = [
   "Cocinero",
   "Profesor",
-  "Logística",
+  "Carpintero",
+  "Electricista",
+  "Plomero",
+  "Pintor",
+  "Jardinero",
+  "Albañil",
+  "Costurero",
+  "Peluquero",
+  "Conductor",
+  "Cuidador",
   "Tallerista",
-  "Coordinador",
-  "Apoyo Escolar",
-  "Administración",
-  "Primeros Auxilios",
-  "Diseño Gráfico",
-  "Redes Sociales",
-  "Fotografía"
+  "Logística",
+  "Apoyo Escolar"
 ];
 
 // Local state for temporary skill tags being edited
@@ -314,7 +321,10 @@ function renderProfileData() {
   const viewName = document.getElementById("view-profile-name");
   const viewDesc = document.getElementById("view-profile-desc");
   const viewLocation = document.getElementById("view-profile-location");
+  const viewAvailability = document.getElementById("view-profile-availability");
   const viewEmail = document.getElementById("view-profile-email");
+  const viewPhone1 = document.getElementById("view-profile-phone1");
+  const viewPhone2 = document.getElementById("view-profile-phone2");
   const viewSkills = document.getElementById("view-skills-badges");
 
   // Avatar
@@ -331,7 +341,10 @@ function renderProfileData() {
   if (viewName) viewName.textContent = userProfile.name;
   if (viewDesc) viewDesc.textContent = userProfile.desc;
   if (viewLocation) viewLocation.textContent = userProfile.location;
+  if (viewAvailability) viewAvailability.textContent = userProfile.availability;
   if (viewEmail) viewEmail.textContent = userProfile.email;
+  if (viewPhone1) viewPhone1.textContent = userProfile.phone1;
+  if (viewPhone2) viewPhone2.textContent = userProfile.phone2;
 
   // Skills Badges (Read-Only)
   if (viewSkills) {
@@ -364,7 +377,10 @@ function setupProfileEditEvents() {
   const editName = document.getElementById("edit-name");
   const editDesc = document.getElementById("edit-desc");
   const editLocation = document.getElementById("edit-location");
+  const editAvailability = document.getElementById("edit-availability");
   const editEmail = document.getElementById("edit-email");
+  const editPhone1 = document.getElementById("edit-phone1");
+  const editPhone2 = document.getElementById("edit-phone2");
   const avatarInput = document.getElementById("edit-avatar-input");
 
   // Click "Editar Perfil"
@@ -374,7 +390,10 @@ function setupProfileEditEvents() {
       editName.value = userProfile.name;
       editDesc.value = userProfile.desc;
       editLocation.value = userProfile.location;
+      editAvailability.value = userProfile.availability;
       editEmail.value = userProfile.email;
+      editPhone1.value = userProfile.phone1 || "";
+      editPhone2.value = userProfile.phone2 || "";
       
       // Copy skills list to temp list
       tempSkills = [...userProfile.skills];
@@ -403,7 +422,10 @@ function setupProfileEditEvents() {
       userProfile.name = editName.value.trim() || "Voluntario de Prueba";
       userProfile.desc = editDesc.value.trim() || "Sin descripción.";
       userProfile.location = editLocation.value.trim() || "No especificada";
+      userProfile.availability = editAvailability.value.trim() || "No especificada";
       userProfile.email = editEmail.value.trim() || "voluntario@gmail.com";
+      userProfile.phone1 = editPhone1.value.trim() || "";
+      userProfile.phone2 = editPhone2.value.trim() || "";
       userProfile.skills = [...tempSkills];
 
       renderProfileData();
