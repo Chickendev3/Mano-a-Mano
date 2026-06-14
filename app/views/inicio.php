@@ -158,7 +158,6 @@
 </section>
 
 <!-- ORGANIZACIONES DESTACADAS (Carrusel) -->
-<!-- ORGANIZACIONES DESTACADAS (Carrusel) -->
 <section class="section section-bg-alt" id="organizaciones">
   <div class="container">
     <div class="section-header">
@@ -166,7 +165,6 @@
       <h2 class="section-title">Organizaciones activas</h2>
       <p class="section-subtitle">Conocé algunas de las ONGs que ya están transformando realidades en la plataforma.</p>
     </div>
-<<<<<<< HEAD
 
     <div class="orgs-carousel-wrapper">
       <button class="carousel-arrow carousel-arrow-prev" id="orgs-prev" aria-label="Anterior">
@@ -177,35 +175,17 @@
         <?php foreach ($organizaciones as $org): ?>
           <div class="org-card">
             <div class="org-card-header">
-              <?php if (!empty($org['imagen'])): ?>
-                <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0;">
+              <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0; background-color: var(--color-background); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center;">
+                <?php if (!empty($org['imagen'])): ?>
                   <img src="<?= BASE_URL . $org['imagen'] ?>" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-              <?php else: ?>
-                <div class="org-logo-avatar <?= htmlspecialchars($org['avatar_clase']) ?>" aria-label="Logo de <?= htmlspecialchars($org['nombre']) ?>"><?= htmlspecialchars($org['iniciales']) ?></div>
-              <?php endif; ?>
+                <?php else: ?>
+                  <img src="<?= BASE_URL ?>img/org_placeholder.png" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+                <?php endif; ?>
+              </div>
               <div class="org-info">
                 <h4><?= htmlspecialchars($org['nombre']) ?></h4>
                 <span class="org-tag"><?= htmlspecialchars($org['categoria']) ?></span>
               </div>
-=======
-    
-    <!-- Orgs Carousel with Scroll Snap -->
-    <div class="orgs-carousel" id="orgs-container">
-      <?php foreach ($organizaciones as $org): ?>
-        <div class="org-card">
-          <div class="org-card-header">
-            <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0; background-color: var(--color-background); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center;">
-              <?php if (!empty($org['imagen'])): ?>
-                <img src="<?= BASE_URL . $org['imagen'] ?>" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
-              <?php else: ?>
-                <img src="<?= BASE_URL ?>img/org_placeholder.png" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
-              <?php endif; ?>
-            </div>
-            <div class="org-info">
-              <h4><?= htmlspecialchars($org['nombre']) ?></h4>
-              <span class="org-tag"><?= htmlspecialchars($org['categoria']) ?></span>
->>>>>>> f78e9960ab034fef0910f28714436b7d3243c995
             </div>
             <p class="org-desc"><?= htmlspecialchars($org['descripcion']) ?></p>
             <div class="org-meta">
