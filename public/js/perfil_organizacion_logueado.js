@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupMockUploads();
   setupVolunteersSection();
   setupInvitationsGrid();
+  setupAssociationsGrid();
 });
 
 // ==========================================
@@ -321,6 +322,11 @@ function setupTabs() {
         currentSentPage = 1;
         renderReceivedInvitations();
         renderSentInvitations();
+      }
+
+      if (targetId === "pane-asociaciones") {
+        currentAssociationsPage = 1;
+        renderAssociations();
       }
 
       if (typeof lucide !== "undefined") {
@@ -1715,5 +1721,274 @@ function openSentCampaignDetailsView(invitationId) {
     lucide.createIcons();
   }
 }
+
+// ==========================================
+// 11. ASOCIACIONES SECCIÓN ESTADO Y MOCKUP
+// ==========================================
+let currentAssociationsPage = 1;
+
+let associations = [
+  {
+    id: 1101,
+    campaignId: 201,
+    title: "Reforestación Parque Central",
+    desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad.",
+    category: "medio-ambiente",
+    startDate: "2026-06-14",
+    endDate: "2026-06-21",
+    location: "Buenos Aires, Argentina",
+    details: "Actividades de plantación, riego y tutorado de 50 plantines autóctonos. Se proveen herramientas y guantes.",
+    images: ["img/campaign_park.png"],
+    ownerName: "Carlos Rodríguez",
+    ownerType: "voluntario"
+  },
+  {
+    id: 1102,
+    campaignId: 998,
+    title: "Limpieza de Río Luján",
+    desc: "Jornada ecológica para recolectar plásticos, vidrios y residuos en las costas del río.",
+    category: "medio-ambiente",
+    startDate: "2026-05-01",
+    endDate: "2026-05-15",
+    location: "Tigre, Buenos Aires",
+    details: "Limpieza participativa en la costa del río con provisión de bolsas de residuos, pinzas de agarre y chalecos.",
+    images: ["img/campaign_park.png"],
+    ownerName: "Fundación Vida Silvestre",
+    ownerType: "organizacion"
+  },
+  {
+    id: 1103,
+    campaignId: 999,
+    title: "Apoyo Escolar Primario",
+    desc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
+    category: "educacion",
+    startDate: "2026-06-20",
+    endDate: "2026-12-20",
+    location: "San Martín, Buenos Aires",
+    details: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas.",
+    images: ["img/camp_placeholder.png"],
+    ownerName: "Fundación Educar",
+    ownerType: "organizacion"
+  }
+];
+
+function setupAssociationsGrid() {
+  const filterSelect = document.getElementById("filter-associations-select");
+  const sortSelect = document.getElementById("sort-associations-select");
+
+  if (filterSelect) {
+    filterSelect.addEventListener("change", () => {
+      currentAssociationsPage = 1;
+      renderAssociations();
+    });
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      currentAssociationsPage = 1;
+      renderAssociations();
+    });
+  }
+}
+
+function renderAssociations() {
+  const grid = document.getElementById("associations-list");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-associations-select")?.value || "";
+  const sortVal = document.getElementById("sort-associations-select")?.value || "";
+
+  // 1. Filter
+  let filtered = [...associations];
+  
+  if (filterVal) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    if (filterVal === "activas") {
+      filtered = filtered.filter(assoc => new Date(assoc.endDate) >= today);
+    } else if (filterVal === "finalizadas") {
+      filtered = filtered.filter(assoc => new Date(assoc.endDate) < today);
+    }
+  }
+
+  // 2. Sort
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  // 3. Paginate
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentAssociationsPage > totalPages && totalPages > 0) {
+    currentAssociationsPage = totalPages;
+  }
+
+  const startIndex = (currentAssociationsPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  // 4. Render HTML
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary); background-color: var(--color-surface); border: 1px dashed var(--color-border); border-radius: var(--radius-md);">
+        No se encontraron asociaciones registradas con este filtro.
+      </div>
+    `;
+    renderAssociationsPagination(0);
+    return;
+  }
+
+  paginated.forEach(assoc => {
+    const imgUrl = assoc.images && assoc.images.length > 0 ? assoc.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${assoc.title}">` 
+      : `<i data-lucide="image"></i>`;
+
+    const profileUrl = assoc.ownerType === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+    const ownerTypeLabel = assoc.ownerType === "voluntario" ? "Voluntario" : "Organización";
+
+    const article = document.createElement("article");
+    article.className = "invite-card";
+    article.addEventListener("click", () => {
+      openAssociationCampaignDetailsView(assoc.id);
+    });
+
+    article.innerHTML = `
+      <div class="invite-card-img-col campaign-img">
+        ${imgHTML}
+      </div>
+      <div class="invite-card-content-col">
+        <h3 class="alt-card-title">${assoc.title}</h3>
+        <p class="alt-card-desc">${assoc.desc}</p>
+        
+        <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
+          <span style="font-size: 12px; color: var(--color-text-muted);">
+            <i data-lucide="calendar" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> Período: ${assoc.startDate} al ${assoc.endDate}
+          </span>
+          <span style="font-size: 12px; color: var(--color-text-muted);">
+            <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${assoc.location}
+          </span>
+          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
+            <i data-lucide="user" style="width:12px; height:12px;"></i> Pertenece a: <strong>${assoc.ownerName}</strong> (${ownerTypeLabel})
+          </a>
+        </div>
+      </div>
+      
+      <div class="invite-card-actions-col">
+        <a href="${BASE_URL + profileUrl}" class="btn btn-ghost" onclick="event.stopPropagation();" style="border: 1px solid var(--color-border); padding: 8px 16px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-secondary); background: none;">
+          <i data-lucide="external-link" style="width:14px; height:14px;"></i> Ir al perfil
+        </a>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderAssociationsPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderAssociationsPagination(totalPages) {
+  const container = document.getElementById("associations-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentAssociationsPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentAssociationsPage > 1) {
+      currentAssociationsPage--;
+      renderAssociations();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentAssociationsPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentAssociationsPage = i;
+      renderAssociations();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentAssociationsPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentAssociationsPage < totalPages) {
+      currentAssociationsPage++;
+      renderAssociations();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+function openAssociationCampaignDetailsView(associationId) {
+  const assoc = associations.find(a => a.id === associationId);
+  if (!assoc) return;
+
+  // Prefill shared modal labels
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = assoc.title;
+  
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${assoc.desc}</p>
+      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${assoc.details}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${assoc.location}</p>
+      <p><strong>Período:</strong> ${assoc.startDate} al ${assoc.endDate}</p>
+    `;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const tags = [getCategoryLabel(assoc.category), "Convocatoria"];
+    tags.forEach(tag => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
+      mTags.appendChild(span);
+    });
+  }
+
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = "none";
+  }
+
+  openModal("modal-profile-camp-detail");
+  
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+
 
 

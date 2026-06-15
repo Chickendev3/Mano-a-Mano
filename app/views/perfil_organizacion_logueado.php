@@ -203,12 +203,36 @@
           </div>
         </div>
 
-        <!-- PANE: ASOCIACIONES (Placeholder) -->
+        <!-- PANE: ASOCIACIONES -->
         <div class="profile-pane" id="pane-asociaciones" role="tabpanel">
-          <div class="placeholder-pane-content">
-            <i data-lucide="heart-handshake"></i>
-            <h3>Asociaciones</h3>
-            <p>Aquí se listarán las alianzas y colaboraciones activas con otras organizaciones o voluntarios independientes.</p>
+          <div class="pane-header-actions">
+            <h2>Asociaciones</h2>
+          </div>
+
+          <!-- FILTERS AND SORT -->
+          <div class="tabs-filters-bar">
+            <div class="filter-group">
+              <select class="filter-select" id="filter-associations-select" aria-label="Filtrar por">
+                <option value="">Filtrar por (Todas)</option>
+                <option value="activas">Campañas Activas</option>
+                <option value="finalizadas">Campañas Finalizadas</option>
+              </select>
+              <select class="filter-select" id="sort-associations-select" aria-label="Ordenar por">
+                <option value="">Ordenar por (Por defecto)</option>
+                <option value="reciente">Más recientes (Descendente)</option>
+                <option value="antiguas">Más antiguas (Ascendente)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Associations List Grid -->
+          <div class="invites-list-container alternating-grid" id="associations-list">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- PAGINATION CONTROLS -->
+          <div class="pagination-container" id="associations-pagination">
+            <!-- Populated dynamically via JS -->
           </div>
         </div>
 
