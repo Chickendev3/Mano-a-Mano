@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTabs();
   setupCampaignsGrid();
   setupMockUploads();
+  setupVolunteersSection();
 });
 
 // ==========================================
@@ -828,3 +829,320 @@ function setupMockUploads() {
     });
   });
 }
+
+// ==========================================
+// 9. GESTIONAR VOLUNTARIOS FIJOS LÓGICA
+// ==========================================
+
+// Mock user database for search simulation
+let volunteerUsersDB = [
+  {
+    email: "juan.perez@gmail.com",
+    name: "Juan",
+    lastName: "Pérez",
+    avatar: ""
+  },
+  {
+    email: "maria.gomez@gmail.com",
+    name: "María",
+    lastName: "Gómez",
+    avatar: ""
+  },
+  {
+    email: "carlos.rodriguez@gmail.com",
+    name: "Carlos",
+    lastName: "Rodríguez",
+    avatar: ""
+  },
+  {
+    email: "lucia.fernandez@gmail.com",
+    name: "Lucía",
+    lastName: "Fernández",
+    avatar: ""
+  },
+  {
+    email: "sofia.lopez@gmail.com",
+    name: "Sofía",
+    lastName: "López",
+    avatar: ""
+  }
+];
+
+// Active fixed volunteers
+let fixedVolunteers = [
+  {
+    email: "carlos.rodriguez@gmail.com",
+    name: "Carlos",
+    lastName: "Rodríguez",
+    avatar: ""
+  },
+  {
+    email: "lucia.fernandez@gmail.com",
+    name: "Lucía",
+    lastName: "Fernández",
+    avatar: ""
+  }
+];
+
+// Discharged volunteers
+let dischargedVolunteers = [
+  {
+    email: "maria.gomez@gmail.com",
+    name: "María",
+    lastName: "Gómez",
+    avatar: ""
+  }
+];
+
+function setupVolunteersSection() {
+  const toggleSearchBtn = document.getElementById("btn-toggle-volunteer-search");
+  const searchContainer = document.getElementById("volunteer-search-container");
+  const searchBtn = document.getElementById("btn-execute-volunteer-search");
+  const searchInput = document.getElementById("volunteer-search-email");
+
+  if (toggleSearchBtn && searchContainer) {
+    toggleSearchBtn.addEventListener("click", () => {
+      const isHidden = searchContainer.style.display === "none";
+      searchContainer.style.display = isHidden ? "block" : "none";
+      if (isHidden && searchInput) {
+        searchInput.value = "";
+        const resultsDiv = document.getElementById("volunteer-search-results");
+        if (resultsDiv) resultsDiv.innerHTML = "";
+        searchInput.focus();
+      }
+    });
+  }
+
+  if (searchBtn && searchInput) {
+    searchBtn.addEventListener("click", () => {
+      performVolunteerSearch();
+    });
+
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        performVolunteerSearch();
+      }
+    });
+  }
+
+  // Initial render of lists
+  renderVolunteerLists();
+}
+
+function renderVolunteerLists() {
+  const fixedList = document.getElementById("fixed-volunteers-list");
+  const dischargedList = document.getElementById("discharged-volunteers-list");
+
+  // RENDER FIXED VOLUNTEERS
+  if (fixedList) {
+    fixedList.innerHTML = "";
+    if (fixedVolunteers.length === 0) {
+      fixedList.innerHTML = `
+        <div class="volunteer-empty-state">
+          No hay voluntarios fijos registrados.
+        </div>
+      `;
+    } else {
+      fixedVolunteers.forEach(vol => {
+        const card = document.createElement("article");
+        card.className = "invite-card volunteer-card";
+        
+        const avatarHTML = vol.avatar 
+          ? `<img src="${BASE_URL + vol.avatar}" alt="${vol.name}">`
+          : `<i data-lucide="user"></i>`;
+
+        card.innerHTML = `
+          <div class="invite-card-img-col user-avatar">
+            ${avatarHTML}
+          </div>
+          <div class="invite-card-content-col">
+            <h3 class="alt-card-title">${vol.name} ${vol.lastName}</h3>
+            <p class="alt-card-desc">${vol.email}</p>
+          </div>
+          <div class="invite-card-actions-col">
+            <button class="btn btn-ghost volunteer-btn-remove" onclick="dischargeVolunteer('${vol.email}')">
+              <i data-lucide="user-minus" style="width: 14px; height: 14px; margin-right: 4px;"></i> Dar de baja
+            </button>
+          </div>
+        `;
+        fixedList.appendChild(card);
+      });
+    }
+  }
+
+  // RENDER DISCHARGED VOLUNTEERS
+  if (dischargedList) {
+    dischargedList.innerHTML = "";
+    if (dischargedVolunteers.length === 0) {
+      dischargedList.innerHTML = `
+        <div class="volunteer-empty-state">
+          No hay voluntarios dados de baja.
+        </div>
+      `;
+    } else {
+      dischargedVolunteers.forEach(vol => {
+        const card = document.createElement("article");
+        card.className = "invite-card volunteer-card";
+        
+        const avatarHTML = vol.avatar 
+          ? `<img src="${BASE_URL + vol.avatar}" alt="${vol.name}">`
+          : `<i data-lucide="user"></i>`;
+
+        card.innerHTML = `
+          <div class="invite-card-img-col user-avatar">
+            ${avatarHTML}
+          </div>
+          <div class="invite-card-content-col">
+            <h3 class="alt-card-title">${vol.name} ${vol.lastName}</h3>
+            <p class="alt-card-desc">${vol.email}</p>
+          </div>
+          <div class="invite-card-actions-col">
+            <button class="btn btn-ghost volunteer-btn-add" onclick="enrollVolunteer('${vol.email}')">
+              <i data-lucide="user-check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Volver a dar de alta
+            </button>
+          </div>
+        `;
+        dischargedList.appendChild(card);
+      });
+    }
+  }
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function performVolunteerSearch() {
+  const emailInput = document.getElementById("volunteer-search-email");
+  const resultsDiv = document.getElementById("volunteer-search-results");
+  
+  if (!emailInput || !resultsDiv) return;
+
+  const searchEmail = emailInput.value.trim().toLowerCase();
+  if (!searchEmail) {
+    resultsDiv.innerHTML = `
+      <div style="color: #EF4444; font-size: 14px; font-weight: 500;">
+        Por favor, ingrese un correo electrónico para buscar.
+      </div>
+    `;
+    return;
+  }
+
+  // Find user in the mock DB
+  const foundUser = volunteerUsersDB.find(u => u.email.toLowerCase() === searchEmail);
+
+  if (!foundUser) {
+    resultsDiv.innerHTML = `
+      <div style="color: #EF4444; font-size: 14px; font-weight: 500; padding: 12px; background-color: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-sm);">
+        No se encontró ningún usuario registrado con el correo: <strong>${emailInput.value}</strong>
+      </div>
+    `;
+    return;
+  }
+
+  // Check if already active
+  const isActive = fixedVolunteers.some(v => v.email.toLowerCase() === searchEmail);
+  
+  const avatarHTML = foundUser.avatar 
+    ? `<img src="${BASE_URL + foundUser.avatar}" alt="${foundUser.name}">`
+    : `<i data-lucide="user"></i>`;
+
+  if (isActive) {
+    resultsDiv.innerHTML = `
+      <article class="invite-card volunteer-card" style="margin-bottom: 0; background-color: var(--color-surface);">
+        <div class="invite-card-img-col user-avatar">
+          ${avatarHTML}
+        </div>
+        <div class="invite-card-content-col">
+          <h3 class="alt-card-title">${foundUser.name} ${foundUser.lastName}</h3>
+          <p class="alt-card-desc">${foundUser.email}</p>
+        </div>
+        <div class="invite-card-actions-col">
+          <span class="volunteer-status-badge">
+            Ya es voluntario fijo
+          </span>
+        </div>
+      </article>
+    `;
+  } else {
+    resultsDiv.innerHTML = `
+      <article class="invite-card volunteer-card" style="margin-bottom: 0; background-color: var(--color-surface);">
+        <div class="invite-card-img-col user-avatar">
+          ${avatarHTML}
+        </div>
+        <div class="invite-card-content-col">
+          <h3 class="alt-card-title">${foundUser.name} ${foundUser.lastName}</h3>
+          <p class="alt-card-desc">${foundUser.email}</p>
+        </div>
+        <div class="invite-card-actions-col">
+          <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="enrollVolunteer('${foundUser.email}')">
+            <i data-lucide="user-check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Dar de Alta
+          </button>
+        </div>
+      </article>
+    `;
+  }
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+window.enrollVolunteer = function(email) {
+  // Check if in discharged list, remove it
+  const dischargedIndex = dischargedVolunteers.findIndex(v => v.email.toLowerCase() === email.toLowerCase());
+  let volunteerToEnroll = null;
+
+  if (dischargedIndex !== -1) {
+    volunteerToEnroll = dischargedVolunteers.splice(dischargedIndex, 1)[0];
+  } else {
+    // If not in discharged, look in volunteerUsersDB
+    const dbUser = volunteerUsersDB.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (dbUser) {
+      volunteerToEnroll = { ...dbUser };
+    }
+  }
+
+  if (volunteerToEnroll) {
+    // Add to active if not already there
+    if (!fixedVolunteers.some(v => v.email.toLowerCase() === email.toLowerCase())) {
+      fixedVolunteers.push(volunteerToEnroll);
+    }
+
+    // Reset search UI
+    const searchInput = document.getElementById("volunteer-search-email");
+    const resultsDiv = document.getElementById("volunteer-search-results");
+    if (searchInput) searchInput.value = "";
+    if (resultsDiv) resultsDiv.innerHTML = "";
+    
+    const searchContainer = document.getElementById("volunteer-search-container");
+    if (searchContainer) searchContainer.style.display = "none";
+
+    renderVolunteerLists();
+
+    if (typeof showToast !== "undefined") {
+      showToast("Voluntario dado de alta", `${volunteerToEnroll.name} ${volunteerToEnroll.lastName} se sumó a tus voluntarios fijos.`, true);
+    }
+  }
+};
+
+window.dischargeVolunteer = function(email) {
+  const activeIndex = fixedVolunteers.findIndex(v => v.email.toLowerCase() === email.toLowerCase());
+  
+  if (activeIndex !== -1) {
+    const removedVolunteer = fixedVolunteers.splice(activeIndex, 1)[0];
+    
+    // Add to discharged list if not already there
+    if (!dischargedVolunteers.some(v => v.email.toLowerCase() === email.toLowerCase())) {
+      dischargedVolunteers.push(removedVolunteer);
+    }
+
+    renderVolunteerLists();
+
+    if (typeof showToast !== "undefined") {
+      showToast("Voluntario dado de baja", `${removedVolunteer.name} ${removedVolunteer.lastName} fue removido de la lista activa.`, true);
+    }
+  }
+};
+
+

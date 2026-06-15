@@ -162,12 +162,44 @@
           </div>
         </div>
 
-        <!-- PANE: GESTIONAR VOLUNTARIOS FIJOS (Placeholder) -->
+        <!-- PANE: GESTIONAR VOLUNTARIOS FIJOS -->
         <div class="profile-pane" id="pane-voluntarios" role="tabpanel">
-          <div class="placeholder-pane-content">
-            <i data-lucide="users"></i>
-            <h3>Gestionar voluntarios fijos</h3>
-            <p>Aquí podrás administrar los voluntarios estables asociados a tu organización, certificar su asistencia y otorgar insignias de impacto social.</p>
+          <div class="pane-header-actions">
+            <h2>Voluntarios fijos</h2>
+            <button class="btn btn-primary" id="btn-toggle-volunteer-search">
+              <i data-lucide="user-plus" style="width: 16px; height: 16px; margin-right: 4px;"></i> Nuevo voluntario fijo
+            </button>
+          </div>
+
+          <!-- SEARCH SECTION (Hidden by default) -->
+          <div class="volunteer-search-container" id="volunteer-search-container" style="display: none;">
+            <h3 class="volunteer-search-title">Buscar voluntario por correo electrónico</h3>
+            <div class="volunteer-search-row">
+              <input type="email" id="volunteer-search-email" class="edit-input" placeholder="ejemplo@correo.com">
+              <button class="btn btn-primary volunteer-search-btn" id="btn-execute-volunteer-search">
+                <i data-lucide="search" style="width: 16px; height: 16px; margin-right: 4px;"></i> Buscar
+              </button>
+            </div>
+            
+            <!-- SEARCH RESULTS AREA -->
+            <div class="volunteer-search-results-area" id="volunteer-search-results">
+              <!-- Dynamically populated card or message -->
+            </div>
+          </div>
+
+          <!-- VOLUNTARIOS FIJOS SECTIONS -->
+          <div>
+            <h3 class="volunteer-section-title">Listado de voluntarios fijos</h3>
+            <div class="invites-list-container" id="fixed-volunteers-list">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+
+          <div>
+            <h3 class="volunteer-section-title discharged">Listado de voluntarios dados de baja</h3>
+            <div class="invites-list-container" id="discharged-volunteers-list">
+              <!-- Populated dynamically via JS -->
+            </div>
           </div>
         </div>
 
