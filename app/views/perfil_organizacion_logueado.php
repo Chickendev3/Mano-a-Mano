@@ -212,13 +212,72 @@
           </div>
         </div>
 
-        <!-- PANE: INVITACIONES (Placeholder) -->
+        <!-- PANE: INVITACIONES -->
         <div class="profile-pane" id="pane-invitaciones" role="tabpanel">
-          <div class="placeholder-pane-content">
-            <i data-lucide="mail"></i>
-            <h3>Invitaciones</h3>
-            <p>Envía y administra invitaciones para que otros voluntarios se sumen a tus causas y campañas activas.</p>
+          
+          <!-- SECTION 1: INVITACIONES RECIBIDAS -->
+          <div class="invites-section" style="margin-bottom: 40px;">
+            <div class="pane-header-actions">
+              <h2>Invitaciones Recibidas</h2>
+            </div>
+            
+            <div class="tabs-filters-bar">
+              <div class="filter-group">
+                <select class="filter-select" id="filter-received-select" aria-label="Filtrar por">
+                  <option value="">Filtrar por (Todas)</option>
+                  <option value="medio-ambiente">Medio Ambiente</option>
+                  <option value="educacion">Educación</option>
+                  <option value="accion-social">Acción Social</option>
+                  <option value="cultura">Cultura</option>
+                </select>
+                <select class="filter-select" id="sort-received-select" aria-label="Ordenar por">
+                  <option value="">Ordenar por (Por defecto)</option>
+                  <option value="reciente">Más recientes</option>
+                  <option value="antiguas">Más antiguas</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="invites-list-container alternating-grid" id="received-invitations-list">
+              <!-- Populated dynamically via JS -->
+            </div>
+
+            <div class="pagination-container" id="received-invitations-pagination">
+              <!-- Populated dynamically via JS -->
+            </div>
           </div>
+
+          <!-- SECTION 2: TUS INVITACIONES (ENVIADAS) -->
+          <div class="invites-section">
+            <div class="pane-header-actions">
+              <h2>Tus invitaciones</h2>
+            </div>
+
+            <div class="tabs-filters-bar">
+              <div class="filter-group">
+                <select class="filter-select" id="filter-sent-select" aria-label="Filtrar por">
+                  <option value="">Filtrar por (Todas)</option>
+                  <option value="pendiente">Pendientes</option>
+                  <option value="aceptado">Aceptadas</option>
+                  <option value="rechazado">Rechazadas</option>
+                </select>
+                <select class="filter-select" id="sort-sent-select" aria-label="Ordenar por">
+                  <option value="">Ordenar por (Por defecto)</option>
+                  <option value="reciente">Más recientes</option>
+                  <option value="antiguas">Más antiguas</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="invites-list-container alternating-grid" id="sent-invitations-list">
+              <!-- Populated dynamically via JS -->
+            </div>
+
+            <div class="pagination-container" id="sent-invitations-pagination">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -449,6 +508,18 @@
     <div style="display: flex; gap: 12px; justify-content: center;">
       <button class="btn btn-ghost" onclick="closeModal('modal-delete-confirm')">Cancelar</button>
       <button class="btn btn-primary" id="confirm-delete-btn" style="background-color: #EF4444; border-color: #EF4444; color: #ffffff;">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. CANCEL INVITATION CONFIRMATION MODAL -->
+<div class="modal-overlay" id="modal-cancel-invitation-confirm" role="dialog" aria-modal="true" aria-labelledby="cancel-invitation-title">
+  <div class="modal-box modal-box-small" style="max-width: 400px; padding: 24px; text-align: center;">
+    <h3 class="modal-title" id="cancel-invitation-title" style="color: #EF4444; font-size: 18px; margin-bottom: 12px;">¿Cancelar invitación?</h3>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; line-height: 1.5;">Esta acción retirará la invitación enviada y ya no estará disponible para el destinatario.</p>
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-cancel-invitation-confirm')">Volver</button>
+      <button class="btn btn-primary" id="confirm-cancel-invitation-btn" style="background-color: #EF4444; border-color: #EF4444; color: #ffffff;">Cancelar invitación</button>
     </div>
   </div>
 </div>
