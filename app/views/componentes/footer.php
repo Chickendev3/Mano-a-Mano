@@ -58,4 +58,3 @@
     </div>
   </div>
 </footer>
->>>>>>> origin/inicio_registro_login_lucia

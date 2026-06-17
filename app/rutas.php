@@ -9,8 +9,8 @@ $rutas = [
 
     /* Registro */
     'registro' => ['controlador' => 'registroCtrl', 'metodo' => 'index'],
-    /* 'registro/voluntario' => ['controlador' => 'registroCtrl', 'metodo' => 'voluntario'],
-    'registro/organizacion' => ['controlador' => 'registroCtrl', 'metodo' => 'organizacion'], */
+    'registro/voluntario' => ['controlador' => 'registroCtrl', 'metodo' => 'cargarFormVoluntario'],
+    'registro/organizacion' => ['controlador' => 'registroCtrl', 'metodo' => 'cargarFormOrganizacion'],
 
     /* Contacto */
     'contacto' => ['controlador' => 'contactoCtrl', 'metodo' => 'index'],

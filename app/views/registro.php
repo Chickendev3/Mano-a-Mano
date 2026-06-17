@@ -9,12 +9,15 @@
         <h1 class="wireframe-title" style="max-width: 450px; line-height: 1.25;">Por favor, elegí tu tipo de usuario para registrarse</h1>
         
         <div class="role-selection-box" style="max-width: 400px; width: 100%;">
-          <a href="<?= BASE_URL ?>registro_organizacion" class="btn btn-primary btn-role" id="role-org-btn" style="text-align: center;">
+          <a href="<?= BASE_URL ?>registro/organizacion" class="btn btn-primary btn-role" id="role-org-btn" style="text-align: center;">
             Como organización <i data-lucide="building-2" style="margin-left: 8px;"></i>
           </a>
-          <a href="<?= BASE_URL ?>registro_voluntario" class="btn btn-primary btn-role" id="role-vol-btn" style="text-align: center;">
+          <a href="<?= BASE_URL ?>registro/voluntario" class="btn btn-primary btn-role" id="role-vol-btn" style="text-align: center;">
             Como Voluntario <i data-lucide="user" style="margin-left: 8px;"></i>
           </a>
+          <p style="text-align: left; font-size: 14px; color: var(--color-text-secondary);">
+            Ya tenés cuenta? <a href="<?= BASE_URL ?>sesion" style="color: var(--color-primary); font-weight: 600; text-decoration: underline;">Iniciá Sesion</a>
+          </p>
         </div>
       </div>
       

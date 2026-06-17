@@ -54,6 +54,16 @@ class registroCtrl extends Controlador {
         $this->cargarVista('registro', $datos);
     }
 
+    public function cargarFormOrganizacion() {
+        $datos = [];
+        $this->cargarVista('registro_organizacion', $datos, 'Registrarse como Organización');
+    }
+
+    public function cargarFormVoluntario() {
+        $datos = [];
+        $this->cargarVista('registro_voluntario', $datos, 'Registrarse como Voluntario');
+    }
+
     private function registrarVoluntario( string $nombre, string $apellido, string $email, string $clave, string $telefono, ?string $telefonoEmergencia = null, ?string $ubicacion = null ) : ?string {
         $modeloVoluntario = $this->cargarModelo("Voluntario");
 
