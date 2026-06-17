@@ -48,42 +48,45 @@
       <div class="col-form" style="max-width: 480px; width: 100%; margin-left: auto;">
         <h2 class="wireframe-title" style="font-size: 32px; margin-bottom: 8px;">Formulario</h2>
         <p class="wireframe-subtitle" style="margin-bottom: 28px;">Completa el siguiente formulario.</p>
-        
-        <form action="contacto" method="post" id="contact-form-page">
+
+        <div id="contact-message-box">
+          <?php if (!empty($msj)) : ?>
+            <div role="alert" style="margin-bottom: 24px; padding: 16px; border-radius: 12px; background-color: <?= strpos(strtolower($msj), 'error') !== false ? 'rgba(254, 226, 226, 0.9)' : 'rgba(220, 252, 231, 0.9)'; ?>; color: <?= strpos(strtolower($msj), 'error') !== false ? '#b91c1c' : '#166534'; ?>; border: 1px solid <?= strpos(strtolower($msj), 'error') !== false ? '#fca5a5' : '#86efac'; ?>;">
+              <?= htmlspecialchars($msj) ?>
+            </div>
+          <?php endif; ?>
+        </div>
+
+        <form action="<?= BASE_URL ?>contacto" method="post" id="contact-form-page">
           <div class="form-row">
             <div class="form-group">
               <label for="contact-name" class="form-label">Nombre *</label>
-              <input type="text" id="contact-name" class="form-input" placeholder="Nombre" name="nombre" required>
+              <input type="text" id="contact-name" name="nombre" class="form-input" placeholder="Nombre" required>
             </div>
             <div class="form-group">
               <label for="contact-lastname" class="form-label">Apellido *</label>
-              <input type="text" id="contact-lastname" class="form-input" placeholder="Apellido" name="apellido" required>
+              <input type="text" id="contact-lastname" name="apellido" class="form-input" placeholder="Apellido" required>
             </div>
           </div>
           
           <div class="form-group">
             <label for="contact-email" class="form-label">Email *</label>
-            <input type="email" id="contact-email" class="form-input" placeholder="tucorreo@aqui.com" name="email" required autocomplete="email">
+            <input type="email" id="contact-email" name="email" class="form-input" placeholder="tucorreo@aqui.com" required autocomplete="email">
           </div>
           
           <div class="form-group">
             <label for="contact-name" class="form-label">Asunto *</label>
-            <input type="text" id="contact-asunto" class="form-input" placeholder="Titulo del asunto" name="asunto" required>
+            <input type="text" id="contact-asunto" name="asunto" class="form-input" placeholder="Titulo del asunto" required>
           </div>
           
           <div class="form-group" style="margin-bottom: 24px;">
             <label for="contact-message" class="form-label">Cuerpo *</label>
-            <textarea id="contact-message" class="form-input" rows="4" placeholder="Escriba aquí el cuerpo del mensaje" style="resize: vertical;" name="cuerpo" required></textarea>
+            <textarea id="contact-message" name="cuerpo" class="form-input" rows="4" placeholder="Escriba aquí el cuerpo del mensaje" style="resize: vertical;" required></textarea>
           </div>
           
           <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 16px; padding: 14px;">
             Enviar
           </button>
-          <?php if (!empty($msj)) : ?>
-            <div style="background-color: rgba(239, 68, 68, 0.15); color: #EF4444; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid rgba(239, 68, 68, 0.3); margin-bottom: 20px; font-size: 14px; font-weight: 500;">
-              <?= htmlspecialchars($msj) ?>
-            </div>
-          <?php endif; ?>
         </form>
       </div>
       
@@ -171,4 +174,3 @@
       </div>
     </div>
   </div>
-</section>

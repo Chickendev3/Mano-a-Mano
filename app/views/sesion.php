@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!-- VISTA DE FORM DE INICIAR SESIÓN -->
 
 <main>

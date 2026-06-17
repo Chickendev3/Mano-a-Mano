@@ -12,11 +12,14 @@ $rutas = [
     'registro/voluntario' => ['controlador' => 'registroCtrl', 'metodo' => 'cargarFormVoluntario'],
     'registro/organizacion' => ['controlador' => 'registroCtrl', 'metodo' => 'cargarFormOrganizacion'],
 
+    /* Conectar */
+    'conectar' => ['controlador' => 'conectarCtrl', 'metodo' => 'index'],  
+
     /* Contacto */
     'contacto' => ['controlador' => 'contactoCtrl', 'metodo' => 'index'],
+    /* 'enviar-correo' => ['controlador' => 'contactoCtrl', 'metodo' => 'enviarCorreo'] */
 
-    /* Conectar */
-    'conectar' => ['controlador' => 'conectarCtrl', 'metodo' => 'index'],
+    /* Organizaciones */
 
     /* Perfiles */
     'perfil' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilDesarrollo']
