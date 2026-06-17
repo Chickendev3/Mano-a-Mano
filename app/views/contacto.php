@@ -49,47 +49,41 @@
         <h2 class="wireframe-title" style="font-size: 32px; margin-bottom: 8px;">Formulario</h2>
         <p class="wireframe-subtitle" style="margin-bottom: 28px;">Completa el siguiente formulario.</p>
         
-        <form id="contact-form-page">
+        <form action="contacto" method="post" id="contact-form-page">
           <div class="form-row">
             <div class="form-group">
               <label for="contact-name" class="form-label">Nombre *</label>
-              <input type="text" id="contact-name" class="form-input" placeholder="Placeholder" required>
+              <input type="text" id="contact-name" class="form-input" placeholder="Nombre" name="nombre" required>
             </div>
             <div class="form-group">
               <label for="contact-lastname" class="form-label">Apellido *</label>
-              <input type="text" id="contact-lastname" class="form-input" placeholder="Placeholder" required>
+              <input type="text" id="contact-lastname" class="form-input" placeholder="Apellido" name="apellido" required>
             </div>
           </div>
           
           <div class="form-group">
             <label for="contact-email" class="form-label">Email *</label>
-            <input type="email" id="contact-email" class="form-input" placeholder="Placeholder" required autocomplete="email">
+            <input type="email" id="contact-email" class="form-input" placeholder="tucorreo@aqui.com" name="email" required autocomplete="email">
           </div>
           
           <div class="form-group">
-            <label for="contact-subject" class="form-label">Asunto</label>
-            <select id="contact-subject" class="form-input" style="background-color: var(--color-background);">
-              <option value="">Placeholder (Selecciona un asunto)</option>
-              <option value="verificacion">Verificación de Organización</option>
-              <option value="campanas">Problema con Campañas</option>
-              <option value="postulacion">Dudas sobre Postulación</option>
-              <option value="otro">Otro Motivo</option>
-            </select>
+            <label for="contact-name" class="form-label">Asunto *</label>
+            <input type="text" id="contact-asunto" class="form-input" placeholder="Titulo del asunto" name="asunto" required>
           </div>
           
           <div class="form-group" style="margin-bottom: 24px;">
             <label for="contact-message" class="form-label">Cuerpo *</label>
-            <textarea id="contact-message" class="form-input" rows="4" placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit..." style="resize: vertical;" required></textarea>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 28px; display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="contact-agree" class="form-checkbox" style="width: 16px; height: 16px; accent-color: var(--color-primary);" required>
-            <label for="contact-agree" class="form-label" style="margin-bottom: 0; font-weight: 500; font-size: 14px; color: var(--color-text-secondary); cursor: pointer;">Estás de acuerdo que nos comuniquemos con vos *</label>
+            <textarea id="contact-message" class="form-input" rows="4" placeholder="Escriba aquí el cuerpo del mensaje" style="resize: vertical;" name="cuerpo" required></textarea>
           </div>
           
           <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 16px; padding: 14px;">
             Enviar
           </button>
+          <?php if (!empty($msj)) : ?>
+            <div style="background-color: rgba(239, 68, 68, 0.15); color: #EF4444; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid rgba(239, 68, 68, 0.3); margin-bottom: 20px; font-size: 14px; font-weight: 500;">
+              <?= htmlspecialchars($msj) ?>
+            </div>
+          <?php endif; ?>
         </form>
       </div>
       
