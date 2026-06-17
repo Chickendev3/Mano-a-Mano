@@ -3,18 +3,22 @@
 $rutas = [
     '' => ['controlador' => 'inicioCtrl', 'metodo' => 'index'],
 
-    /* Registro y Sesión */
-    'registro' => ['controlador' => 'registroCtrl', 'metodo' => 'index'],
+    /* Sesión */
     'sesion' => ['controlador' => 'sesionCtrl', 'metodo' => 'index'],
-    'cerrar-sesion' => ['controlador' => 'sesionCtrl', 'metodo' => 'cerrarSesion']
+    'cerrar-sesion' => ['controlador' => 'sesionCtrl', 'metodo' => 'cerrarSesion'],
 
+    /* Registro */
+    'registro' => ['controlador' => 'registroCtrl', 'metodo' => 'index'],
+    /* 'registro/voluntario' => ['controlador' => 'registroCtrl', 'metodo' => 'voluntario'],
+    'registro/organizacion' => ['controlador' => 'registroCtrl', 'metodo' => 'organizacion'], */
 
-    /* Voluntarios */
+    /* Contacto */
+    'contacto' => ['controlador' => 'contactoCtrl', 'metodo' => 'index'],
 
-    /* Organizaciones */
+    /* Conectar */
+    'conectar' => ['controlador' => 'conectarCtrl', 'metodo' => 'index'],
 
-    /* .... */
-
+    /* Perfiles */
+    'perfil' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilDesarrollo']
 ];
-
 ?>

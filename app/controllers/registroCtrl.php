@@ -1,6 +1,7 @@
 <?php
-class registroCtrl extends Controlador{
+class registroCtrl extends Controlador {
 
+    // Renders the role selection page
     public function index() {
         $datos = ['error' => null, 'tipo' => null];
         $action = $_POST['action'] ?? '';
@@ -21,7 +22,7 @@ class registroCtrl extends Controlador{
 
                 if ($error !== null) {
                     $datos['error'] = $error;
-                    $this->cargarVista('registro', $datos);     // Fijarse acá si está bien al momento de hacer la unión con la VISTA
+                    $this->cargarVista('registro_voluntario', $datos, 'Registrarse como Voluntario');     // Fijarse acá si está bien al momento de hacer la unión con la VISTA
                     return;
                 }
 
@@ -41,7 +42,7 @@ class registroCtrl extends Controlador{
 
                 if ($error !== null) {
                     $datos['error'] = $error;
-                    $this->cargarVista('registro', $datos);     // Fijarse acá si está bien al momento de hacer la unión con la VISTA
+                    $this->cargarVista('registro_organizacion', $datos, 'Registrarse como Organización');     // Fijarse acá si está bien al momento de hacer la unión con la VISTA
                     return;
                 }
 
@@ -49,7 +50,7 @@ class registroCtrl extends Controlador{
                 return;
             }
         }
-        
+            
         $this->cargarVista('registro', $datos);
     }
 

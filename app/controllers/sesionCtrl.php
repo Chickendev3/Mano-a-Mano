@@ -1,6 +1,6 @@
 <?php
 class sesionCtrl extends Controlador {
-
+    
 	public function index() : void {
 		$datos = ['msj' => null];
 
@@ -38,19 +38,23 @@ class sesionCtrl extends Controlador {
 
 		if ($usuarioVol){
 			if (password_verify($clave, $usuarioVol['clave'])) {
+                $_SESSION['usuario_logueado'] = true;
 				$_SESSION['id_usuario'] = $usuarioVol['id_usuario'];
 				$_SESSION['id_voluntario'] = $usuarioVol['id_voluntario'];
 				$_SESSION['nombre_usuario'] = $usuarioVol['nombre'];
 				$_SESSION['apellido_usuario'] = $usuarioVol['apellido'];
 				$_SESSION['img_perfil'] = $usuarioVol['img_perfil'];
+                $_SESSION['usuario_rol'] = 'voluntario';
 				return null;	
 			}
 		} elseif ($usuarioOrg)
 			if (password_verify($clave, $usuarioOrg['clave'])) {
+                $_SESSION['usuario_logueado'] = true;
 				$_SESSION['id_usuario'] = $usuarioOrg['id_usuario'];
 				$_SESSION['nombre_usuario'] = $usuarioOrg['nombre'];
 				$_SESSION['id_organizacion'] = $usuarioOrg['id_organizacion'];
 				$_SESSION['img_perfil'] = $usuarioOrg['img_perfil'];
+                $_SESSION['usuario_rol'] = 'organizacion';
 				return null;	
 			}
 		

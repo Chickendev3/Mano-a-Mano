@@ -1,0 +1,183 @@
+/* ==========================================================================
+   Secondary Pages & Wireframe Layouts
+   ========================================================================== */
+
+/* Main Layout Grid for register/login/contacto */
+.wireframe-section {
+  padding: 140px 0 100px 0;
+  min-height: calc(100vh - 90px);
+  display: flex;
+  align-items: center;
+  background: radial-gradient(circle at 10% 20%, rgba(54, 124, 158, 0.02) 0%, rgba(155, 122, 205, 0.01) 90%);
+}
+
+.wireframe-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 64px;
+  align-items: center;
+  width: 100%;
+}
+
+.wireframe-grid.reverse-layout {
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
+.wireframe-grid.reverse-layout .col-form {
+  order: 2;
+}
+
+.wireframe-grid.reverse-layout .col-img {
+  order: 1;
+}
+
+/* Wireframe Image Placeholder Box */
+.wireframe-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  min-height: 350px;
+}
+
+/* Crossed X lines for wireframe look */
+.wireframe-placeholder::before,
+.wireframe-placeholder::after {
+  content: "";
+  position: absolute;
+  width: 141.4%; /* sqrt(2) * 100 to cross perfectly */
+  height: 2px;
+  background-color: var(--color-border);
+  top: 50%;
+  left: -20.7%;
+  transform-origin: center;
+  z-index: 1;
+}
+
+.wireframe-placeholder::before {
+  transform: rotate(45deg);
+}
+
+.wireframe-placeholder::after {
+  transform: rotate(-45deg);
+}
+
+.wireframe-placeholder-inner {
+  position: relative;
+  z-index: 2;
+  background-color: var(--color-surface);
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.wireframe-placeholder-inner i {
+  font-size: 32px;
+  color: var(--color-text-muted);
+}
+
+.wireframe-placeholder-inner span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* Page titles */
+.wireframe-title {
+  font-size: 36px;
+  margin-bottom: 16px;
+  font-weight: 800;
+}
+
+.wireframe-subtitle {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin-bottom: 32px;
+}
+
+/* Role Selection Specifics */
+.role-selection-box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.role-selection-box .btn-role {
+  width: 100%;
+  padding: 18px 24px;
+  font-size: 16px;
+  justify-content: center;
+}
+
+/* Password Toggle Eye Button */
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-container .form-input {
+  padding-right: 48px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+  z-index: 10;
+  padding: 4px;
+}
+
+.password-toggle-btn:hover {
+  color: var(--color-primary);
+}
+
+.form-help-text {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+}
+
+/* Responsive Overrides for Secondary Pages */
+@media (max-width: 900px) {
+  .wireframe-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  
+  .wireframe-grid.reverse-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .wireframe-grid.reverse-layout .col-form {
+    order: 0 !important;
+  }
+  
+  .wireframe-grid.reverse-layout .col-img {
+    order: 1 !important;
+  }
+  
+  .wireframe-placeholder {
+    aspect-ratio: 16 / 9;
+    min-height: 250px;
+  }
+}
