@@ -8,7 +8,7 @@ require '../libs/vendor/autoload.php';
 class contactoCtrl extends Controlador {
 
 	public function index() : void {
-		$datos = ['msj' => null];
+		$msj = null;
 
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$nombre = trim($_POST['nombre'] ?? '');
@@ -25,6 +25,7 @@ class contactoCtrl extends Controlador {
 			}
 		}
 
+		$datos = ['msj' => $msj];
 		$this->cargarVista('contacto', $datos, 'Mano a Mano - Contacto'); 
 	}
 

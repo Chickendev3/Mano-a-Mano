@@ -1,5 +1,5 @@
 <?php
-abstract class Usuario {
+class Usuario {
     protected $bd;    /* Se declara el atributo privado para mantener la conexión a la BD  */
     protected $camposUsuario = ['nombre', 'email', 'descripcion', 'telefono', 'ubicacion', 'img_perfil'];
 
@@ -21,10 +21,17 @@ abstract class Usuario {
         return (bool) $bd->resultado();
     }
 
-    /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
-    abstract public function obtenerUsuarios() :array;
+    public static function estaRegistrado () :int {
+        if (isset($_SESSION['id_usuario']))
+            return $_SESSION['id_usuario'];
+        else
+            return 0;
+    }
 
-    abstract public function obtenerUsuarioporID( int $id ) :array;
+    /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
+    /* abstract public function obtenerUsuarios() :array;
+
+    abstract public function obtenerUsuarioporID( int $id ) :array; */
 
 
     /* -------------------- INSERTAR DATOS -------------------- */

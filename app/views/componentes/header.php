@@ -4,9 +4,11 @@
         Inicio
     </button>
 
+    <?php if (!isset($_SESSION['id_usuario'])): ?>
     <button type="button" onclick="window.location.href='<?= BASE_URL ?>registro'">
         Registro
     </button>
+    <?php endif; ?>
 
     <?php if (isset($_SESSION['id_usuario'])): ?>
     <button type="button" onclick="window.location.href='<?= BASE_URL ?>cerrar-sesion'">

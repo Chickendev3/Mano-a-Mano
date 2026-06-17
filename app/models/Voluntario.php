@@ -15,7 +15,7 @@ class Voluntario extends Usuario{
 
 
     /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
-    public function obtenerUsuarios() :array {
+    public function obtenerVoluntarios() :array {
         $consulta = "SELECT u.id as 'id', CONCAT(u.nombre, ' ', v.apellido) as 'nombre completo', u.email, u.telefono, u.ubicacion, v.telefono_emergencia, v.disponibilidad_horaria, u.img_perfil 
                         FROM usuarios u JOIN voluntarios v ON u.id = v.usuario_id;";
     
@@ -25,7 +25,7 @@ class Voluntario extends Usuario{
         return $this->bd->resultados();
     }
 
-    public function obtenerUsuarioPorID ( int $idUsuario ) :array {
+    public function obtenerVoluntarioPorID ( int $idUsuario ) :array {
         $consulta = "SELECT u.id as 'id', CONCAT(u.nombre, ' ', v.apellido) as 'nombre completo', u.email, u.descripcion, u.telefono, u.ubicacion, v.telefono_emergencia, v.disponibilidad_horaria, u.img_perfil 
                         FROM usuarios u JOIN voluntarios v ON u.id = v.usuario_id
                         WHERE v.usuario_id = :id";
