@@ -19,9 +19,10 @@ $rutas = [
     'contacto' => ['controlador' => 'contactoCtrl', 'metodo' => 'index'],
     /* 'enviar-correo' => ['controlador' => 'contactoCtrl', 'metodo' => 'enviarCorreo'] */
 
-    /* Organizaciones */
 
     /* Perfiles */
-    'perfil' => ['controlador' => 'inicioCtrl', 'metodo' => 'perfilDesarrollo']
+    'perfil' => ['controlador' => 'perfilCtrl', 'metodo' => 'cargaPerfil']
+    /* 'perfil/LoggedIn/Voluntario' => [] */
+
 ];
 ?>

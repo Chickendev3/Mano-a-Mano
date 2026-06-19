@@ -99,9 +99,10 @@ class inicioCtrl extends Controlador {
         $this->cargarVista('inicio', $datos, 'Mano a Mano | Conectando Personas y Causas');
     }
 
-    public function perfilDesarrollo() : void {
+    /* public function perfilDesarrollo() : void {
         $datos = [];
         $this->cargarVista('perfil_pendiente', $datos, 'Perfil en Desarrollo | Mano a Mano');
-    }
+    } */
+
 }
 ?>
