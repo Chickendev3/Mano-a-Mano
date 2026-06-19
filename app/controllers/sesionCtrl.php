@@ -15,6 +15,7 @@ class sesionCtrl extends Controlador {
 			if ($msj == null){
 				/* header("location: " . BASE_URL ); */
 				$this->cargarVista('perfil_pendiente', $datos, 'Mano a Mano - Perfil');
+				return;
 			}
 		}
 
