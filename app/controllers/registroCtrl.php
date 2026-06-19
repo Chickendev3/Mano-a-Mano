@@ -3,7 +3,11 @@ class registroCtrl extends Controlador {
 
     // Renders the role selection page
     public function index() {
-        $datos = ['error' => null, 'tipo' => null];
+        $datos = ['error' => null, 
+                  'tipo' => null,
+                  'cssPropio' => 'registro.css',
+                  'jsPropio' => 'registro.js'];
+        
         $action = $_POST['action'] ?? '';
         
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {

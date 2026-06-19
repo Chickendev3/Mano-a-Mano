@@ -91,7 +91,9 @@ class inicioCtrl extends Controlador {
         $datos = [
             'campanias' => $campanias,
             'organizaciones' => $organizaciones,
-            'error' => null
+            'error' => null,
+            'cssPropio' => 'inicio.css',
+            'jsPropio' => 'inicio.js'
         ];
 
         $this->cargarVista('inicio', $datos, 'Mano a Mano | Conectando Personas y Causas');

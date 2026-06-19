@@ -12,23 +12,36 @@
     <!-- Global CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css">
 
-    <!-- Dynamic CSS load based on the view -->
-    <?php 
-        $base_css = $rutaVista;
-        if ($rutaVista === 'registro_voluntario' || $rutaVista === 'registro_organizacion') {
-            $base_css = 'registro';
-        }
-        echo '<link rel="stylesheet" href="' . BASE_URL . 'css/' . $base_css . '.css">';
-    ?>
+    <!-- CSS Dinámicos según la vista cargada -->
+    <?php if (isset($cssPropio) && !empty($cssPropio)){
+            if (!is_array($cssPropio)) 
+                $cssPropio = [$cssPropio];
+            
+            foreach($cssPropio as $css){
+        ?>
+        
+        <link rel="stylesheet" href="<?= BASE_URL ?>css/<?php echo htmlspecialchars($css); ?>">
+    <?php }} ?>
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Define global Javascript configurations from PHP -->
-    <script>
-        const BASE_URL = '<?= BASE_URL ?>';
-        const IS_LOGGED_IN = <?= (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === true) ? 'true' : 'false' ?>;
-    </script>
+
+
+    <!-- Carga de JS Global-->
+    <script src="<?= BASE_URL ?>js/main.js"></script>
+
+    <!-- Carga de JS Dinámicos-->
+    <?php if (isset($jsPropio) && !empty($jsPropio)){
+            if (!is_array($jsPropio)) 
+                $jsPropio = [$jsPropio];
+            
+            foreach($jsPropio as $js){
+        ?>
+        
+        <script src="<?= BASE_URL ?>js/<?php echo htmlspecialchars($js); ?>"></script>
+    <?php }} ?>
+
 </head>
 
 <?php
@@ -37,30 +50,11 @@
 
 <body>
 
-    <!-- Load Header Component -->
-    <?php require_once '../app/views/componentes/header.php'; ?> 
-
-    <!-- Load Dynamic Page Content -->
     <?php require_once '../app/views/' . $rutaVista . '.php'; ?> 
-
-    <!-- Load Footer Component -->
-    <?php require_once '../app/views/componentes/footer.php'; ?> 
-
-    <!-- Global JS Script -->
-    <script src="<?= BASE_URL ?>js/main.js"></script>
-
-    <!-- Dynamic JS load based on the view -->
-    <?php 
-        $base_js = $rutaVista;
-        if ($rutaVista === 'registro_voluntario' || $rutaVista === 'registro_organizacion') {
-            $base_js = 'registro';
-        }
-        echo '<script src="' . BASE_URL . 'js/' . $base_js . '.js"></script>';
-        // ----------------------------------------------------------------------------- CORREGIR ACÁ, HACER LA CARGA DINÁMICA DE CSS Y JS
-    ?>
+    
 </body>
 
-    <!-- Carga de JS globales-->
+
 
 <?php
     require_once '../app/views/componentes/footer.php';
