@@ -36,6 +36,8 @@ const availableSkills = [
 
 // Local state for temporary skill tags being edited
 let tempSkills = [];
+// Local state for temporary campaign causes tags being selected
+let tempCampaignCauses = [];
 
 // Campaign Mock Database
 let campaigns = [
@@ -310,6 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupInvitationsGrid();
   setupVolunteeringGrid();
   setupMockUploads();
+  setupCampaignCausesEvents();
 });
 
 // ==========================================
@@ -505,6 +508,87 @@ window.removeTempSkill = function(index) {
   const tagInput = document.getElementById("tag-search-input");
   if (tagInput) showSuggestions(tagInput.value);
 };
+
+// Dibuja las etiquetas de causas seleccionadas en el formulario
+function renderCampaignCauses() {
+  const container = document.getElementById("create-campaign-causes-list");
+  const form = document.getElementById("create-camp-form");
+  if (!container || !form) return;
+
+  // Limpia el contenedor de etiquetas visuales
+  container.innerHTML = "";
+  
+  // 2. Elimina cualquier input oculto anterior de causas para no duplicar
+  form.querySelectorAll('input[name="causas[]"]').forEach(input => input.remove());
+
+  // 3. Genera las etiquetas visuales y los inputs ocultos para el POST
+  tempCampaignCauses.forEach((cause, index) => {
+    // Crear etiqueta visual
+    const div = document.createElement("div");
+    div.className = "edit-tag-item";
+    div.innerHTML = `
+      <span>${cause}</span>
+      <button type="button" class="edit-tag-remove-btn" onclick="removeCampaignCause(${index})">×</button>
+    `;
+    container.appendChild(div);
+
+    // Crea el input oculto que viajará en el POST a PHP
+    const hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "causas[]"; // PHP lo lee como array
+    hiddenInput.value = cause;
+    form.appendChild(hiddenInput);
+  });
+}
+
+// Elimina una causa seleccionada
+window.removeCampaignCause = function(index) {
+  tempCampaignCauses.splice(index, 1);
+  renderCampaignCauses();
+  const causeInput = document.getElementById("campaign-cause-search-input");
+  if (causeInput) showCampaignCauseSuggestions(causeInput.value);
+};
+
+// Filtra y muestra las sugerencias basadas en lo que escribe el usuario
+function showCampaignCauseSuggestions(filterText) {
+  const listElement = document.getElementById("campaign-cause-suggestions");
+  if (!listElement) return;
+
+  const searchVal = filterText.toLowerCase().trim();
+  
+  // Leemos del objeto global window, si no existe usamos un array vacío
+  const causesList = window.availableCampaignCauses || [];
+  
+  const filtered = causesList.filter(cause => {
+    const isAlreadySelected = tempCampaignCauses.includes(cause);
+    const matchesSearch = cause.toLowerCase().includes(searchVal);
+    return !isAlreadySelected && matchesSearch;
+  });
+
+  if (filtered.length > 0) {
+    listElement.innerHTML = "";
+    filtered.forEach(cause => {
+      const li = document.createElement("li");
+      li.className = "tag-suggestion-item";
+      li.textContent = cause;
+      li.addEventListener("click", () => {
+        tempCampaignCauses.push(cause);
+        renderCampaignCauses();
+        const causeInput = document.getElementById("campaign-cause-search-input");
+        if (causeInput) {
+          causeInput.value = "";
+          causeInput.focus();
+        }
+        listElement.classList.remove("active");
+      });
+      listElement.appendChild(li);
+    });
+    listElement.classList.add("active");
+  } else {
+    listElement.classList.remove("active");
+  }
+}
+
 
 function showSuggestions(filterText) {
   const listElement = document.getElementById("tag-suggestions");
@@ -881,19 +965,24 @@ function openCampaignDetailsView(campaignId) {
 // ==========================================
 // 6. CREATE CAMPAIGN CRUD FLOW
 // ==========================================
+/* Ésta funcion se queda */
 function openCreateCampaignModal() {
   const form = document.getElementById("create-camp-form");
   if (form) form.reset();
 
-  uploadedImagesForForm = [];
-  renderFormImagesPreview("create-images-preview-grid");
-  toggleCreateAddInfoField();
+  // Resetear archivos e imágenes seleccionadas
+  selectedCampaignFiles = [];
+  renderSelectedFilesPreview();
+
+  tempCampaignCauses = [];
+  renderCampaignCauses();
   
   openModal("modal-create-campaign");
 }
 
+/* Ésta funcion se queda */
 window.toggleCreateAddInfoField = function() {
-  const typeVal = document.querySelector('input[name="create-camp-type"]:checked')?.value || "convocatoria";
+  const typeVal = document.querySelector('input[name="tipo_campania"]:checked')?.value || "convocatoria";
   const infoGroup = document.getElementById("create-additional-info-group");
   if (infoGroup) {
     if (typeVal === "convocatoria") {
@@ -926,6 +1015,7 @@ window.simulateCreateCampaignImageUpload = function() {
   renderFormImagesPreview("create-images-preview-grid");
 };
 
+/* Ésta funcion se queda */
 function renderFormImagesPreview(gridId) {
   const grid = document.getElementById(gridId);
   if (!grid) return;
@@ -942,48 +1032,34 @@ function renderFormImagesPreview(gridId) {
   });
 }
 
+/* Ésta funcion se queda */
 window.removeUploadedImage = function(index, gridId) {
   uploadedImagesForForm.splice(index, 1);
   renderFormImagesPreview(gridId);
 };
 
-window.handleCreateCampaignSubmit = function() {
-  const title = document.getElementById("create-title").value.trim();
-  const desc = document.getElementById("create-desc").value.trim();
-  const category = document.getElementById("create-category").value;
-  const location = document.getElementById("create-location").value.trim();
-  const startDate = document.getElementById("create-start-date").value;
-  const endDate = document.getElementById("create-end-date").value;
-  const details = document.getElementById("create-details").value.trim();
-  const type = document.querySelector('input[name="create-camp-type"]:checked').value;
-  const additionalInfo = type === "convocatoria" ? document.getElementById("create-additional").value.trim() : "";
+/* 
+  Nota: La función window.handleCreateCampaignSubmit fue removida 
+  ya que el formulario se envía directamente por POST a PHP.
+*/
 
-  // Construct new campaign item
-  const newCampaign = {
-    id: Date.now(),
-    title,
-    desc,
-    category,
-    type,
-    startDate,
-    endDate,
-    location,
-    details,
-    additionalInfo,
-    images: [...uploadedImagesForForm]
-  };
+/* Maneja el comportamiento del buscador de causas */
+function setupCampaignCausesEvents() {
+  const causeInput = document.getElementById("campaign-cause-search-input");
+  const causeSuggestions = document.getElementById("campaign-cause-suggestions");
 
-  // Push to local DB
-  campaigns.unshift(newCampaign);
-
-  closeModal("modal-create-campaign");
-  currentPage = 1;
-  renderCampaigns();
-
-  if (typeof showToast !== "undefined") {
-    showToast("Campaña creada con éxito", `"${title}" ya está registrada en tu cuenta.`, true);
+  if (causeInput) {
+    causeInput.addEventListener("focus", () => showCampaignCauseSuggestions(causeInput.value));
+    causeInput.addEventListener("input", () => showCampaignCauseSuggestions(causeInput.value));
+    
+    // Cierra la lista de sugerencias al hacer clic afuera
+    document.addEventListener("click", (e) => {
+      if (!causeInput.contains(e.target) && !causeSuggestions.contains(e.target)) {
+        causeSuggestions.classList.remove("active");
+      }
+    });
   }
-};
+}
 
 // ==========================================
 // 7. MODIFY CAMPAIGN CRUD FLOW
@@ -2180,3 +2256,68 @@ function openVolunteeringDetailsView(volunteeringId) {
 }
 
 
+// ==========================================
+// MANEJO DE ARCHIVOS REALES PARA CAMPAÑAS Y PERFIL
+// ==========================================
+
+// Estado local para los archivos reales seleccionados para subir
+let selectedCampaignFiles = [];
+
+// Maneja la selección de archivos desde el input file
+window.handleFileSelect = function(event) {
+  const files = event.target.files;
+  
+  // Validación: máximo de 3 imágenes
+  if (selectedCampaignFiles.length + files.length > 3) {
+    if (typeof showToast !== "undefined") {
+      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes por campaña.", false);
+    }
+    return;
+  }
+
+  // Agrega los nuevos archivos seleccionados a nuestra lista local
+  for (let i = 0; i < files.length; i++) {
+    selectedCampaignFiles.push(files[i]);
+  }
+
+  renderSelectedFilesPreview();
+};
+
+// Dibuja las previsualizaciones de las imágenes seleccionadas
+function renderSelectedFilesPreview() {
+  const grid = document.getElementById("create-images-preview-grid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  selectedCampaignFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file); // Genera una URL temporal local
+    const div = document.createElement("div");
+    div.className = "uploaded-image-preview";
+    div.innerHTML = `
+      <img src="${url}" alt="Preview image">
+      <button type="button" class="remove-preview-img-btn" onclick="removeSelectedFile(${index})">×</button>
+    `;
+    grid.appendChild(div);
+  });
+
+  // Sincroniza la lista de archivos reales en el input file
+  syncFileInput();
+}
+
+// Remueve una imagen seleccionada
+window.removeSelectedFile = function(index) {
+  selectedCampaignFiles.splice(index, 1);
+  renderSelectedFilesPreview();
+};
+
+// Sincroniza el array de JS de vuelta con el elemento input file en el DOM
+function syncFileInput() {
+  const input = document.getElementById("campaign-images-input");
+  if (!input) return;
+
+  const dataTransfer = new DataTransfer();
+  selectedCampaignFiles.forEach(file => {
+    dataTransfer.items.add(file);
+  });
+  input.files = dataTransfer.files; // Asigna la nueva lista limpia de archivos
+}

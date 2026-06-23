@@ -1,4 +1,6 @@
-<!-- CAMPAIGN DETAIL MODAL (SHARED COMPONENT) -->
+<!-- VISTA DEL MODAL DE UNA CAMPAÑA (INFORMACIÓN QUE SE COMPARTE) -->
+<!-- VISTA INFROMATIVA DE LA INFO DE LA CAMPAÑA -->
+
 <div class="modal-overlay" id="modal-profile-camp-detail" role="dialog" aria-modal="true" aria-labelledby="m-camp-title">
   <div class="modal-box modal-box-large">
     <!-- Close button -->

@@ -1,4 +1,6 @@
-<?php
+<?php 
+/** @var array $usuario */
+
 /* Vista de Perfil de Voluntario (Logueado - Dashboard Privado) */
 ?>
 <main class="profile-view-container">
@@ -24,21 +26,23 @@
         
         <!-- READ-ONLY STATE (Visible by default) -->
         <div id="profile-view-state">
-          <h1 class="profile-name" id="view-profile-name">Cargando...</h1>
+          <h1 class="profile-name"> <?php echo $usuario['nombre completo'] ?> </h1>
           
-          <p class="profile-desc-text" id="view-profile-desc">
-            Cargando descripción...
+          <p class="profile-desc-text">
+            <?php echo $usuario['descripcion'] ?>
           </p>
 
           <div class="profile-meta-row">
             <div class="profile-meta-item">
               <i data-lucide="map-pin"></i>
-              <span id="view-profile-location">Cargando ubicación...</span>
+              <span><?php echo $usuario['ubicacion'] ?></span>
             </div>
+            <?php if (!empty($usuario['disponibilidad_horaria'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="clock"></i>
-              <span id="view-profile-availability">Cargando disponibilidad...</span>
+              <span><?php echo $usuario['disponibilidad_horaria'] ?></span>
             </div>
+            <?php endif; ?>
           </div>
 
           <!-- Private Information Section (Only visible to the volunteer on their private dashboard) -->
@@ -49,15 +53,23 @@
             <div class="profile-meta-row" style="margin-top: 0; gap: 12px 24px;">
               <div class="profile-meta-item">
                 <i data-lucide="mail"></i>
-                <span id="view-profile-email">Cargando email...</span>
+                <span> <?php echo $usuario['email'] ?> </span>
               </div>
               <div class="profile-meta-item">
                 <i data-lucide="phone"></i>
-                <span>Tel. Principal: <strong id="view-profile-phone1">Cargando...</strong></span>
+                <span>Tel. Principal: <strong> <?php echo $usuario['telefono'] ?> </strong></span>
               </div>
               <div class="profile-meta-item">
                 <i data-lucide="phone-call"></i>
-                <span>Tel. Secundario: <strong id="view-profile-phone2">Cargando...</strong></span>
+                <span>Tel. Secundario: 
+                  <strong>
+                  <?php if (!empty($usuario['telefono_emergencia'])):
+                    echo $usuario['telefono_emergencia'];
+                  else:
+                    echo 'No asignado';
+                  endif; ?>
+                  </strong>
+                </span>
               </div>
             </div>
           </div>
@@ -115,7 +127,7 @@
           </div>
 
           <div class="edit-row" style="margin-bottom: 16px;">
-            <label>Etiquetas de oficio (Selección con buscador)</label>
+            <label>Etiquetas de oficio</label>
             <div class="edit-tags-container" id="edit-tags-list">
               <!-- Populated dynamically -->
             </div>
@@ -370,88 +382,98 @@
     
     <h3 class="modal-title" id="create-camp-title" style="margin-bottom: 24px;">Crear nueva campaña</h3>
     
-    <form class="campaign-modal-form" id="create-camp-form" onsubmit="event.preventDefault(); handleCreateCampaignSubmit();">
-      
+    <script>
+      window.availableCampaignCauses = <?= json_encode($causas ?? []); ?>;
+    </script>
+    <form action="<?= BASE_URL ?>crear-campania" method="POST" enctype="multipart/form-data" class="campaign-modal-form" id="create-camp-form">
       <!-- Campaign Type -->
       <div class="edit-row">
         <label>Elija el tipo de campaña:</label>
         <div class="radio-group-type">
           <label class="radio-label">
-            <input type="radio" name="create-camp-type" value="convocatoria" checked onchange="toggleCreateAddInfoField()">
-            <span>Campaña con postulaciones</span>
+            <input type="radio" name="tipo_campania" value="convocatoria" checked onchange="toggleCreateAddInfoField()">
+            <span>Campaña Convocativa</span>
           </label>
           <label class="radio-label">
-            <input type="radio" name="create-camp-type" value="informativa" onchange="toggleCreateAddInfoField()">
-            <span>Campaña informativa (sin postulaciones)</span>
+            <input type="radio" name="tipo_campania" value="informativa" onchange="toggleCreateAddInfoField()">
+            <span>Campaña Informativa</span>
           </label>
         </div>
       </div>
+      <!-- create-camp-type era el anterior a tipo-campania -->
 
       <!-- Campaign Title -->
       <div class="edit-row">
-        <label for="create-title">Nombre de la campaña</label>
-        <input type="text" id="create-title" class="edit-input" placeholder="Ingrese el nombre de la campaña" required>
+        <label for="create-title">Titulo de la Campaña</label>
+        <input type="text" name="titulo_campania" id="create-title" class="edit-input" placeholder="Ingrese el titulo de la campaña" required>
       </div>
 
-      <!-- Campaign Short Description -->
+      <!-- Campaign Description -->
       <div class="edit-row">
-        <label for="create-desc">Breve descripción</label>
-        <textarea id="create-desc" class="edit-input" rows="2" placeholder="Ingrese una descripción corta para las tarjetas del listado" required></textarea>
+        <label for="create-desc">Descripción de la Campaña</label>
+        <textarea id="create-desc" name="descripcion_campania" class="edit-input" rows="2" placeholder="Describa e ingrese los detalles de la Campaña" required></textarea>
       </div>
 
-      <!-- Category Tags Selection -->
-      <div class="form-group-row">
-        <div class="edit-row">
-          <label for="create-category">Categoría principal</label>
-          <select id="create-category" class="edit-input" required>
-            <option value="medio-ambiente">Medio Ambiente</option>
-            <option value="educacion">Educación</option>
-            <option value="accion-social">Acción Social</option>
-            <option value="salud">Salud</option>
-            <option value="cultura">Cultura</option>
-          </select>
+      <!-- Causas de la Campaña (Etiquetas con buscador) -->
+      <div class="edit-row">
+        <label>Causas de la Campaña</label>
+        <div class="edit-tags-container" id="create-campaign-causes-list">
+          <!-- Se completa dinámicamente con JS -->
         </div>
-        <div class="edit-row">
-          <label for="create-location">Ubicación</label>
-          <input type="text" id="create-location" class="edit-input" placeholder="Ej: Rosario, Santa Fe" required>
+        <div class="tag-search-wrapper">
+          <input type="text" id="campaign-cause-search-input" class="edit-input" placeholder="Buscar causas (ej: Educación, Medio Ambiente, Salud...)">
+          <ul class="tag-suggestions-list" id="campaign-cause-suggestions">
+            <!-- Sugerencias dinámicas de JS -->    <!-- FALTAN LAS SUGERENCIAS -->
+          </ul>
         </div>
+      </div>
+
+      <div class="edit-row">
+        <label for="create-location">Ubicación</label>
+        <input type="text" name="ubicacion" id="create-location" class="edit-input" placeholder="Ej: Rosario, Santa Fe" required>
       </div>
 
       <!-- Dates -->
       <div class="form-group-row">
         <div class="edit-row">
           <label for="create-start-date">Fecha de inicio</label>
-          <input type="date" id="create-start-date" class="edit-input" required>
+          <input type="date" name="fecha_inicio" id="create-start-date" class="edit-input" required>
         </div>
         <div class="edit-row">
           <label for="create-end-date">Fecha de finalización</label>
-          <input type="date" id="create-end-date" class="edit-input" required>
+          <input type="date" name="fecha_fin" id="create-end-date" class="edit-input" required>
         </div>
       </div>
 
       <!-- Important Information / Detailed content -->
-      <div class="edit-row">
+      <!-- <div class="edit-row">
         <label for="create-details">Información importante (Detalle de la campaña)</label>
         <textarea id="create-details" class="edit-input" rows="4" placeholder="Ingrese las actividades a realizar, horarios específicos y detalles del proyecto" required></textarea>
-      </div>
+      </div> -->
 
       <!-- Additional Info (Conditional for Convocatoria) -->
       <div class="edit-row" id="create-additional-info-group">
         <label for="create-additional">Información adicional (Solo visible para postulantes aceptados)</label>
-        <textarea id="create-additional" class="edit-input" rows="3" placeholder="Ej: Dirección exacta, teléfono del coordinador, herramientas a traer..."></textarea>
+        <textarea id="create-additional" name="info_adicional" class="edit-input" rows="3" placeholder="Ej: Dirección exacta, teléfono del coordinador, herramientas a traer..."></textarea>
       </div>
 
-      <!-- Images (Mockup simulation) -->
+      <!-- Imágenes de la campaña (Real) -->
       <div class="edit-row">
-        <label>Imágenes de la campaña (Opcional)</label>
-        <div class="image-upload-simulation" onclick="simulateCreateCampaignImageUpload()">
+        <label>Imágenes de la campaña (Máximo 3)</label>
+        <!-- Botón visual para hacer clic en el input de archivo oculto -->
+        <div class="image-upload-simulation" onclick="document.getElementById('campaign-images-input').click()">
           <div class="image-upload-simulation-content">
             <i data-lucide="image-plus"></i>
-            <span>+ Agregar imágenes (Simulado)</span>
+            <span>Seleccionar imágenes</span>
           </div>
         </div>
+
+        <!-- Input de archivos oculto -->
+        <input type="file" name="imagenes[]" id="campaign-images-input" multiple accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+        
+        <!-- Grid para ver las imágenes seleccionadas -->
         <div class="uploaded-images-grid" id="create-images-preview-grid">
-          <!-- Dynamically populated mock image previews -->
+          <!-- Se completa dinámicamente con JS -->
         </div>
       </div>
 

@@ -19,7 +19,7 @@ class sesionCtrl extends Controlador {
 				include_once '../app/controllers/perfilCtrl.php';
 				
 				$perfil = new perfilCtrl();
-				$perfil->cargaPerfil();
+				$perfil->index();
 
 				return;
 				/* if ($_SESSION['usuario_rol'] == 'voluntario') {

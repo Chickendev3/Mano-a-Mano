@@ -27,7 +27,11 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
 
-
+    <!-- Definición de BASE_URL para JavaScript -->
+    <script>
+        const BASE_URL = '<?= BASE_URL ?>';
+    </script>
+    
     <!-- Carga de JS Global-->
     <script src="<?= BASE_URL ?>js/main.js"></script>
 

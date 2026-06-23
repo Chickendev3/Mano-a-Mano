@@ -61,6 +61,10 @@ class Voluntario extends Usuario{
         return $this->bd->resultado();
     }
 
+    /* public function obtenerCampaniasPorVoluntario ( int $idVoluntario ) :array {
+
+    } */
+
 
     /* -------------------- INSERTAR DATOS -------------------- */
     public function nuevoVoluntario( string $nombre, string $apellido, string $email, string $clave, string $telefono, ?string $telefonoEmergencia = null, ?string $ubicacion = null ) :bool {
