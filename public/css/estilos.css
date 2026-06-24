@@ -216,7 +216,7 @@ button, input, textarea, select {
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(50% - 180px);
+  width: calc(50% - 260px);
   height: 90px;
   background-color: #FFFFFF;
   z-index: 1;
@@ -242,7 +242,7 @@ button, input, textarea, select {
   position: absolute;
   top: 0;
   right: 0;
-  width: calc(50% - 150px);
+  width: calc(50% - 240px);
   height: 90px;
   background-color: #FFFFFF;
   z-index: 1;

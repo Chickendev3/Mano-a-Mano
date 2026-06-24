@@ -4,7 +4,7 @@
   <div class="hero-bg-container">
     <img src="<?= BASE_URL ?>img/hero_new.png" alt="Voluntarios cooperando para generar impacto social" class="hero-bg-img">
     <svg class="hero-wave-overlay" viewBox="0 0 100 800" preserveAspectRatio="none" aria-hidden="true">
-      <path fill="#FFFFFF" d="M0,0 L100,0 L100,800 L0,800 C50,700 80,600 30,450 C20,300 50,150 80,0 Z"></path>
+      <path fill="#F5F7F8" d="M0,0 L80,0 C50,150 20,300 30,450 C80,600 50,700 0,800 L0,800 L0,0 Z"></path>
     </svg>
     <div class="hero-quote-card">
       <div class="icon-circle">
