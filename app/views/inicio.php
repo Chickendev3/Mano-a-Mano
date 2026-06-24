@@ -1,5 +1,19 @@
 <!-- HERO SECTION -->
 <section class="hero" id="inicio">
+  <!-- Right Side Background Image & Wave Overlay -->
+  <div class="hero-bg-container">
+    <img src="<?= BASE_URL ?>img/hero_new.png" alt="Voluntarios cooperando para generar impacto social" class="hero-bg-img">
+    <svg class="hero-wave-overlay" viewBox="0 0 100 800" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="#FFFFFF" d="M0,0 L100,0 L100,800 L0,800 C50,700 80,600 30,450 C20,300 50,150 80,0 Z"></path>
+    </svg>
+    <div class="hero-quote-card">
+      <div class="icon-circle">
+        <i data-lucide="leaf"></i>
+      </div>
+      <p>Pequeñas acciones,<br>grandes cambios.</p>
+    </div>
+  </div>
+
   <div class="container hero-grid">
     <div class="hero-content">
       <div class="hero-tag">
@@ -49,18 +63,9 @@
         </div>
       </div>
     </div>
-    <div class="hero-image-wrapper">
-      <div class="hero-bg-blob"></div>
-      <div class="hero-img-container">
-        <img src="<?= BASE_URL ?>img/hero_new.png" alt="Voluntarios cooperando para generar impacto social" class="hero-img">
-        <div class="hero-quote-card">
-          <div class="icon-circle">
-            <i data-lucide="leaf"></i>
-          </div>
-          <p>Pequeñas acciones,<br>grandes cambios.</p>
-        </div>
-      </div>
-    </div>
+    
+    <!-- Empty space in grid to leave room for background image on the right -->
+    <div class="hero-empty-space"></div>
   </div>
 </section>
 

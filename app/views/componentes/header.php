@@ -1,5 +1,7 @@
 <!-- FIXED HEADER / NAVBAR -->
 <header class="header" id="header">
+  <div class="header-bg-left"></div>
+  <div class="header-bg-right"></div>
   <div class="container nav-container">
     <a href="<?= BASE_URL ?>" class="logo-wrapper" id="nav-logo-link">
       <img src="<?= BASE_URL ?>img/Logo_mano_a_mano_sin_fondo.png" alt="Logo Mano a Mano" class="logo-img">

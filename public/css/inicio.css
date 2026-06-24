@@ -2,22 +2,53 @@
    HERO SECTION
    ========================================================================== */
 .hero {
-  padding-top: 180px;
+  padding-top: 160px;
   padding-bottom: 120px;
-  background: radial-gradient(circle at 0% 0%, var(--color-beige) 0%, var(--color-background) 100%);
+  background-color: #FFFFFF;
   position: relative;
   overflow: hidden;
 }
 
+.hero-bg-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-wave-overlay {
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 160px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
 .hero-grid {
   display: grid;
-  grid-template-columns: 1fr 1.15fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .hero-content {
   max-width: 650px;
+}
+
+.hero-empty-space {
+  height: 100%;
 }
 
 .hero-tag {
@@ -26,7 +57,7 @@
   gap: 8px;
   padding: 8px 16px;
   background-color: var(--color-primary-light);
-  border: 1px solid rgba(76, 127, 107, 0.2);
+  border: 1px solid rgba(79, 143, 107, 0.2);
   border-radius: var(--radius-full);
   font-size: 14px;
   font-weight: 600;
@@ -44,7 +75,7 @@
 .hero-tag-pulse {
   width: 8px;
   height: 8px;
-  background-color: var(--color-success);
+  background-color: var(--color-primary);
   border-radius: 50%;
   position: relative;
 }
@@ -54,7 +85,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: var(--color-success);
+  background-color: var(--color-primary);
   border-radius: 50%;
   animation: pulse-ring 1.5s infinite;
 }
@@ -71,9 +102,9 @@
 
 .hero-subtitle {
   font-size: 19px;
+  font-weight: 500;
   color: var(--color-text-secondary);
-  margin-bottom: 36px;
-  font-weight: 400;
+  margin: 0;
 }
 
 .hero-buttons {
@@ -244,8 +275,8 @@
 
 .hero-quote-card {
   position: absolute;
-  bottom: 20px;
-  right: -20px;
+  bottom: 40px;
+  right: 40px;
   background-color: var(--color-primary-dark);
   color: #FFFFFF;
   padding: 16px 20px;
@@ -1243,8 +1274,26 @@
 @media (max-width: 768px) {
   .section { padding: 60px 0; }
   
+  .hero {
+    padding-top: 120px;
+    padding-bottom: 60px;
+  }
+  
+  .hero-bg-container {
+    position: relative;
+    width: 100% !important;
+    height: 300px !important;
+    order: 2;
+    margin-top: 30px;
+  }
+  
+  .hero-wave-overlay {
+    display: none !important;
+  }
+  
   .hero-grid {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 40px;
     text-align: center;
   }
@@ -1252,6 +1301,8 @@
   .hero-content { margin: 0 auto; }
   .hero-tag { justify-content: center; }
   .hero-buttons { justify-content: center; }
+  .hero-empty-space { display: none !important; }
+  
   .hero-stats {
     flex-direction: column;
     align-items: stretch;
@@ -1270,8 +1321,8 @@
     padding-bottom: 12px;
   }
   .hero-quote-card {
-    right: 10px;
-    bottom: 10px;
+    right: 20px !important;
+    bottom: 20px !important;
     padding: 12px 16px;
     max-width: 240px;
   }
