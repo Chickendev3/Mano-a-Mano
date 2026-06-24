@@ -4,6 +4,7 @@
     <div class="hero-content">
       <div class="hero-tag">
         <span class="hero-tag-pulse" aria-hidden="true"></span>
+        <i data-lucide="users" class="hero-tag-icon"></i>
         <span>+1,400 Voluntarios activos hoy</span>
       </div>
       <h1 class="hero-title">Conectamos personas con causas que generan impacto</h1>
@@ -11,31 +12,54 @@
       <?php if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true): ?>
       <div class="hero-buttons">
         <a href="<?= BASE_URL ?>registro/voluntario" class="btn btn-primary btn-lg" id="hero-volunteer-btn">
-          Quiero ser voluntario <i data-lucide="arrow-right"></i>
+          Quiero ser voluntario <i data-lucide="heart"></i>
         </a>
         <a href="<?= BASE_URL ?>registro/organizacion" class="btn btn-outline btn-lg" id="hero-org-btn">
-          Soy una organización
+          Soy una organización <i data-lucide="building-2"></i>
         </a>
       </div>
       <?php endif; ?>
       <div class="hero-stats">
         <div class="stat-item">
-          <h3 id="stat-campaigns">+180</h3>
-          <p>Campañas activas</p>
+          <div class="stat-icon-circle stat-icon-green">
+            <i data-lucide="megaphone"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-campaigns">+180</h3>
+            <p>Campañas activas</p>
+          </div>
         </div>
         <div class="stat-item">
-          <h3 id="stat-orgs">95</h3>
-          <p>ONGs registradas</p>
+          <div class="stat-icon-circle stat-icon-purple">
+            <i data-lucide="building-2"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-orgs">95</h3>
+            <p>ONGs registradas</p>
+          </div>
         </div>
         <div class="stat-item">
-          <h3 id="stat-impact">+12k</h3>
-          <p>Horas de impacto</p>
+          <div class="stat-icon-circle stat-icon-orange">
+            <i data-lucide="clock"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-impact">+12k</h3>
+            <p>Horas de impacto</p>
+          </div>
         </div>
       </div>
     </div>
     <div class="hero-image-wrapper">
       <div class="hero-bg-blob"></div>
-      <img src="<?= BASE_URL ?>img/hero.png" alt="Ilustración de personas cooperando para generar impacto social" class="hero-img">
+      <div class="hero-img-container">
+        <img src="<?= BASE_URL ?>img/hero_new.png" alt="Voluntarios cooperando para generar impacto social" class="hero-img">
+        <div class="hero-quote-card">
+          <div class="icon-circle">
+            <i data-lucide="leaf"></i>
+          </div>
+          <p>Pequeñas acciones,<br>grandes cambios.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>

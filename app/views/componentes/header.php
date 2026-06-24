@@ -2,15 +2,15 @@
 <header class="header" id="header">
   <div class="container nav-container">
     <a href="<?= BASE_URL ?>" class="logo-wrapper" id="nav-logo-link">
-      <img src="<?= BASE_URL ?>img/Logo_mano_a_mano (1) (1).png" alt="Logo Mano a Mano" class="logo-img">
+      <img src="<?= BASE_URL ?>img/Logo_mano_a_mano_sin_fondo.png" alt="Logo Mano a Mano" class="logo-img">
     </a>
     
     <!-- Nav Links -->
     <nav aria-label="Navegación principal">
       <ul class="nav-links">
-        <li><a href="<?= BASE_URL ?>" class="nav-link <?= ($rutaVista === 'inicio') ? 'active' : '' ?>" id="link-inicio">Inicio</a></li>
-        <li><a href="<?= BASE_URL ?>conectar" class="nav-link <?= ($rutaVista === 'conectar') ? 'active' : '' ?>" id="link-conectar">Conectar</a></li>
-        <li><a href="<?= BASE_URL ?>contacto" class="nav-link <?= ($rutaVista === 'contacto') ? 'active' : '' ?>" id="link-contacto">Contacto</a></li>
+        <li><a href="<?= BASE_URL ?>" class="nav-link <?= ($rutaVista === 'inicio') ? 'active' : '' ?>" id="link-inicio"><i data-lucide="home"></i> Inicio</a></li>
+        <li><a href="<?= BASE_URL ?>conectar" class="nav-link <?= ($rutaVista === 'conectar') ? 'active' : '' ?>" id="link-conectar"><i data-lucide="users"></i> Conectar</a></li>
+        <li><a href="<?= BASE_URL ?>contacto" class="nav-link <?= ($rutaVista === 'contacto') ? 'active' : '' ?>" id="link-contacto"><i data-lucide="mail"></i> Contacto</a></li>
       </ul>
     </nav>
     
@@ -34,8 +34,8 @@
         </div>
       <?php else: ?>
         <!-- Not Logged In: Login/Register buttons -->
-        <a href="<?= BASE_URL ?>sesion" class="btn btn-ghost" id="nav-login-btn">Iniciar sesión</a>
-        <a href="<?= BASE_URL ?>registro" class="btn btn-primary" id="nav-register-btn">Registrarse</a>
+        <a href="<?= BASE_URL ?>sesion" class="btn btn-ghost" id="nav-login-btn"><i data-lucide="user"></i> Iniciar sesión</a>
+        <a href="<?= BASE_URL ?>registro" class="btn btn-primary" id="nav-register-btn">Registrarse <i data-lucide="arrow-right"></i></a>
       <?php endif; ?>
       <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Abrir menú" aria-expanded="false">
         <i data-lucide="menu"></i>
