@@ -28,14 +28,25 @@
             <?php 
               $perfil_url = (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'voluntario') ? 'perfil_voluntario_logueado' : 'perfil_organizacion_logueado';
             ?>
-            <a href="<?= BASE_URL . $perfil_url ?>" class="nav-dropdown-item" role="menuitem">Ver perfil</a>
-            <a href="<?= BASE_URL ?>sesion/salir" class="nav-dropdown-item" role="menuitem">Cerrar sesión</a>
+            <a href="<?= BASE_URL . $perfil_url ?>" class="nav-dropdown-item" role="menuitem">
+              <i data-lucide="user"></i> Mi Perfil
+            </a>
+            <a href="<?= BASE_URL . $perfil_url ?>#postulaciones" class="nav-dropdown-item" role="menuitem">
+              <i data-lucide="clipboard-list"></i> Mis Inscripciones
+            </a>
+            <a href="<?= BASE_URL . $perfil_url ?>#configuracion" class="nav-dropdown-item" role="menuitem">
+              <i data-lucide="settings"></i> Configuración
+            </a>
+            <div class="nav-dropdown-divider"></div>
+            <a href="<?= BASE_URL ?>sesion/salir" class="nav-dropdown-item logout" role="menuitem">
+              <i data-lucide="log-out"></i> Cerrar Sesión
+            </a>
           </div>
         </div>
       <?php else: ?>
         <!-- Not Logged In: Login/Register buttons -->
         <a href="<?= BASE_URL ?>sesion" class="btn btn-ghost" id="nav-login-btn"><i data-lucide="user"></i> Iniciar sesión</a>
-        <a href="<?= BASE_URL ?>registro" class="btn btn-primary" id="nav-register-btn">Registrarse <i data-lucide="arrow-right"></i></a>
+        <a href="<?= BASE_URL ?>registro" class="btn btn-primary" id="nav-register-btn">Registrarse <span class="arrow-circle"><i data-lucide="arrow-right"></i></span></a>
       <?php endif; ?>
       <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Abrir menú" aria-expanded="false">
         <i data-lucide="menu"></i>

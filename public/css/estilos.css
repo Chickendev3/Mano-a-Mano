@@ -4,24 +4,24 @@
 /* CSS Variables */
 :root {
   /* Color Palette */
-  --color-primary: #4C7F6B;
-  --color-primary-dark: #2F4F4B;
-  --color-primary-light: rgba(76, 127, 107, 0.1);
+  --color-primary: #4F8F6B;
+  --color-primary-dark: #3E7758;
+  --color-primary-light: rgba(79, 143, 107, 0.08);
   --color-secondary: #7E72B8;
   --color-secondary-light: rgba(126, 114, 184, 0.1);
-  --color-success: #7FAE9E;
-  --color-success-dark: #659081;
-  --color-success-light: rgba(127, 174, 158, 0.15);
-  --color-background: #E6E9E4;
+  --color-success: #4F8F6B;
+  --color-success-dark: #3E7758;
+  --color-success-light: rgba(79, 143, 107, 0.08);
+  --color-background: #F5F7F8;
   --color-surface: #FFFFFF;
-  --color-surface-hover: #CFE0D6;
-  --color-text-primary: #2D3B45;
-  --color-text-secondary: #4A5862;
-  --color-text-muted: #808E97;
-  --color-border: #CFE0D6;
+  --color-surface-hover: #E5E7EB;
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #9CA3AF;
+  --color-border: #E5E7EB;
 
   /* Additional Palette Colors */
-  --color-beige: #E9E2D6;
+  --color-beige: #FFFFFF;
   --color-orange: #F2B24C;
   
   /* Shadows */
@@ -203,27 +203,20 @@ button, input, textarea, select {
 /* HEADER */
 .header {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 110px;
-  background: transparent;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 1200px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
   z-index: 1000;
-  transition: all var(--transition-normal);
-}
-
-.header::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'><path fill='%23E9E2D6' d='M0,0 L1440,0 L1440,75 C1320,105 1120,60 900,90 C680,120 480,80 280,105 C140,118 0,85 0,85 Z'></path></svg>");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  z-index: -1;
-  transition: all var(--transition-normal);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-container {
@@ -231,27 +224,21 @@ button, input, textarea, select {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding-top: 10px;
+  padding: 0 24px;
 }
 
 /* LOGO */
 .logo-wrapper {
   display: flex;
   align-items: center;
-  background: #FFFFFF;
-  border-radius: var(--radius-full);
-  padding: 6px 20px;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  height: 60px;
-  flex-shrink: 0;
+  height: 100%;
 }
 
 .logo-img {
-  height: 48px;
+  height: 36px;
   width: auto;
   object-fit: contain;
-  transition: transform .3s ease;
+  transition: transform 0.3s ease;
 }
 
 .logo-img:hover {
@@ -262,15 +249,14 @@ button, input, textarea, select {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 4px;
   list-style: none;
   margin: 0;
-  padding: 6px 16px;
-  background: #FFFFFF;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  height: 60px;
+  padding: 6px;
+  background: var(--color-background);
+  border-radius: 100px;
+  height: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .nav-links li {
@@ -282,24 +268,25 @@ button, input, textarea, select {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
   text-decoration: none;
-  transition: all .3s ease;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
   padding: 8px 16px;
-  border-radius: var(--radius-full);
+  border-radius: 100px;
 }
 
 .nav-link i {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: var(--color-text-secondary);
-  transition: color var(--transition-fast);
+  transition: color 300ms ease;
 }
 
 .nav-link:hover {
   color: var(--color-primary);
+  transform: translateY(-2px);
 }
 
 .nav-link:hover i {
@@ -307,8 +294,7 @@ button, input, textarea, select {
 }
 
 .nav-link.active {
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
+  background-color: rgba(79, 143, 107, 0.1);
   color: var(--color-primary);
 }
 
@@ -320,36 +306,34 @@ button, input, textarea, select {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: #FFFFFF;
-  border-radius: var(--radius-full);
-  padding: 6px 8px 6px 20px;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  height: 60px;
+  gap: 12px;
 }
 
 #nav-login-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
   background: transparent;
   box-shadow: none;
   border: none;
-  padding: 0;
+  padding: 8px 16px;
+  border-radius: 100px;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #nav-login-btn i {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: var(--color-text-secondary);
 }
 
 #nav-login-btn:hover {
+  background-color: var(--color-background);
   color: var(--color-primary);
+  transform: translateY(-2px);
 }
 
 #nav-login-btn:hover i {
@@ -359,42 +343,64 @@ button, input, textarea, select {
 #nav-register-btn {
   background-color: var(--color-primary);
   color: #FFFFFF;
-  border-radius: var(--radius-full);
-  padding: 10px 20px;
+  border-radius: 100px;
+  padding: 8px 16px 8px 20px;
   font-size: 14px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  box-shadow: var(--shadow-sm);
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(79, 143, 107, 0.2);
   border: none;
-  height: 46px;
+  height: 44px;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#nav-register-btn i {
-  width: 20px;
-  height: 20px;
-  background: #FFFFFF;
-  color: var(--color-primary);
+#nav-register-btn .arrow-circle {
+  width: 24px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#nav-register-btn .arrow-circle i {
+  width: 14px;
+  height: 14px;
 }
 
 #nav-register-btn:hover {
   background-color: var(--color-primary-dark);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(62, 119, 88, 0.3);
+}
+
+#nav-register-btn:hover .arrow-circle {
+  transform: translateX(2px);
+  background-color: #FFFFFF;
+  color: var(--color-primary-dark);
 }
 
 .mobile-menu-btn {
   display: none;
-  background: transparent;
+  background: var(--color-background);
   color: var(--color-text-primary);
-  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   border: none;
+  transition: all 200ms ease;
+}
+
+.mobile-menu-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* USER NAV DROPDOWN */
@@ -407,37 +413,49 @@ button, input, textarea, select {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 8px 18px;
   background-color: var(--color-background);
-  color: var(--color-primary);
-  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  border-radius: 100px;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  border: 1px solid var(--color-border);
-  height: 46px;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  height: 44px;
+}
+
+.nav-dropdown-toggle i {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
 }
 
 .nav-dropdown-toggle:hover {
-  background-color: var(--color-primary);
-  color: var(--color-surface);
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.nav-dropdown-toggle:hover i {
+  color: var(--color-primary);
 }
 
 .nav-dropdown-menu {
   position: absolute;
   right: 0;
-  top: 100%;
-  margin-top: 8px;
+  top: calc(100% + 8px);
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  min-width: 180px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 8px;
+  min-width: 220px;
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px);
-  transition: all var(--transition-normal);
-  z-index: 1100;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1001;
 }
 
 .nav-dropdown:hover .nav-dropdown-menu {
@@ -447,27 +465,55 @@ button, input, textarea, select {
 }
 
 .nav-dropdown-item {
-  display: block;
-  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
   font-size: 14px;
-  font-weight: 550;
-  color: var(--color-text-primary);
-  transition: background-color var(--transition-fast);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+  transition: all 200ms ease;
   text-align: left;
 }
 
+.nav-dropdown-item i {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  transition: color 200ms ease;
+}
+
 .nav-dropdown-item:hover {
-  background-color: var(--color-surface-hover);
+  background-color: var(--color-background);
   color: var(--color-primary);
 }
 
-.nav-dropdown-item:first-child {
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
+.nav-dropdown-item:hover i {
+  color: var(--color-primary);
 }
 
-.nav-dropdown-item:last-child {
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  border-top: 1px solid var(--color-border);
+.nav-dropdown-divider {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.06);
+  margin: 6px 0;
+}
+
+.nav-dropdown-item.logout {
+  color: #EF4444;
+}
+
+.nav-dropdown-item.logout i {
+  color: #FCA5A5;
+}
+
+.nav-dropdown-item.logout:hover {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+.nav-dropdown-item.logout:hover i {
+  color: #DC2626;
 }
 
 /* Hamburguesa / Mobile Nav Class Toggles */
@@ -475,16 +521,28 @@ button, input, textarea, select {
   display: flex !important;
   flex-direction: column;
   position: absolute;
-  top: 80px;
+  top: 76px;
   left: 0;
   width: 100%;
   background-color: var(--color-surface);
-  padding: 30px 24px;
-  border-bottom: 1px solid var(--color-border);
-  gap: 20px;
-  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  gap: 8px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
   z-index: 999;
-  animation: slideDown var(--transition-normal);
+  height: auto;
+  animation: slideDown 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-links.mobile-active li {
+  width: 100%;
+}
+
+.nav-links.mobile-active .nav-link {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 12px;
 }
 
 @keyframes slideDown {
@@ -494,42 +552,31 @@ button, input, textarea, select {
 
 /* Keep header scroll styles */
 .header-scrolled {
-  background: rgba(255, 255, 255, 0.98) !important;
-  height: 80px !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
-.header-scrolled::before {
-  background-image: none !important;
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.header-scrolled .logo-wrapper,
-.header-scrolled .nav-links,
-.header-scrolled .nav-actions {
-  box-shadow: none !important;
-  border: none !important;
-  background: transparent !important;
-  height: 100% !important;
-}
-
-.header-scrolled .nav-link.active {
-  border: none !important;
-  background: var(--color-primary-light) !important;
-}
-
-.header-scrolled .nav-dropdown-toggle {
-  background: var(--color-primary-light) !important;
-  border: none !important;
+  top: 12px !important;
+  height: 64px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12), 0 2px 5px rgba(0,0,0,0.06) !important;
 }
 
 .header-scrolled .logo-img {
-  height: 48px !important;
+  height: 32px !important;
+}
+
+.header-scrolled .nav-links {
+  height: 42px !important;
+}
+
+.header-scrolled .nav-link {
+  padding: 6px 12px !important;
+}
+
+.header-scrolled #nav-register-btn,
+.header-scrolled .nav-dropdown-toggle {
+  height: 38px !important;
 }
 
 .header-scrolled .nav-links.mobile-active {
-  top: 80px !important;
+  top: 68px !important;
 }
 
 /* Forms Base */
@@ -752,37 +799,58 @@ select:focus-visible {
 /* Responsive Styles */
 @media (max-width: 768px) {
   .header {
-    height: 80px !important;
-    background: var(--color-surface) !important;
-    box-shadow: var(--shadow-sm);
-  }
-  .header::before {
-    display: none !important;
+    width: 94% !important;
+    height: 64px !important;
+    top: 16px !important;
+    border-radius: 100px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
   }
   .logo-wrapper {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
     padding: 0 !important;
   }
-  .nav-links {
+  .logo-img {
+    height: 32px !important;
+  }
+  nav[aria-label="Navegación principal"] {
     display: none !important;
   }
   .nav-actions {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    height: auto !important;
+    gap: 10px !important;
   }
-  .nav-actions .btn, .nav-dropdown {
+  #nav-login-btn {
     display: none !important;
   }
+  #nav-register-btn {
+    height: 36px !important;
+    padding: 6px 12px 6px 16px !important;
+    font-size: 13px !important;
+    gap: 6px !important;
+  }
+  #nav-register-btn .arrow-circle {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  #nav-register-btn .arrow-circle i {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  .nav-dropdown-toggle {
+    height: 36px !important;
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+  }
   .mobile-menu-btn {
-    display: block !important;
-    background: var(--color-surface-hover) !important;
-    padding: 8px;
-    border-radius: var(--radius-sm);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: var(--color-background) !important;
+    color: var(--color-text-primary) !important;
+    padding: 0 !important;
   }
   
   .footer-top {

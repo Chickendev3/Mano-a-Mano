@@ -12,7 +12,7 @@
       <?php if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true): ?>
       <div class="hero-buttons">
         <a href="<?= BASE_URL ?>registro/voluntario" class="btn btn-primary btn-lg" id="hero-volunteer-btn">
-          Quiero ser voluntario <i data-lucide="heart"></i>
+          Quiero ser voluntario <span class="arrow-circle"><i data-lucide="arrow-right"></i></span>
         </a>
         <a href="<?= BASE_URL ?>registro/organizacion" class="btn btn-outline btn-lg" id="hero-org-btn">
           Soy una organización <i data-lucide="building-2"></i>
