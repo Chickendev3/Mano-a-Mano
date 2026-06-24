@@ -3,7 +3,7 @@
   <div class="container">
     <div class="footer-top">
       <div class="footer-brand">
-        <img src="<?= BASE_URL ?>img/Logo_mano_a_mano_sin_fondo.png" alt="Logo de Mano a Mano en footer" class="footer-logo">
+        <img src="<?= BASE_URL ?>img/logo.png" alt="Logo de Mano a Mano en footer" class="footer-logo">
         <p class="footer-desc">Una plataforma moderna creada para democratizar, agilizar y visibilizar el voluntariado y la colaboración social.</p>
         <div class="footer-socials">
           <a href="#" class="social-btn" aria-label="Instagram"><i data-lucide="instagram"></i></a>
