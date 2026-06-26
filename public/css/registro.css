@@ -8,7 +8,7 @@
   min-height: calc(100vh - 90px);
   display: flex;
   align-items: center;
-  background: radial-gradient(circle at 10% 20%, rgba(54, 124, 158, 0.02) 0%, rgba(155, 122, 205, 0.01) 90%);
+  background: radial-gradient(circle at 10% 20%, rgba(76, 127, 107, 0.02) 0%, rgba(126, 114, 184, 0.01) 90%);
 }
 
 .wireframe-grid {

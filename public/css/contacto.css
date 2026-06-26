@@ -28,7 +28,7 @@
 }
 
 .accordion-item:hover {
-  border-color: rgba(54, 124, 158, 0.3);
+  border-color: rgba(76, 127, 107, 0.3);
   box-shadow: var(--shadow-md);
 }
 
