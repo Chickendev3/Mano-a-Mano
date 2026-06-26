@@ -59,12 +59,14 @@ class registroCtrl extends Controlador {
     }
 
     public function cargarFormOrganizacion() {
-        $datos = [];
+        $datos = ['cssPropio' => 'registro.css',
+                  'jsPropio' => 'registro.js'];
         $this->cargarVista('registro_organizacion', $datos, 'Registrarse como Organización');
     }
 
     public function cargarFormVoluntario() {
-        $datos = [];
+        $datos = ['cssPropio' => 'registro.css',
+                  'jsPropio' => 'registro.js'];
         $this->cargarVista('registro_voluntario', $datos, 'Registrarse como Voluntario');
     }
 
