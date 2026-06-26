@@ -1,3 +1,7 @@
+<?php 
+/** @var array $campanias */
+?>
+
 <section class="section" style="padding-top: 140px; min-height: calc(100vh - 90px); display: flex; align-items: center;">
   <div class="container">
     <div class="section-header" style="margin-bottom: 40px;">
@@ -43,14 +47,41 @@
       </div>
     </div>
 
-    <!-- Placeholder block representing future stage -->
-    <div style="text-align: center; padding: 60px 40px; background-color: var(--color-surface); border: 2px dashed var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-secondary); box-shadow: var(--shadow-sm);">
-      <div style="width: 64px; height: 64px; border-radius: 50%; background-color: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px;">
-        <i data-lucide="search"></i>
+    <!-- Contenedor de Campañas Activas en Grilla -->
+    <?php if (empty($campanias)): ?>
+      <div style="text-align: center; padding: 40px; background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-secondary); box-shadow: var(--shadow-sm);">
+        No se encontraron campañas activas registradas en este momento.
       </div>
-      <h2 style="margin-bottom: 8px; font-size: 22px; color: var(--color-text-primary); font-family: 'Outfit', sans-serif;">Módulo de Búsqueda Activa</h2>
-      <p style="max-width: 500px; margin: 0 auto 24px auto; font-size: 15px;">Esta sección está reservada para el desarrollo de la siguiente etapa académica. Aquí se conectarán los filtros con la base de datos para la búsqueda interactiva en tiempo real.</p>
-      <a href="<?= BASE_URL ?>" class="btn btn-outline">Volver al inicio</a>
-    </div>
+    <?php else: ?>
+      <div class="camps-carousel" id="campaigns-container">
+        <?php foreach ($campanias as $camp): ?>
+          <article class="camp-card">
+            <div class="camp-img-wrapper">
+              <img src="<?= !empty($camp['imagen']) ? BASE_URL . $camp['imagen'] : BASE_URL . 'img/img_generica.png' ?>" alt="<?= htmlspecialchars($camp['titulo']) ?>" class="camp-img">
+              <?php if (!empty($camp['category'])): ?>
+                <span class="camp-cat-badge"><?= htmlspecialchars($camp['category']) ?></span>
+              <?php endif; ?>
+            </div>
+            <div class="camp-content">
+              <span class="camp-org"><?= htmlspecialchars($camp['nombre']) ?></span>
+              <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
+              <p class="camp-desc"><?= htmlspecialchars($camp['descripcion']) ?></p>
+              
+              <button class="btn btn-primary" onclick="openCampaignDetails(<?= $camp['id'] ?>)">Ver campaña</button>
+            </div>
+          </article>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
   </div>
 </section>
+
+<!-- INYECCIÓN DE VARIABLES Y CARGA DEL MODAL DE DETALLE COMPARTIDO -->
+<script>
+  window.campaigns = <?= json_encode($campanias ?? []); ?>;
+</script>
+
+<?php 
+include_once '../app/views/componentes/perfil_comun_logueado.php';
+renderModalDetalleCampania();
+?>

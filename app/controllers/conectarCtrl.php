@@ -2,10 +2,18 @@
 class conectarCtrl extends Controlador {
 
     public function index() : void {
-        $datos = ['error' => null,
-                  'cssPropio' => 'conectar.css',
-                  'jsPropio' => 'conectar.js'];
-        $this->cargarVista('conectar', $datos, 'Conectar | Mano a Mano');
+        $modeloCampania = $this->cargarModelo('Campania');
+
+        $campanias = $modeloCampania->obtenerTodasCampanias();
+    
+    
+        $datos = ['cssPropio' => 'conectar.css',
+                  'jsPropio' => 'conectar.js',
+                  'campanias' => $campanias ?? []];
+        
+        $this->cargarVista('conectar', $datos, 'Conectar - Mano a Mano');
     }
+
+
 }
 ?>

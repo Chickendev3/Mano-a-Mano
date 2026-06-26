@@ -16,22 +16,58 @@ class Campania {
     */
 
     /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
-    public function obtenerCampanias() :array {
+    public function obtenerTodasCampanias() :array {
         /* Actualizalizar el estado de la campaña en caso de fecha de finalización vencida */
 
-        $consulta = "SELECT o.*, t.tipo as 'nombre_tipo'
-                        FROM organizaciones o JOIN tipos_campanias t ON t.id = o.tipo_id;";
-    
+        $consulta = "SELECT c.id, u.nombre, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+                        FROM campanias c 
+                            JOIN usuarios u ON c.usuario_id = u.id
+                            JOIN tipos_campanias t ON t.id = c.tipo_id
+                            JOIN organizaciones o ON u.id = o.usuario_id;";
         $this->bd->consulta($consulta);
         $this->bd->ejecutar();
+        $campaniasOrgs = $this->bd->resultados();
 
-        return $this->bd->resultados();
+        $consulta = "SELECT c.id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre', t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+                        FROM campanias c 
+                            JOIN usuarios u ON c.usuario_id = u.id
+                            JOIN tipos_campanias t ON t.id = c.tipo_id
+                            JOIN voluntarios v ON u.id = v.usuario_id;";
+        $this->bd->consulta($consulta);
+        $this->bd->ejecutar();
+        $campaniasVol = $this->bd->resultados();
+
+        $todasLasCampanias = array_merge($campaniasOrgs, $campaniasVol);
+        
+        $campaniasMapeadas = [];
+        foreach ($todasLasCampanias as $camp) {
+            $idCamp = (int)$camp['id'];
+            $causes = $this->obtenerCausasDeCampania($idCamp);
+            $images = $this->obtenerArchivosDeCampania($idCamp);
+            
+            $campaniasMapeadas[] = [
+                'id' => $idCamp,
+                'nombre' => $camp['nombre'],
+                'tipo' => strtolower($camp['tipo']) === 'convocatoria' ? 'convocatoria' : 'informativa',
+                'titulo' => $camp['titulo'],
+                'descripcion' => $camp['descripcion'],
+                'fecha_inicio' => $camp['fecha_inicio'],
+                'fecha_finalizacion' => $camp['fecha_finalizacion'],
+                'ubicacion' => $camp['ubicacion'],
+                'info_adicional' => $camp['info_adicional'],
+                'category' => !empty($causes) ? $causes[0] : '',
+                'causes' => $causes,
+                'imagen' => !empty($images) ? $images[0] : '',
+                'images' => $images
+            ];
+        }
+        
+        return $campaniasMapeadas;
     }
 
     public function obtenerCampaniaPorID ( int $idCampania ) :array {
-        $consulta = "SELECT o.*, t.tipo as 'nombre_tipo'
-                        FROM organizaciones o JOIN tipos_campanias t ON t.id = o.tipo_id
-                        WHERE o.id = :id;";
+        $consulta = "SELECT * FROM campanias
+                        WHERE id = :id;";
     
         $this->bd->consulta($consulta);
         $this->bd->asignar(":id", $idCampania);
@@ -42,8 +78,8 @@ class Campania {
 
     public function obtenerImgenesPorCampania ( int $idCampania ) :array {
         $consulta = "SELECT a.referencia, a.tipo as 'tipo_archivo'
-                        FROM organizaciones o JOIN archivos a ON o.id = a.campania_id
-                        WHERE o.id = :id;";
+                        FROM campanias c JOIN archivos a ON c.id = a.campania_id
+                        WHERE c.id = :id;";
     
         $this->bd->consulta($consulta);
         $this->bd->asignar(":id", $idCampania);

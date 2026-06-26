@@ -1,4 +1,4 @@
-// Search page script mockup
+// CONECTAR PAGE - Lógica de Búsqueda e Interactividad
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('search-input');
   const categorySelect = document.getElementById('category-select');
@@ -13,8 +13,95 @@ document.addEventListener('DOMContentLoaded', () => {
       
       console.log('Filtros seleccionados:', { q, cat, loc });
       if (typeof showToast !== 'undefined') {
-        showToast('Buscando...', 'Simulando filtrado de base de datos para la próxima fase.', true);
+        showToast('Buscando...', 'Filtrando base de datos...', true);
       }
     });
   }
 });
+
+// MODAL DE DETALLE DE CAMPAÑA DINÁMICO DESDE EL BUSCADOR
+window.openCampaignDetails = function(campaignId) {
+  // Buscamos la campaña en el listado de la base de datos inyectado por PHP
+  const campaignsList = window.campaigns || [];
+  const camp = campaignsList.find(c => c.id === campaignId);
+  if (!camp) return;
+
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = camp.titulo;
+  
+  // Respetamos la distribución original en forma de lista de párrafos simples
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.descripcion}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.ubicacion}</p>
+      <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.fecha_inicio}</p>
+      <p><strong>Fecha de finalización:</strong> ${camp.fecha_finalizacion}</p>
+    `;
+  }
+
+  // Renderizado de causas directamente como etiquetas
+  if (mTags) {
+    mTags.innerHTML = "";
+    const causesList = camp.causes || (camp.category ? [camp.category] : []);
+    causesList.forEach(cause => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${cause}`;
+      mTags.appendChild(span);
+    });
+
+    // Tipo de campaña
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    const typeLabel = camp.tipo === "convocatoria" ? "Convocatoria" : "Informativa";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
+    mTags.appendChild(typeSpan);
+  }
+
+  // Carga de la Galería de Fotos reales si la campaña tiene
+  const gallerySec = document.getElementById("m-camp-gallery-sec");
+  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+  if (gallerySec && galleryGrid) {
+    galleryGrid.innerHTML = "";
+    if (camp.images && camp.images.length > 0) {
+      camp.images.forEach(imgUrl => {
+        const div = document.createElement("div");
+        div.className = "gallery-placeholder-img"; // Usar clase original
+        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campaña" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
+        galleryGrid.appendChild(div);
+      });
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+    }
+  }
+
+  // Ocultamos las secciones privadas y de organizaciones asociadas en esta vista general
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  if (assocSec) assocSec.style.display = "none";
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mPostulateBtn) {
+    // Si la campaña es convocatoria, mostramos el botón de postulación
+    mPostulateBtn.style.display = camp.tipo === "convocatoria" ? "inline-flex" : "none";
+  }
+
+  openModal("modal-profile-camp-detail");
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+};
