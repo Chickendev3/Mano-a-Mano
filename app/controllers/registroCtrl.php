@@ -30,8 +30,8 @@ class registroCtrl extends Controlador {
                     return;
                 }
 
-                $this->cargarVista('sesion');
-                return;
+                header('Location: ' . BASE_URL . 'sesion');
+                exit;
 
             } elseif ($action == 'organizacion') {
                 $datos['tipo'] = 'organizacion';
@@ -50,8 +50,8 @@ class registroCtrl extends Controlador {
                     return;
                 }
 
-                $this->cargarVista('sesion');
-                return;
+                header('Location: ' . BASE_URL . 'sesion');
+                exit;
             }
         }
             

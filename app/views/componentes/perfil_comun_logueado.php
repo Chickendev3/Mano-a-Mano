@@ -144,8 +144,7 @@ function renderModalesComunesPerfil( $causas = [], $campaniasUsuario = [] ) {
       window.campaigns = <?= json_encode($campaniasUsuario ?? []); ?>;
     </script>
     
-    <form action="<?= BASE_URL ?>crear-campania" method="POST" enctype="multipart/form-data" class="campaign-modal-form" id="create-camp-form">
-      <div id="create-camp-message-box"></div>  
+    <form action="<?= BASE_URL ?>crear-campania" method="POST" enctype="multipart/form-data" class="campaign-modal-form" id="create-camp-form">  
       
       <!-- Tipo de Campaña -->
       <div class="edit-row">
@@ -228,6 +227,8 @@ function renderModalesComunesPerfil( $causas = [], $campaniasUsuario = [] ) {
           <!-- Se completa dinámicamente con JS -->
         </div>
       </div>
+
+      <div id="create-camp-message-box"></div>
 
       <!-- Acciones del Footer del Modal -->
       <div class="modal-footer-actions" style="margin-top: 16px;">

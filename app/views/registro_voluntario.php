@@ -6,7 +6,7 @@
       <div class="col-form" style="max-width: 460px; width: 100%;">
         <h1 class="wireframe-title">Registrarse como voluntario</h1>
         
-        <form action="<?= BASE_URL ?>registro/voluntario" method="POST" id="reg-vol-form" style="margin-top: 32px;">
+        <form action="<?= BASE_URL ?>registro" method="POST" id="reg-vol-form" style="margin-top: 32px;">
           
           <!-- Dynamic Error Alert -->
           <?php if (!empty($error)): ?>
