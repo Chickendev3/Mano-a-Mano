@@ -13,7 +13,7 @@ class perfilCtrl extends Controlador {
             $infoUsuario = $modeloRol->obtenerVoluntarioPorID($_SESSION['id_usuario']);
 
             $css = ['perfil_voluntario_logueado.css'];
-            $js = ['perfil_voluntario_logueado.js'];
+            $js = ['perfil_comun_logueado.js', 'perfil_voluntario_logueado.js'];
         }
         elseif($_SESSION['usuario_rol'] == 'organizacion') {
             $modeloRol = $this->cargarModelo('Organizacion');

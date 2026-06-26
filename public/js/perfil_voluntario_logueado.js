@@ -1,9 +1,15 @@
 /**
- * Perfil Voluntario Logueado - Interactive Logic
+ * Perfil Voluntario Logueado - Lógica Interactiva Específica
  * Mano a Mano MVC
+ * 
+ * Este archivo contiene la lógica y variables de estado exclusivas del perfil
+ * de Voluntario (datos de perfil personal, insignias, oficios, postulaciones
+ * a otras campañas e historial de voluntariado).
  */
 
-// Initial State
+// =========================================================================
+// VARIABLES DE ESTADO Y SIMULACIÓN (MOCK DATA)
+// =========================================================================
 let userProfile = {
   name: "Voluntario de Prueba",
   desc: "Apasionado por la educación y el trabajo social. Busco colaborar en proyectos comunitarios que generen un impacto positivo en la niñez y el medio ambiente.",
@@ -12,41 +18,22 @@ let userProfile = {
   email: "voluntario@gmail.com",
   phone1: "+54 11 5555-5678",
   phone2: "+54 11 9999-1234",
-  avatar: "", // Base64 data or URL
+  avatar: "", 
   skills: ["Cocinero", "Profesor"]
 };
 
 const availableSkills = [
-  "Cocinero",
-  "Profesor",
-  "Carpintero",
-  "Electricista",
-  "Plomero",
-  "Pintor",
-  "Jardinero",
-  "Albañil",
-  "Costurero",
-  "Peluquero",
-  "Conductor",
-  "Cuidador",
-  "Tallerista",
-  "Logística",
-  "Apoyo Escolar"
+  "Cocinero", "Profesor", "Carpintero", "Electricista", "Plomero", 
+  "Pintor", "Jardinero", "Albañil", "Costurero", "Peluquero", 
+  "Conductor", "Cuidador", "Tallerista", "Logística", "Apoyo Escolar"
 ];
 
-// Local state for temporary skill tags being edited
-let tempSkills = [];
-// Local state for temporary campaign causes tags being selected
-let tempCampaignCauses = [];
-// Estado local para causas e imágenes en la edición de campaña
-let tempModifyCampaignCauses = [];
-let selectedModifyCampaignFiles = [];
-let existingCampaignImages = [];        // Array vacío para guardar las rutas de imágenes que ya existen en MariaDB
+let tempSkills = [];                     // Oficios temporales en edición de perfil
+let currentPostulationsPage = 1;
+let currentCancelPostulationId = null;
+let currentVolunteeringPage = 1;
 
-// Las campañas se cargan dinámicamente desde MariaDB mediante PHP en window.campaigns
-let campaigns = window.campaigns || [];
-
-// Postulations Mock Database
+// Base de Datos Simulada para Postulaciones (Voluntario a campañas externas)
 let postulations = [
   {
     id: 501,
@@ -92,106 +79,7 @@ let postulations = [
   }
 ];
 
-let currentCancelPostulationId = null;
-let currentPostulationsPage = 1;
-
-// Received Invitations Mock Database (Campaña | Invitador | etc.)
-let receivedInvitations = [
-  {
-    id: 701,
-    campaignId: 401,
-    title: "Clases de Pintura Infantil",
-    desc: "Buscamos voluntarios para dictar talleres recreativos de dibujo y pintura a niños del barrio.",
-    category: "cultura",
-    startDate: "2026-07-05",
-    endDate: "2026-07-26",
-    location: "Rosario, Santa Fe",
-    details: "Talleres grupales los domingos para fomentar la expresión artística e integración de los niños de la zona.",
-    images: ["img/camp_placeholder.png"]
-  },
-  {
-    id: 702,
-    campaignId: 402,
-    title: "Limpieza de Río Luján",
-    desc: "Jornada ecológica para recolectar plásticos, vidrios y residuos en las costas del río.",
-    category: "medio-ambiente",
-    startDate: "2026-07-12",
-    endDate: "2026-07-12",
-    location: "Tigre, Buenos Aires",
-    details: "Limpieza participativa en la costa del río con provisión de bolsas de residuos, pinzas de agarre y chalecos.",
-    images: ["img/campaign_park.png"]
-  }
-];
-
-// Sent Invitations Mock Database (Destinatario | Estado | Campaña)
-let sentInvitations = [
-  {
-    id: 801,
-    name: "Brian Clark",
-    type: "voluntario",
-    status: "pendiente",
-    campaignId: 301,
-    campaignTitle: "Apoyo Escolar Primario",
-    campaignDesc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
-    campaignCategory: "educacion",
-    campaignStartDate: "2026-06-20",
-    campaignEndDate: "2026-12-20",
-    campaignLocation: "San Martín, Buenos Aires",
-    campaignDetails: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
-    avatar: "img/org_placeholder.png"
-  },
-  {
-    id: 802,
-    name: "Techo Verde",
-    type: "organizacion",
-    status: "aceptado",
-    campaignId: 302,
-    campaignTitle: "Taller de Huertas Comunitarias",
-    campaignDesc: "Aprende sobre agricultura urbana, compostaje y cuidado del medio ambiente en nuestro taller semanal.",
-    campaignCategory: "medio-ambiente",
-    campaignStartDate: "2026-06-25",
-    campaignEndDate: "2026-08-25",
-    campaignLocation: "Villa Crespo, CABA",
-    campaignDetails: "Un espacio interactivo y gratuito para todos los vecinos donde se aprende a crear huertas orgánicas.",
-    avatar: "img/org_placeholder.png"
-  },
-  {
-    id: 803,
-    name: "María Inés",
-    type: "voluntario",
-    status: "rechazado",
-    campaignId: 301,
-    campaignTitle: "Apoyo Escolar Primario",
-    campaignDesc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
-    campaignCategory: "educacion",
-    campaignStartDate: "2026-06-20",
-    campaignEndDate: "2026-12-20",
-    campaignLocation: "San Martín, Buenos Aires",
-    campaignDetails: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
-    avatar: "img/org_placeholder.png"
-  },
-  {
-    id: 804,
-    name: "Mentes Brillantes",
-    type: "organizacion",
-    status: "pendiente",
-    campaignId: 303,
-    campaignTitle: "Colecta y Clasificación de Ropa",
-    campaignDesc: "Ayudanos a recibir y clasificar donaciones de ropa y abrigo que serán enviadas a comedores.",
-    campaignCategory: "accion-social",
-    campaignStartDate: "2026-07-01",
-    campaignEndDate: "2026-07-15",
-    campaignLocation: "Palermo, CABA",
-    campaignDetails: "Campaña de invierno para clasificar abrigos, calzado y frazadas recibidas.",
-    avatar: "img/org_placeholder.png"
-  }
-];
-
-let currentCancelInvitationId = null;
-let currentReceivedPage = 1;
-let currentSentPage = 1;
-
-// Volunteering Mock Database
+// Base de Datos Simulada para Voluntariados (Historial de participación)
 let volunteering = [
   {
     id: 901,
@@ -255,34 +143,91 @@ let volunteering = [
   }
 ];
 
-let currentVolunteeringPage = 1;
+// Base de Datos Simulada para Invitaciones en el Voluntario
+// Nota: Se vinculan a las globales para ser visualizadas
+window.addEventListener("DOMContentLoaded", () => {
+  receivedInvitations = [
+    {
+      id: 701,
+      campaignId: 401,
+      title: "Clases de Pintura Infantil",
+      desc: "Buscamos voluntarios para dictar talleres recreativos de dibujo y pintura a niños del barrio.",
+      category: "cultura",
+      startDate: "2026-07-05",
+      endDate: "2026-07-26",
+      location: "Rosario, Santa Fe",
+      details: "Talleres grupales los domingos para fomentar la expresión artística e integración de los niños de la zona.",
+      images: ["img/camp_placeholder.png"]
+    },
+    {
+      id: 702,
+      campaignId: 402,
+      title: "Limpieza de Río Luján",
+      desc: "Jornada ecológica para recolectar plásticos, vidrios y residuos en las costas del río.",
+      category: "medio-ambiente",
+      startDate: "2026-07-12",
+      endDate: "2026-07-12",
+      location: "Tigre, Buenos Aires",
+      details: "Limpieza participativa en la costa del río con provisión de bolsas de residuos, pinzas de agarre y chalecos.",
+      images: ["img/campaign_park.png"]
+    }
+  ];
 
-// ABM State variables
-let currentEditCampaignId = null;
-let currentDeleteCampaignId = null;
-let uploadedImagesForForm = [];
+  sentInvitations = [
+    {
+      id: 801,
+      name: "Brian Clark",
+      type: "voluntario",
+      status: "pendiente",
+      campaignId: 301,
+      campaignTitle: "Apoyo Escolar Primario",
+      campaignDesc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
+      campaignCategory: "educacion",
+      campaignStartDate: "2026-06-20",
+      campaignEndDate: "2026-12-20",
+      campaignLocation: "San Martín, Buenos Aires",
+      campaignDetails: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
+      avatar: "img/org_placeholder.png"
+    },
+    {
+      id: 802,
+      name: "Techo Verde",
+      type: "organizacion",
+      status: "aceptado",
+      campaignId: 302,
+      campaignTitle: "Taller de Huertas Comunitarias",
+      campaignDesc: "Aprende sobre agricultura urbana, compostaje y cuidado del medio ambiente en nuestro taller semanal.",
+      campaignCategory: "medio-ambiente",
+      campaignStartDate: "2026-06-25",
+      campaignEndDate: "2026-08-25",
+      campaignLocation: "Villa Crespo, CABA",
+      campaignDetails: "Un espacio interactivo y gratuito para todos los vecinos donde se aprende a crear huertas orgánicas.",
+      avatar: "img/org_placeholder.png"
+    }
+  ];
 
-// Pagination State
-let currentPage = 1;
-const itemsPerPage = 2;
+  // Dispara el renderizado común de las invitaciones cargadas
+  if (typeof renderReceivedInvitations !== "undefined") {
+    renderReceivedInvitations();
+    renderSentInvitations();
+  }
+});
 
-// Initialize Page
+// =========================================================================
+// INICIALIZACIÓN ESPECÍFICA DEL VOLUNTARIO
+// =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
   renderProfileData();
   setupProfileEditEvents();
   setupTabs();
-  setupCampaignsGrid();
   setupPostulationsGrid();
-  setupInvitationsGrid();
   setupVolunteeringGrid();
   setupMockUploads();
-  setupCampaignCausesEvents();
-  setupCampaignFormValidations();
 });
 
-// ==========================================
-// 1. RENDER PROFILE DATA
-// ==========================================
+// =========================================================================
+// 1. RENDERIZADO DE DATOS DEL PERFIL DEL VOLUNTARIO
+// =========================================================================
 function renderProfileData() {
   const avatarView = document.getElementById("avatar-img-view");
   const avatarPlaceholder = document.getElementById("avatar-icon-placeholder");
@@ -295,17 +240,17 @@ function renderProfileData() {
   const viewPhone2 = document.getElementById("view-profile-phone2");
   const viewSkills = document.getElementById("view-skills-badges");
 
-  // Avatar
   if (userProfile.avatar) {
-    avatarView.src = userProfile.avatar;
-    avatarView.style.display = "block";
-    avatarPlaceholder.style.display = "none";
+    if (avatarView) {
+      avatarView.src = userProfile.avatar;
+      avatarView.style.display = "block";
+    }
+    if (avatarPlaceholder) avatarPlaceholder.style.display = "none";
   } else {
-    avatarView.style.display = "none";
-    avatarPlaceholder.style.display = "block";
+    if (avatarView) avatarView.style.display = "none";
+    if (avatarPlaceholder) avatarPlaceholder.style.display = "block";
   }
 
-  // Text details
   if (viewName) viewName.textContent = userProfile.name;
   if (viewDesc) viewDesc.textContent = userProfile.desc;
   if (viewLocation) viewLocation.textContent = userProfile.location;
@@ -314,7 +259,6 @@ function renderProfileData() {
   if (viewPhone1) viewPhone1.textContent = userProfile.phone1;
   if (viewPhone2) viewPhone2.textContent = userProfile.phone2;
 
-  // Skills Badges (Read-Only)
   if (viewSkills) {
     viewSkills.innerHTML = "";
     userProfile.skills.forEach(skill => {
@@ -325,16 +269,15 @@ function renderProfileData() {
     });
   }
 
-  // Update navbar/header if logged in (user menu name)
   const navDropdownSpan = document.querySelector(".nav-dropdown-toggle span");
   if (navDropdownSpan) {
     navDropdownSpan.textContent = userProfile.name;
   }
 }
 
-// ==========================================
-// 2. PROFILE EDIT LOGIC
-// ==========================================
+// =========================================================================
+// 2. GESTIÓN DE EDICIÓN DEL PERFIL DE VOLUNTARIO
+// =========================================================================
 function setupProfileEditEvents() {
   const editBtn = document.getElementById("edit-profile-btn");
   const cancelBtn = document.getElementById("cancel-profile-btn");
@@ -351,10 +294,8 @@ function setupProfileEditEvents() {
   const editPhone2 = document.getElementById("edit-phone2");
   const avatarInput = document.getElementById("edit-avatar-input");
 
-  // Click "Editar Perfil"
   if (editBtn) {
     editBtn.addEventListener("click", () => {
-      // Prefill fields
       editName.value = userProfile.name;
       editDesc.value = userProfile.desc;
       editLocation.value = userProfile.location;
@@ -363,30 +304,24 @@ function setupProfileEditEvents() {
       editPhone1.value = userProfile.phone1 || "";
       editPhone2.value = userProfile.phone2 || "";
       
-      // Copy skills list to temp list
       tempSkills = [...userProfile.skills];
       renderEditableSkills();
 
-      // Toggle display
       viewState.style.display = "none";
       editState.style.display = "block";
     });
   }
 
-  // Click "Cancelar"
   if (cancelBtn) {
     cancelBtn.addEventListener("click", () => {
       viewState.style.display = "block";
       editState.style.display = "none";
-      // Clear suggestions
-      document.getElementById("tag-suggestions").classList.remove("active");
+      document.getElementById("tag-suggestions")?.classList.remove("active");
     });
   }
 
-  // Click "Guardar"
   if (saveBtn) {
     saveBtn.addEventListener("click", () => {
-      // Save data
       userProfile.name = editName.value.trim() || "Voluntario de Prueba";
       userProfile.desc = editDesc.value.trim() || "Sin descripción.";
       userProfile.location = editLocation.value.trim() || "No especificada";
@@ -398,7 +333,6 @@ function setupProfileEditEvents() {
 
       renderProfileData();
 
-      // Toggle display back
       viewState.style.display = "block";
       editState.style.display = "none";
 
@@ -408,21 +342,20 @@ function setupProfileEditEvents() {
     });
   }
 
-  // Handle Avatar Input File Reader
   if (avatarInput) {
     avatarInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          // Temporarily show preview in UI circle
           const avatarView = document.getElementById("avatar-img-view");
           const avatarPlaceholder = document.getElementById("avatar-icon-placeholder");
-          avatarView.src = event.target.result;
-          avatarView.style.display = "block";
-          avatarPlaceholder.style.display = "none";
+          if (avatarView) {
+            avatarView.src = event.target.result;
+            avatarView.style.display = "block";
+          }
+          if (avatarPlaceholder) avatarPlaceholder.style.display = "none";
           
-          // Save in profile state immediately
           userProfile.avatar = event.target.result;
           if (typeof showToast !== "undefined") {
             showToast("Imagen de perfil", "Foto de perfil actualizada con éxito.", true);
@@ -433,7 +366,7 @@ function setupProfileEditEvents() {
     });
   }
 
-  // Skills tag autocomplete
+  // Buscador de oficios
   const tagInput = document.getElementById("tag-search-input");
   const tagSuggestions = document.getElementById("tag-suggestions");
 
@@ -441,9 +374,8 @@ function setupProfileEditEvents() {
     tagInput.addEventListener("focus", () => showSuggestions(tagInput.value));
     tagInput.addEventListener("input", () => showSuggestions(tagInput.value));
     
-    // Close suggestions list on click outside
     document.addEventListener("click", (e) => {
-      if (!tagInput.contains(e.target) && !tagSuggestions.contains(e.target)) {
+      if (tagInput && tagSuggestions && !tagInput.contains(e.target) && !tagSuggestions.contains(e.target)) {
         tagSuggestions.classList.remove("active");
       }
     });
@@ -469,99 +401,15 @@ function renderEditableSkills() {
 window.removeTempSkill = function(index) {
   tempSkills.splice(index, 1);
   renderEditableSkills();
-  // Refresh autocomplete list
   const tagInput = document.getElementById("tag-search-input");
   if (tagInput) showSuggestions(tagInput.value);
 };
-
-// Dibuja las etiquetas de causas seleccionadas en el formulario
-function renderCampaignCauses() {
-  const container = document.getElementById("create-campaign-causes-list");
-  const form = document.getElementById("create-camp-form");
-  if (!container || !form) return;
-
-  // Limpia el contenedor de etiquetas visuales
-  container.innerHTML = "";
-  
-  // 2. Elimina cualquier input oculto anterior de causas para no duplicar
-  form.querySelectorAll('input[name="causas[]"]').forEach(input => input.remove());
-
-  // 3. Genera las etiquetas visuales y los inputs ocultos para el POST
-  tempCampaignCauses.forEach((cause, index) => {
-    // Crear etiqueta visual
-    const div = document.createElement("div");
-    div.className = "edit-tag-item";
-    div.innerHTML = `
-      <span>${cause}</span>
-      <button type="button" class="edit-tag-remove-btn" onclick="removeCampaignCause(${index})">×</button>
-    `;
-    container.appendChild(div);
-
-    // Crea el input oculto que viajará en el POST a PHP
-    const hiddenInput = document.createElement("input");
-    hiddenInput.type = "hidden";
-    hiddenInput.name = "causas[]"; // PHP lo lee como array
-    hiddenInput.value = cause;
-    form.appendChild(hiddenInput);
-  });
-}
-
-// Elimina una causa seleccionada
-window.removeCampaignCause = function(index) {
-  tempCampaignCauses.splice(index, 1);
-  renderCampaignCauses();
-  const causeInput = document.getElementById("campaign-cause-search-input");
-  if (causeInput) showCampaignCauseSuggestions(causeInput.value);
-};
-
-// Filtra y muestra las sugerencias basadas en lo que escribe el usuario
-function showCampaignCauseSuggestions(filterText) {
-  const listElement = document.getElementById("campaign-cause-suggestions");
-  if (!listElement) return;
-
-  const searchVal = filterText.toLowerCase().trim();
-  
-  // Leemos del objeto global window, si no existe usamos un array vacío
-  const causesList = window.availableCampaignCauses || [];
-  
-  const filtered = causesList.filter(cause => {
-    const isAlreadySelected = tempCampaignCauses.includes(cause);
-    const matchesSearch = cause.toLowerCase().includes(searchVal);
-    return !isAlreadySelected && matchesSearch;
-  });
-
-  if (filtered.length > 0) {
-    listElement.innerHTML = "";
-    filtered.forEach(cause => {
-      const li = document.createElement("li");
-      li.className = "tag-suggestion-item";
-      li.textContent = cause;
-      li.addEventListener("click", () => {
-        tempCampaignCauses.push(cause);
-        renderCampaignCauses();
-        const causeInput = document.getElementById("campaign-cause-search-input");
-        if (causeInput) {
-          causeInput.value = "";
-          causeInput.focus();
-        }
-        listElement.classList.remove("active");
-      });
-      listElement.appendChild(li);
-    });
-    listElement.classList.add("active");
-  } else {
-    listElement.classList.remove("active");
-  }
-}
-
 
 function showSuggestions(filterText) {
   const listElement = document.getElementById("tag-suggestions");
   if (!listElement) return;
 
   const searchVal = filterText.toLowerCase().trim();
-  
-  // Filter available skills that are not already selected
   const filtered = availableSkills.filter(skill => {
     const isAlreadySelected = tempSkills.includes(skill);
     const matchesSearch = skill.toLowerCase().includes(searchVal);
@@ -592,9 +440,9 @@ function showSuggestions(filterText) {
   }
 }
 
-// ==========================================
-// 3. TAB CONTROLLER
-// ==========================================
+// =========================================================================
+// 3. CONTROLADOR DE PESTAÑAS (TABS EXCLUSIVO VOLUNTARIO)
+// =========================================================================
 function setupTabs() {
   const tabBtns = document.querySelectorAll(".profile-tab-btn");
   const panes = document.querySelectorAll(".profile-pane");
@@ -603,24 +451,20 @@ function setupTabs() {
     btn.addEventListener("click", () => {
       const targetId = btn.getAttribute("aria-controls");
 
-      // Deactivate all buttons
       tabBtns.forEach(b => {
         b.classList.remove("active");
         b.setAttribute("aria-selected", "false");
       });
-
-      // Hide all panes
       panes.forEach(p => p.classList.remove("active"));
 
-      // Activate clicked
       btn.classList.add("active");
       btn.setAttribute("aria-selected", "true");
       
       const targetPane = document.getElementById(targetId);
       if (targetPane) targetPane.classList.add("active");
 
-      // Reset campaign page on tab back
-      if (targetId === "pane-gestionar") {
+      // Recarga de grillas según pestaña activa
+      if (targetId === "pane-gestionar" && typeof renderCampaigns !== "undefined") {
         currentPage = 1;
         renderCampaigns();
       }
@@ -628,7 +472,7 @@ function setupTabs() {
         currentPostulationsPage = 1;
         renderPostulations();
       }
-      if (targetId === "pane-invitaciones") {
+      if (targetId === "pane-invitaciones" && typeof renderReceivedInvitations !== "undefined") {
         currentReceivedPage = 1;
         currentSentPage = 1;
         renderReceivedInvitations();
@@ -639,7 +483,6 @@ function setupTabs() {
         renderVolunteering();
       }
 
-      // Re-render Lucide icons
       if (typeof lucide !== "undefined") {
         lucide.createIcons();
       }
@@ -647,691 +490,9 @@ function setupTabs() {
   });
 }
 
-// ==========================================
-// 4. CAMPAIGN LISTS & FILTERS (CRUD & GRID)
-// ==========================================
-function setupCampaignsGrid() {
-  const filterSelect = document.getElementById("filter-campaigns-select");
-  const sortSelect = document.getElementById("sort-campaigns-select");
-  const createBtn = document.getElementById("btn-create-campaign-modal");
-
-  if (filterSelect) {
-    filterSelect.addEventListener("change", () => {
-      currentPage = 1;
-      renderCampaigns();
-    });
-  }
-
-  if (sortSelect) {
-    sortSelect.addEventListener("change", () => {
-      currentPage = 1;
-      renderCampaigns();
-    });
-  }
-
-  if (createBtn) {
-    createBtn.addEventListener("click", () => {
-      openCreateCampaignModal();
-    });
-  }
-
-  // Delete Confirm button
-  const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-  if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener("click", () => {
-      if (currentDeleteCampaignId) {
-        campaigns = campaigns.filter(c => c.id !== currentDeleteCampaignId);
-        closeModal("modal-delete-confirm");
-        currentDeleteCampaignId = null;
-        
-        currentPage = 1; // reset page
-        renderCampaigns();
-
-        if (typeof showToast !== "undefined") {
-          showToast("Campaña eliminada", "La campaña se eliminó correctamente de tu perfil.", true);
-        }
-      }
-    });
-  }
-
-  // Initial render
-  renderCampaigns();
-}
-
-function getCategoryLabel(cat) {
-  switch (cat) {
-    case "medio-ambiente": return "Medio Ambiente";
-    case "educacion": return "Educación";
-    case "accion-social": return "Acción Social";
-    case "salud": return "Salud";
-    case "cultura": return "Cultura";
-    default: return "Solidario";
-  }
-}
-
-function renderCampaigns() {
-  const grid = document.getElementById("my-campaigns-grid");
-  if (!grid) return;
-
-  const filterVal = document.getElementById("filter-campaigns-select")?.value || "";
-  const sortVal = document.getElementById("sort-campaigns-select")?.value || "";
-
-  // 1. Filter
-  let filtered = [...campaigns];
-  if (filterVal) {
-    filtered = filtered.filter(c => c.type === filterVal);
-  }
-
-  // 2. Sort
-  if (sortVal === "reciente") {
-    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-  } else if (sortVal === "antiguas") {
-    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-  }
-
-  // 3. Paginate
-  const totalItems = filtered.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
-  if (currentPage > totalPages && totalPages > 0) {
-    currentPage = totalPages;
-  }
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginated = filtered.slice(startIndex, endIndex);
-
-  // 4. Render Grid HTML
-  grid.innerHTML = "";
-  if (paginated.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
-        No se encontraron campañas registradas. ¡Crea una nueva campaña!
-      </div>
-    `;
-    renderPagination(0);
-    return;
-  }
-
-  paginated.forEach((camp, index) => {
-    // Alternating style class reverses orientation
-    const isReverse = index % 2 !== 0;
-    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
-    
-    // Choose image
-    const imgUrl = camp.images && camp.images.length > 0 ? camp.images[0] : "";
-    const imgHTML = imgUrl 
-      ? `<img src="${BASE_URL + imgUrl}" alt="${camp.title}" style="width:100%; height:100%; object-fit:cover;">` 
-      : `<i data-lucide="image"></i>`;
-
-    const article = document.createElement("article");
-    article.className = cardClass;
-    // Main card is clickable to view details modal
-    article.addEventListener("click", () => {
-      openCampaignDetailsView(camp.id);
-    });
-
-    article.innerHTML = `
-      <div class="alt-card-img-col">
-        <div class="alt-card-img-placeholder">
-          ${imgHTML}
-        </div>
-      </div>
-      <div class="alt-card-content-col" style="position: relative;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <h3 class="alt-card-title">${camp.title}</h3>
-          <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
-            ${getCategoryLabel(camp.category)}
-          </span>
-        </div>
-        <p class="alt-card-desc">${camp.desc}</p>
-        
-        <div class="camp-card-actions" style="margin-top: auto;">
-          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Más información</button>
-          
-          <!-- Modify campaign button -->
-          <button class="camp-action-btn edit" title="Modificar campaña" onclick="event.stopPropagation(); openModifyCampaignModal(${camp.id});">
-            <i data-lucide="edit-2" style="width:18px; height:18px;"></i>
-          </button>
-          
-          <!-- Delete campaign button -->
-          <button class="camp-action-btn delete" title="Eliminar campaña" onclick="event.stopPropagation(); openDeleteConfirmModal(${camp.id});">
-            <i data-lucide="trash-2" style="width:18px; height:18px;"></i>
-          </button>
-        </div>
-      </div>
-    `;
-    grid.appendChild(article);
-  });
-
-  renderPagination(totalPages);
-
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
-
-function renderPagination(totalPages) {
-  const container = document.getElementById("campaigns-pagination");
-  if (!container) return;
-
-  container.innerHTML = "";
-  if (totalPages <= 1) return;
-
-  // Previous button
-  const prevBtn = document.createElement("button");
-  prevBtn.className = "pag-btn";
-  prevBtn.innerHTML = "&lt; Previous";
-  prevBtn.disabled = currentPage === 1;
-  prevBtn.addEventListener("click", () => {
-    if (currentPage > 1) {
-      currentPage--;
-      renderCampaigns();
-      scrollToCampaigns();
-    }
-  });
-  container.appendChild(prevBtn);
-
-  // Page numbers
-  for (let i = 1; i <= totalPages; i++) {
-    const numBtn = document.createElement("button");
-    numBtn.className = i === currentPage ? "pag-num active" : "pag-num";
-    numBtn.textContent = i;
-    numBtn.addEventListener("click", () => {
-      currentPage = i;
-      renderCampaigns();
-      scrollToCampaigns();
-    });
-    container.appendChild(numBtn);
-  }
-
-  // Next button
-  const nextBtn = document.createElement("button");
-  nextBtn.className = "pag-btn";
-  nextBtn.innerHTML = "Next &gt;";
-  nextBtn.disabled = currentPage === totalPages;
-  nextBtn.addEventListener("click", () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderCampaigns();
-      scrollToCampaigns();
-    }
-  });
-  container.appendChild(nextBtn);
-}
-
-function scrollToCampaigns() {
-  const section = document.querySelector(".profile-tabs-sec");
-  if (section) {
-    section.scrollIntoView({ behavior: "smooth" });
-  }
-}
-
-// ==========================================
-// 5. VIEW CAMPAIGN DETAILS VIEW MODAL (SHARED)
-// ==========================================
-function openCampaignDetailsView(campaignId) {
-  const camp = campaigns.find(c => c.id === campaignId);
-  if (!camp) return;
-
-  // Prefill shared modal labels
-  const mTitle = document.getElementById("m-camp-title");
-  const mDesc = document.getElementById("m-camp-desc");
-  const mTags = document.getElementById("m-camp-tags");
-  const mBadge = document.getElementById("m-camp-accepted-badge");
-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
-  const mSensitive = document.getElementById("m-camp-sensitive-info");
-
-  if (mTitle) mTitle.textContent = camp.title;
-  
-  // Composite detailed content in description
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.location}</p>
-      <p><strong>Período:</strong> ${camp.startDate} al ${camp.endDate}</p>
-    `;
-  }
-
-  // Tags
-  if (mTags) {
-    mTags.innerHTML = "";
-    const tags = [getCategoryLabel(camp.category), camp.type === "convocatoria" ? "Convocatoria" : "Informativa"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
-  }
-
-  // Reset simulated states and badges
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
-
-  // Hide simulated developer state choice card, because it's for external volunteers
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) devStateCard.style.display = "none";
-
-  // Handles postulation button visibility
-  if (mPostulateBtn) {
-    // Hidden since this is the owner viewing their own campaigns
-    mPostulateBtn.style.display = "none";
-  }
-
-  openModal("modal-profile-camp-detail");
-  
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
-
-// ==========================================
-// 6. CREATE CAMPAIGN CRUD FLOW
-// ==========================================
-function openCreateCampaignModal() {
-  const msgBox = document.getElementById("create-camp-message-box");
-  if (msgBox) msgBox.innerHTML = "";
-  const form = document.getElementById("create-camp-form");
-  if (form) form.reset();
-
-  // Resetear archivos e imágenes seleccionadas
-  selectedCampaignFiles = [];
-  renderSelectedFilesPreview();
-
-  tempCampaignCauses = [];
-  renderCampaignCauses();
-  
-  openModal("modal-create-campaign");
-}
-
-/* Ésta funcion se queda */
-window.toggleCreateAddInfoField = function() {
-  const typeVal = document.querySelector('input[name="tipo_campania"]:checked')?.value || "convocatoria";
-  const infoGroup = document.getElementById("create-additional-info-group");
-  if (infoGroup) {
-    if (typeVal === "convocatoria") {
-      infoGroup.style.display = "block";
-      document.getElementById("create-additional").required = true;
-    } else {
-      infoGroup.style.display = "none";
-      document.getElementById("create-additional").required = false;
-    }
-  }
-};
-
-window.simulateCreateCampaignImageUpload = function() {
-  // Mock image upload simulation
-  const mockImages = [
-    "img/campaign_tutoring.png",
-    "img/campaign_park.png",
-    "img/campaign_food.png"
-  ];
-  const randImg = mockImages[Math.floor(Math.random() * mockImages.length)];
-  
-  if (uploadedImagesForForm.length >= 3) {
-    if (typeof showToast !== "undefined") {
-      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes por campaña.", false);
-    }
-    return;
-  }
-
-  uploadedImagesForForm.push(randImg);
-  renderFormImagesPreview("create-images-preview-grid");
-};
-
-/* Ésta funcion se queda */
-function renderFormImagesPreview(gridId) {
-  const grid = document.getElementById(gridId);
-  if (!grid) return;
-
-  grid.innerHTML = "";
-  uploadedImagesForForm.forEach((img, index) => {
-    const div = document.createElement("div");
-    div.className = "uploaded-image-preview";
-    div.innerHTML = `
-      <img src="${BASE_URL + img}" alt="Preview image">
-      <button type="button" class="remove-preview-img-btn" onclick="removeUploadedImage(${index}, '${gridId}')">×</button>
-    `;
-    grid.appendChild(div);
-  });
-}
-
-/* Ésta funcion se queda */
-window.removeUploadedImage = function(index, gridId) {
-  uploadedImagesForForm.splice(index, 1);
-  renderFormImagesPreview(gridId);
-};
-
-/* 
-  Nota: La función window.handleCreateCampaignSubmit fue removida 
-  ya que el formulario se envía directamente por POST a PHP.
-*/
-
-/* Maneja el comportamiento del buscador de causas */
-function setupCampaignCausesEvents() {
-  // --- Para el formulario de Creación ---
-  const causeInput = document.getElementById("campaign-cause-search-input");
-  const causeSuggestions = document.getElementById("campaign-cause-suggestions");
-
-  if (causeInput) {
-    causeInput.addEventListener("focus", () => showCampaignCauseSuggestions(causeInput.value));
-    causeInput.addEventListener("input", () => showCampaignCauseSuggestions(causeInput.value));
-  }
-
-  // --- Para el formulario de Modificación ---
-  const modifyCauseInput = document.getElementById("modify-campaign-cause-search-input");
-  const modifyCauseSuggestions = document.getElementById("modify-campaign-cause-suggestions");
-
-  if (modifyCauseInput) {
-    modifyCauseInput.addEventListener("focus", () => showModifyCampaignCauseSuggestions(modifyCauseInput.value));
-    modifyCauseInput.addEventListener("input", () => showModifyCampaignCauseSuggestions(modifyCauseInput.value));
-  }
-  
-  // Cierra los desplegables al hacer clic afuera de los buscadores
-  document.addEventListener("click", (e) => {
-    if (causeInput && causeSuggestions && !causeInput.contains(e.target) && !causeSuggestions.contains(e.target)) {
-      causeSuggestions.classList.remove("active");
-    }
-    if (modifyCauseInput && modifyCauseSuggestions && !modifyCauseInput.contains(e.target) && !modifyCauseSuggestions.contains(e.target)) {
-      modifyCauseSuggestions.classList.remove("active");
-    }
-  });
-}
-
-// ==========================================
-// 7. MODIFY CAMPAIGN CRUD FLOW
-// ==========================================
-window.openModifyCampaignModal = function(id) {
-  const camp = campaigns.find(c => c.id === id);
-  if (!camp) return;
-
-  currentEditCampaignId = id;
-
-  // Guarda el ID de la campaña en el input oculto (si existe)
-  const idInput = document.getElementById("modify-campaign-id-input");
-  if (idInput) idInput.value = id;
-
-  // Llena inputs de texto tradicionales de manera defensiva (solo si existen en el HTML)
-  const titleInput = document.getElementById("modify-title");
-  if (titleInput) titleInput.value = camp.title || "";
-
-  const descInput = document.getElementById("modify-desc");
-  if (descInput) descInput.value = camp.desc || "";
-
-  const locationInput = document.getElementById("modify-location");
-  if (locationInput) locationInput.value = camp.location || "";
-
-  const startDateInput = document.getElementById("modify-start-date");
-  if (startDateInput) startDateInput.value = camp.startDate || "";
-
-  const endDateInput = document.getElementById("modify-end-date");
-  if (endDateInput) endDateInput.value = camp.endDate || "";
-
-  // Maneja el tipo de campaña y la información adicional de manera defensiva
-  const additionalInput = document.getElementById("modify-additional");
-  if (camp.type === "convocatoria") {
-    const radioConvocatoria = document.getElementById("modify-type-convocatoria");
-    if (radioConvocatoria) radioConvocatoria.checked = true;
-    if (additionalInput) additionalInput.value = camp.additionalInfo || "";
-  } else {
-    const radioInformativa = document.getElementById("modify-type-informativa");
-    if (radioInformativa) radioInformativa.checked = true;
-    if (additionalInput) additionalInput.value = "";
-  }
-
-  // Pre-carga las causas actuales de la campaña en nuestro arreglo temporal
-  if (camp.causes && Array.isArray(camp.causes)) {
-    tempModifyCampaignCauses = [...camp.causes];
-  } else if (camp.category) {
-    tempModifyCampaignCauses = [getCategoryLabel(camp.category)];
-  } else {
-    tempModifyCampaignCauses = [];
-  }
-  renderModifyCampaignCauses();
-
-  existingCampaignImages = [...(camp.images || [])];
-  selectedModifyCampaignFiles = [];                       // Limpiar y resetear nuevos archivos
-  renderModifyImagesPreview();                            // Renderizar ambas listas (existentes y nuevas)
-
-  toggleModifyAddInfoField();
-  openModal("modal-modify-campaign");
-
-  const msgBox = document.getElementById("modify-camp-message-box");
-  if (msgBox) msgBox.innerHTML = "";
-};
-
-window.toggleModifyAddInfoField = function() {
-  const isConvocatoria = document.getElementById("modify-type-convocatoria")?.checked ?? true;
-  const infoGroup = document.getElementById("modify-additional-info-group");
-  const additionalInput = document.getElementById("modify-additional");
-  
-  if (infoGroup && additionalInput) {
-    if (isConvocatoria) {
-      infoGroup.style.display = "block";
-      additionalInput.required = true;
-    } else {
-      infoGroup.style.display = "none";
-      additionalInput.required = false;
-      additionalInput.value = ""; // Limpia el texto para que viaje vacío al servidor
-    }
-  }
-};
-
-window.simulateModifyCampaignImageUpload = function() {
-  const mockImages = [
-    "img/campaign_tutoring.png",
-    "img/campaign_park.png",
-    "img/campaign_food.png"
-  ];
-  const randImg = mockImages[Math.floor(Math.random() * mockImages.length)];
-  
-  if (uploadedImagesForForm.length >= 3) {
-    if (typeof showToast !== "undefined") {
-      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes por campaña.", false);
-    }
-    return;
-  }
-
-  uploadedImagesForForm.push(randImg);
-  renderFormImagesPreview("modify-images-preview-grid");
-};
-
-
-
-// Dibuja las etiquetas de causas seleccionadas en el formulario de modificación
-function renderModifyCampaignCauses() {
-  const container = document.getElementById("modify-campaign-causes-list");
-  const form = document.getElementById("modify-camp-form");
-  if (!container || !form) return;
-
-  container.innerHTML = "";
-  
-  // Elimina inputs ocultos previos de causas
-  form.querySelectorAll('input[name="causas[]"]').forEach(input => input.remove());
-
-  tempModifyCampaignCauses.forEach((cause, index) => {
-    // Renderiza etiqueta visual
-    const div = document.createElement("div");
-    div.className = "edit-tag-item";
-    div.innerHTML = `
-      <span>${cause}</span>
-      <button type="button" class="edit-tag-remove-btn" onclick="removeModifyCampaignCause(${index})">×</button>
-    `;
-    container.appendChild(div);
-
-    // Crear el input oculto para el envío POST a PHP
-    const hiddenInput = document.createElement("input");
-    hiddenInput.type = "hidden";
-    hiddenInput.name = "causas[]";
-    hiddenInput.value = cause;
-    form.appendChild(hiddenInput);
-  });
-}
-
-// Elimina una causa seleccionada en la edición
-window.removeModifyCampaignCause = function(index) {
-  tempModifyCampaignCauses.splice(index, 1);
-  renderModifyCampaignCauses();
-  const causeInput = document.getElementById("modify-campaign-cause-search-input");
-  if (causeInput) showModifyCampaignCauseSuggestions(causeInput.value);
-};
-
-// Muestra sugerencias en el buscador de la edición
-function showModifyCampaignCauseSuggestions(filterText) {
-  const listElement = document.getElementById("modify-campaign-cause-suggestions");
-  if (!listElement) return;
-
-  const searchVal = filterText.toLowerCase().trim();
-  const causesList = window.availableCampaignCauses || [];
-  
-  const filtered = causesList.filter(cause => {
-    const isAlreadySelected = tempModifyCampaignCauses.includes(cause);
-    const matchesSearch = cause.toLowerCase().includes(searchVal);
-    return !isAlreadySelected && matchesSearch;
-  });
-
-  if (filtered.length > 0) {
-    listElement.innerHTML = "";
-    filtered.forEach(cause => {
-      const li = document.createElement("li");
-      li.className = "tag-suggestion-item";
-      li.textContent = cause;
-      li.addEventListener("click", () => {
-        tempModifyCampaignCauses.push(cause);
-        renderModifyCampaignCauses();
-        const causeInput = document.getElementById("modify-campaign-cause-search-input");
-        if (causeInput) {
-          causeInput.value = "";
-          causeInput.focus();
-        }
-        listElement.classList.remove("active");
-      });
-      listElement.appendChild(li);
-    });
-    listElement.classList.add("active");
-  } else {
-    listElement.classList.remove("active");
-  }
-}
-
-// Maneja la selección de archivos de imágenes en la modificación
-window.handleModifyFileSelect = function(event) {
-  const files = event.target.files;
-  
-  if (selectedModifyCampaignFiles.length + files.length > 3) {
-    if (typeof showToast !== "undefined") {
-      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes por campaña.", false);
-    }
-    return;
-  }
-
-  for (let i = 0; i < files.length; i++) {
-    selectedModifyCampaignFiles.push(files[i]);
-  }
-
-  renderModifyImagesPreview();
-};
-
-
-// Dibuja la previsualización de imágenes seleccionadas para modificar
-function renderModifyImagesPreview() {
-  const grid = document.getElementById("modify-images-preview-grid");
-  const form = document.getElementById("modify-camp-form");
-  if (!grid || !form) return;
-
-  grid.innerHTML = "";
-
-  // 1. Eliminar inputs ocultos previos de imágenes existentes para no duplicar
-  form.querySelectorAll('input[name="imagenes_existentes[]"]').forEach(input => input.remove());
-
-  // 2. Renderizar las imágenes que ya existen en la base de datos
-  existingCampaignImages.forEach((imgUrl, index) => {
-    const div = document.createElement("div");
-    div.className = "uploaded-image-preview";
-    div.innerHTML = `
-      <img src="${BASE_URL + imgUrl}" alt="Imagen guardada">
-      <button type="button" class="remove-preview-img-btn" onclick="removeExistingCampaignImage(${index})">×</button>
-    `;
-    grid.appendChild(div);
-
-    // Creamos un input oculto para que viaje en el POST y PHP sepa qué imágenes queremos MANTENER
-    const hiddenInput = document.createElement("input");
-    hiddenInput.type = "hidden";
-    hiddenInput.name = "imagenes_existentes[]";
-    hiddenInput.value = imgUrl;
-    form.appendChild(hiddenInput);
-  });
-
-  // 3. Renderizar los nuevos archivos locales seleccionados en este momento
-  selectedModifyCampaignFiles.forEach((file, index) => {
-    const url = URL.createObjectURL(file);
-    const div = document.createElement("div");
-    div.className = "uploaded-image-preview";
-    div.innerHTML = `
-      <img src="${url}" alt="Nueva imagen a subir">
-      <button type="button" class="remove-preview-img-btn" onclick="removeSelectedModifyFile(${index})">×</button>
-    `;
-    grid.appendChild(div);
-  });
-
-  // Sincronizar el input de archivos oculto
-  syncModifyFileInput();
-}
-
-// Función para remover una imagen que ya estaba guardada en MariaDB
-window.removeExistingCampaignImage = function(index) {
-  existingCampaignImages.splice(index, 1);
-  renderModifyImagesPreview(); // Volver a dibujar y actualizar inputs ocultos
-};
-
-// Función para remover una imagen nueva seleccionada
-window.removeSelectedModifyFile = function(index) {
-  selectedModifyCampaignFiles.splice(index, 1);
-  renderModifyImagesPreview();
-};
-
-// Remueve una imagen seleccionada para modificar
-window.removeSelectedModifyFile = function(index) {
-  selectedModifyCampaignFiles.splice(index, 1);
-  renderModifyImagesPreview();
-};
-
-// Sincroniza el input de archivos oculto
-function syncModifyFileInput() {
-  const input = document.getElementById("modify-campaign-images-input");
-  if (!input) return;
-
-  const dataTransfer = new DataTransfer();
-  selectedModifyCampaignFiles.forEach(file => {
-    dataTransfer.items.add(file);
-  });
-  input.files = dataTransfer.files;
-}
-
-// ==========================================
-// 8. DELETE CAMPAIGN CONFIRM DIALOG
-// ==========================================
-window.openDeleteConfirmModal = function(id) {
-  currentDeleteCampaignId = id;
-  openModal("modal-delete-confirm");
-};
-
-function setupMockUploads() {
-  // Empty helper to configure simulation triggers
-  
-  // Initialize radio selection listeners in details modal
-  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
-  radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      updateModalStateBasedOnRadio();
-    });
-  });
-}
-
-// ==========================================
-// 4b. POSTULATIONS LISTS & FILTERS
-// ==========================================
+// =========================================================================
+// 4. SECCIÓN DE POSTULACIONES (EXCLUSIVO VOLUNTARIO)
+// =========================================================================
 function setupPostulationsGrid() {
   const filterSelect = document.getElementById("filter-postulations-select");
   const sortSelect = document.getElementById("sort-postulations-select");
@@ -1342,7 +503,6 @@ function setupPostulationsGrid() {
       renderPostulations();
     });
   }
-
   if (sortSelect) {
     sortSelect.addEventListener("change", () => {
       currentPostulationsPage = 1;
@@ -1350,7 +510,6 @@ function setupPostulationsGrid() {
     });
   }
 
-  // Confirm cancel postulation button
   const confirmCancelBtn = document.getElementById("confirm-cancel-postulation-btn");
   if (confirmCancelBtn) {
     confirmCancelBtn.addEventListener("click", () => {
@@ -1358,8 +517,7 @@ function setupPostulationsGrid() {
         postulations = postulations.filter(p => p.id !== currentCancelPostulationId);
         closeModal("modal-cancel-postulation-confirm");
         currentCancelPostulationId = null;
-        
-        currentPostulationsPage = 1; // reset page
+        currentPostulationsPage = 1;
         renderPostulations();
 
         if (typeof showToast !== "undefined") {
@@ -1368,6 +526,8 @@ function setupPostulationsGrid() {
       }
     });
   }
+
+  renderPostulations();
 }
 
 function renderPostulations() {
@@ -1377,20 +537,17 @@ function renderPostulations() {
   const filterVal = document.getElementById("filter-postulations-select")?.value || "";
   const sortVal = document.getElementById("sort-postulations-select")?.value || "";
 
-  // 1. Filter
   let filtered = [...postulations];
   if (filterVal) {
     filtered = filtered.filter(p => p.status === filterVal);
   }
 
-  // 2. Sort
   if (sortVal === "reciente") {
     filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
   } else if (sortVal === "antiguas") {
     filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
   }
 
-  // 3. Paginate
   const totalItems = filtered.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
@@ -1402,7 +559,6 @@ function renderPostulations() {
   const endIndex = startIndex + itemsPerPage;
   const paginated = filtered.slice(startIndex, endIndex);
 
-  // 4. Render Grid HTML
   grid.innerHTML = "";
   if (paginated.length === 0) {
     grid.innerHTML = `
@@ -1417,14 +573,11 @@ function renderPostulations() {
   paginated.forEach((post, index) => {
     const isReverse = index % 2 !== 0;
     const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
-    
-    // Choose image
     const imgUrl = post.images && post.images.length > 0 ? post.images[0] : "";
     const imgHTML = imgUrl 
       ? `<img src="${BASE_URL + imgUrl}" alt="${post.title}" style="width:100%; height:100%; object-fit:cover;">` 
       : `<i data-lucide="image"></i>`;
 
-    // Map status text and class
     let statusLabel = "";
     let statusClass = "";
     if (post.status === "aceptado") {
@@ -1441,9 +594,7 @@ function renderPostulations() {
     const article = document.createElement("article");
     article.className = cardClass;
     article.style.cursor = "pointer";
-    article.addEventListener("click", () => {
-      openPostulationDetailsView(post.id);
-    });
+    article.addEventListener("click", () => openPostulationDetailsView(post.id));
 
     article.innerHTML = `
       <div class="alt-card-img-col">
@@ -1490,7 +641,6 @@ function renderPostulationsPagination(totalPages) {
   container.innerHTML = "";
   if (totalPages <= 1) return;
 
-  // Previous button
   const prevBtn = document.createElement("button");
   prevBtn.className = "pag-btn";
   prevBtn.innerHTML = "&lt; Previous";
@@ -1504,7 +654,6 @@ function renderPostulationsPagination(totalPages) {
   });
   container.appendChild(prevBtn);
 
-  // Page numbers
   for (let i = 1; i <= totalPages; i++) {
     const numBtn = document.createElement("button");
     numBtn.className = i === currentPostulationsPage ? "pag-num active" : "pag-num";
@@ -1517,7 +666,6 @@ function renderPostulationsPagination(totalPages) {
     container.appendChild(numBtn);
   }
 
-  // Next button
   const nextBtn = document.createElement("button");
   nextBtn.className = "pag-btn";
   nextBtn.innerHTML = "Next &gt;";
@@ -1541,7 +689,6 @@ function openPostulationDetailsView(postulationId) {
   const post = postulations.find(p => p.id === postulationId);
   if (!post) return;
 
-  // Prefill shared modal labels
   const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");
   const mTags = document.getElementById("m-camp-tags");
@@ -1559,7 +706,6 @@ function openPostulationDetailsView(postulationId) {
     `;
   }
 
-  // Tags
   if (mTags) {
     mTags.innerHTML = "";
     const tags = [getCategoryLabel(post.category), "Convocatoria"];
@@ -1571,20 +717,12 @@ function openPostulationDetailsView(postulationId) {
     });
   }
 
-  // Reset simulated states and badges based on the real postulation status
-  if (mBadge) {
-    mBadge.style.display = "none";
-  }
-  if (mSensitive) {
-    mSensitive.style.display = "none";
-  }
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
 
-  // Make the simulated dev choices card visible inside the modal for review
   const devStateCard = document.querySelector(".dev-state-selector-card");
   if (devStateCard) {
     devStateCard.style.display = "block";
-    
-    // Select the correct radio option based on status
     let radioVal = "no-login";
     if (post.status === "aceptado") {
       radioVal = "registrado-aceptado";
@@ -1593,21 +731,15 @@ function openPostulationDetailsView(postulationId) {
     } else if (post.status === "rechazado") {
       radioVal = "registrado-rechazado";
     }
-    
     const radio = document.querySelector(`input[name="dev-state-choice"][value="${radioVal}"]`);
-    if (radio) {
-      radio.checked = true;
-    }
+    if (radio) radio.checked = true;
   }
 
-  // Configure postulation button
   if (mPostulateBtn) {
     mPostulateBtn.style.display = "block";
   }
 
-  // Trigger simulated choice display updates
   updateModalStateBasedOnRadio();
-
   openModal("modal-profile-camp-detail");
   
   if (typeof lucide !== "undefined") {
@@ -1615,544 +747,9 @@ function openPostulationDetailsView(postulationId) {
   }
 }
 
-function updateModalStateBasedOnRadio() {
-  const selectedState = document.querySelector('input[name="dev-state-choice"]:checked')?.value || 'no-login';
-  
-  const badge = document.getElementById('m-camp-accepted-badge');
-  const infoBox = document.getElementById('m-camp-sensitive-info');
-  const postulateBtn = document.getElementById('m-camp-postulate-btn');
-  
-  if (!postulateBtn) return;
-
-  // Reset standard state
-  if (badge) {
-    badge.style.display = 'none';
-    badge.className = 'modal-status-badge';
-  }
-  if (infoBox) infoBox.style.display = 'none';
-  postulateBtn.disabled = false;
-  postulateBtn.className = 'btn btn-primary';
-  postulateBtn.textContent = 'Postularme';
-
-  if (selectedState === 'no-login') {
-    // Normal state
-  } else if (selectedState === 'registrado-pendiente') {
-    if (badge) {
-      badge.textContent = 'PENDIENTE';
-      badge.className = 'modal-status-badge';
-      badge.style.backgroundColor = 'var(--color-primary-light)';
-      badge.style.color = 'var(--color-primary-dark)';
-      badge.style.border = '1px solid var(--color-primary)';
-      badge.style.display = 'inline-block';
-    }
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Pendiente ✓';
-  } else if (selectedState === 'registrado-aceptado') {
-    if (badge) {
-      badge.textContent = 'ACEPTADO';
-      badge.className = 'modal-status-badge accepted-pill';
-      badge.style.display = 'inline-block';
-      badge.style.backgroundColor = '';
-      badge.style.color = '';
-      badge.style.border = '';
-    }
-    if (infoBox) infoBox.style.display = 'block';
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Postulación Aceptada ✓';
-  } else if (selectedState === 'registrado-rechazado') {
-    if (badge) {
-      badge.textContent = 'RECHAZADO';
-      badge.className = 'modal-status-badge';
-      badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-      badge.style.color = '#EF4444';
-      badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-      badge.style.display = 'inline-block';
-    }
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Postulación Rechazada';
-  }
-}
-
-// ==========================================
-// 4c. INVITATIONS LISTS & FILTERS (RECEIVED & SENT)
-// ==========================================
-function setupInvitationsGrid() {
-  const filterReceived = document.getElementById("filter-received-select");
-  const sortReceived = document.getElementById("sort-received-select");
-  const filterSent = document.getElementById("filter-sent-select");
-  const sortSent = document.getElementById("sort-sent-select");
-
-  if (filterReceived) {
-    filterReceived.addEventListener("change", () => {
-      currentReceivedPage = 1;
-      renderReceivedInvitations();
-    });
-  }
-
-  if (sortReceived) {
-    sortReceived.addEventListener("change", () => {
-      currentReceivedPage = 1;
-      renderReceivedInvitations();
-    });
-  }
-
-  if (filterSent) {
-    filterSent.addEventListener("change", () => {
-      currentSentPage = 1;
-      renderSentInvitations();
-    });
-  }
-
-  if (sortSent) {
-    sortSent.addEventListener("change", () => {
-      currentSentPage = 1;
-      renderSentInvitations();
-    });
-  }
-
-  // Confirm cancel sent invitation button
-  const confirmCancelBtn = document.getElementById("confirm-cancel-invitation-btn");
-  if (confirmCancelBtn) {
-    confirmCancelBtn.addEventListener("click", () => {
-      if (currentCancelInvitationId) {
-        sentInvitations = sentInvitations.filter(inv => inv.id !== currentCancelInvitationId);
-        closeModal("modal-cancel-invitation-confirm");
-        currentCancelInvitationId = null;
-        
-        currentSentPage = 1; // reset page
-        renderSentInvitations();
-
-        if (typeof showToast !== "undefined") {
-          showToast("Invitación cancelada", "La invitación enviada ha sido retirada.", true);
-        }
-      }
-    });
-  }
-}
-
-function renderReceivedInvitations() {
-  const grid = document.getElementById("received-invitations-list");
-  if (!grid) return;
-
-  const filterVal = document.getElementById("filter-received-select")?.value || "";
-  const sortVal = document.getElementById("sort-received-select")?.value || "";
-
-  // 1. Filter
-  let filtered = [...receivedInvitations];
-  if (filterVal) {
-    filtered = filtered.filter(inv => inv.category === filterVal);
-  }
-
-  // 2. Sort
-  if (sortVal === "reciente") {
-    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-  } else if (sortVal === "antiguas") {
-    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-  }
-
-  // 3. Paginate
-  const totalItems = filtered.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
-  if (currentReceivedPage > totalPages && totalPages > 0) {
-    currentReceivedPage = totalPages;
-  }
-
-  const startIndex = (currentReceivedPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginated = filtered.slice(startIndex, endIndex);
-
-  // 4. Render Grid HTML
-  grid.innerHTML = "";
-  if (paginated.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
-        No tienes invitaciones recibidas pendientes.
-      </div>
-    `;
-    renderReceivedPagination(0);
-    return;
-  }
-
-  paginated.forEach(inv => {
-    // Square/rounded campaigns details, strictly on the left
-    const imgUrl = inv.images && inv.images.length > 0 ? inv.images[0] : "";
-    const imgHTML = imgUrl 
-      ? `<img src="${BASE_URL + imgUrl}" alt="${inv.title}">` 
-      : `<i data-lucide="image"></i>`;
-
-    const article = document.createElement("article");
-    article.className = "invite-card";
-    article.addEventListener("click", () => {
-      openReceivedCampaignDetailsView(inv.id);
-    });
-
-    article.innerHTML = `
-      <div class="invite-card-img-col campaign-img">
-        ${imgHTML}
-      </div>
-      <div class="invite-card-content-col">
-        <span style="font-size: 11px; font-weight: 700; color: var(--color-primary); display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-          <i data-lucide="mail" style="width:12px; height:12px;"></i> ¡Te invitaron a una campaña!
-        </span>
-        <h3 class="alt-card-title">${inv.title}</h3>
-        <p class="alt-card-desc">${inv.desc}</p>
-        <span style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px; display: block;">
-          <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${inv.location}
-        </span>
-      </div>
-      
-      <div class="invite-card-actions-col">
-        <button class="btn btn-primary aceptar-invite-btn" type="button" onclick="event.stopPropagation(); acceptReceivedInvitation(${inv.id});">
-          Aceptar
-        </button>
-        <button class="btn btn-ghost rechazar-invite-btn" type="button" onclick="event.stopPropagation(); rejectReceivedInvitation(${inv.id});">
-          Rechazar
-        </button>
-      </div>
-    `;
-    grid.appendChild(article);
-  });
-
-  renderReceivedPagination(totalPages);
-
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
-
-function renderReceivedPagination(totalPages) {
-  const container = document.getElementById("received-invitations-pagination");
-  if (!container) return;
-
-  container.innerHTML = "";
-  if (totalPages <= 1) return;
-
-  const prevBtn = document.createElement("button");
-  prevBtn.className = "pag-btn";
-  prevBtn.innerHTML = "&lt; Previous";
-  prevBtn.disabled = currentReceivedPage === 1;
-  prevBtn.addEventListener("click", () => {
-    if (currentReceivedPage > 1) {
-      currentReceivedPage--;
-      renderReceivedInvitations();
-    }
-  });
-  container.appendChild(prevBtn);
-
-  for (let i = 1; i <= totalPages; i++) {
-    const numBtn = document.createElement("button");
-    numBtn.className = i === currentReceivedPage ? "pag-num active" : "pag-num";
-    numBtn.textContent = i;
-    numBtn.addEventListener("click", () => {
-      currentReceivedPage = i;
-      renderReceivedInvitations();
-    });
-    container.appendChild(numBtn);
-  }
-
-  const nextBtn = document.createElement("button");
-  nextBtn.className = "pag-btn";
-  nextBtn.innerHTML = "Next &gt;";
-  nextBtn.disabled = currentReceivedPage === totalPages;
-  nextBtn.addEventListener("click", () => {
-    if (currentReceivedPage < totalPages) {
-      currentReceivedPage++;
-      renderReceivedInvitations();
-    }
-  });
-  container.appendChild(nextBtn);
-}
-
-window.acceptReceivedInvitation = function(id) {
-  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
-  renderReceivedInvitations();
-
-  if (typeof showToast !== "undefined") {
-    showToast("Invitación aceptada", "Te has unido a la campaña. Ya está programada en tu voluntariado.", true);
-  }
-};
-
-window.rejectReceivedInvitation = function(id) {
-  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
-  renderReceivedInvitations();
-
-  if (typeof showToast !== "undefined") {
-    showToast("Invitación rechazada", "Has rechazado la invitación.", true);
-  }
-};
-
-function renderSentInvitations() {
-  const grid = document.getElementById("sent-invitations-list");
-  if (!grid) return;
-
-  const filterVal = document.getElementById("filter-sent-select")?.value || "";
-  const sortVal = document.getElementById("sort-sent-select")?.value || "";
-
-  // 1. Filter
-  let filtered = [...sentInvitations];
-  if (filterVal) {
-    filtered = filtered.filter(inv => inv.status === filterVal);
-  }
-
-  // 2. Sort
-  if (sortVal === "antiguas") {
-    filtered.reverse();
-  }
-
-  // 3. Paginate
-  const totalItems = filtered.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
-  if (currentSentPage > totalPages && totalPages > 0) {
-    currentSentPage = totalPages;
-  }
-
-  const startIndex = (currentSentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginated = filtered.slice(startIndex, endIndex);
-
-  // 4. Render Grid HTML
-  grid.innerHTML = "";
-  if (paginated.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
-        No has enviado invitaciones aún.
-      </div>
-    `;
-    renderSentPagination(0);
-    return;
-  }
-
-  paginated.forEach(inv => {
-    // Circular user/org avatar strictly on the left
-    const avatarHTML = inv.avatar 
-      ? `<img src="${BASE_URL + inv.avatar}" alt="${inv.name}">` 
-      : `<i data-lucide="user"></i>`;
-
-    const profileUrl = inv.type === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
-    const labelType = inv.type === "voluntario" ? "Voluntario" : "Organización";
-
-    // Status mapping
-    let statusLabel = "";
-    let statusClass = "";
-    if (inv.status === "aceptado") {
-      statusLabel = "Aceptado";
-      statusClass = "aceptado";
-    } else if (inv.status === "pendiente") {
-      statusLabel = "Pendiente";
-      statusClass = "pendiente";
-    } else if (inv.status === "rechazado") {
-      statusLabel = "Rechazado";
-      statusClass = "rechazado";
-    }
-
-    const cancelHTML = (inv.status === "pendiente" || inv.status === "aceptado")
-      ? `<button class="post-cancel-btn" type="button" onclick="event.stopPropagation(); openCancelInvitationConfirmModal(${inv.id});">
-          Cancelar invitación
-         </button>`
-      : "";
-
-    const article = document.createElement("article");
-    article.className = "invite-card";
-    // Clicking card opens the public profile of the user/organization
-    article.addEventListener("click", () => {
-      window.location.href = BASE_URL + profileUrl;
-    });
-
-    article.innerHTML = `
-      <div class="invite-card-img-col user-avatar">
-        ${avatarHTML}
-      </div>
-      <div class="invite-card-content-col">
-        <h3 class="alt-card-title" style="margin-bottom: 2px;">${inv.name}</h3>
-        <span style="font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase;">${labelType}</span>
-        
-        <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
-          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
-            <i data-lucide="user" style="width:12px; height:12px;"></i> Ir al perfil de ${inv.name}
-          </a>
-          <button type="button" class="invite-meta-link" onclick="event.stopPropagation(); openSentCampaignDetailsView(${inv.id});">
-            <i data-lucide="external-link" style="width:12px; height:12px;"></i> Campaña invitada: <strong>${inv.campaignTitle}</strong>
-          </button>
-        </div>
-      </div>
-      
-      <div class="invite-card-actions-col">
-        <button class="postulation-status-btn ${statusClass}" type="button" style="pointer-events: none;">
-          ${statusLabel}
-        </button>
-        ${cancelHTML}
-      </div>
-    `;
-    grid.appendChild(article);
-  });
-
-  renderSentPagination(totalPages);
-
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
-
-function renderSentPagination(totalPages) {
-  const container = document.getElementById("sent-invitations-pagination");
-  if (!container) return;
-
-  container.innerHTML = "";
-  if (totalPages <= 1) return;
-
-  const prevBtn = document.createElement("button");
-  prevBtn.className = "pag-btn";
-  prevBtn.innerHTML = "&lt; Previous";
-  prevBtn.disabled = currentSentPage === 1;
-  prevBtn.addEventListener("click", () => {
-    if (currentSentPage > 1) {
-      currentSentPage--;
-      renderSentInvitations();
-    }
-  });
-  container.appendChild(prevBtn);
-
-  for (let i = 1; i <= totalPages; i++) {
-    const numBtn = document.createElement("button");
-    numBtn.className = i === currentSentPage ? "pag-num active" : "pag-num";
-    numBtn.textContent = i;
-    numBtn.addEventListener("click", () => {
-      currentSentPage = i;
-      renderSentInvitations();
-    });
-    container.appendChild(numBtn);
-  }
-
-  const nextBtn = document.createElement("button");
-  nextBtn.className = "pag-btn";
-  nextBtn.innerHTML = "Next &gt;";
-  nextBtn.disabled = currentSentPage === totalPages;
-  nextBtn.addEventListener("click", () => {
-    if (currentSentPage < totalPages) {
-      currentSentPage++;
-      renderSentInvitations();
-    }
-  });
-  container.appendChild(nextBtn);
-}
-
-window.openCancelInvitationConfirmModal = function(id) {
-  currentCancelInvitationId = id;
-  openModal("modal-cancel-invitation-confirm");
-};
-
-function openReceivedCampaignDetailsView(invitationId) {
-  const inv = receivedInvitations.find(i => i.id === invitationId);
-  if (!inv) return;
-
-  // Prefill shared modal labels
-  const mTitle = document.getElementById("m-camp-title");
-  const mDesc = document.getElementById("m-camp-desc");
-  const mTags = document.getElementById("m-camp-tags");
-  const mBadge = document.getElementById("m-camp-accepted-badge");
-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
-  const mSensitive = document.getElementById("m-camp-sensitive-info");
-
-  if (mTitle) mTitle.textContent = inv.title;
-  
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.location}</p>
-      <p><strong>Período:</strong> ${inv.startDate} al ${inv.endDate}</p>
-    `;
-  }
-
-  if (mTags) {
-    mTags.innerHTML = "";
-    const tags = [getCategoryLabel(inv.category), "Convocatoria"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
-  }
-
-  // Hidden developer state choices card since we're viewing received invitation details
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) devStateCard.style.display = "none";
-
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
-
-  // Hide postulation button as they should either Aceptar/Rechazar from the invitations dashboard
-  if (mPostulateBtn) {
-    mPostulateBtn.style.display = "none";
-  }
-
-  openModal("modal-profile-camp-detail");
-  
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
-
-function openSentCampaignDetailsView(invitationId) {
-  const inv = sentInvitations.find(i => i.id === invitationId);
-  if (!inv) return;
-
-  // Prefill shared modal labels
-  const mTitle = document.getElementById("m-camp-title");
-  const mDesc = document.getElementById("m-camp-desc");
-  const mTags = document.getElementById("m-camp-tags");
-  const mBadge = document.getElementById("m-camp-accepted-badge");
-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
-  const mSensitive = document.getElementById("m-camp-sensitive-info");
-
-  if (mTitle) mTitle.textContent = inv.campaignTitle;
-  
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.campaignDesc}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.campaignLocation}</p>
-      <p><strong>Período:</strong> ${inv.campaignStartDate} al ${inv.campaignEndDate}</p>
-    `;
-  }
-
-  if (mTags) {
-    mTags.innerHTML = "";
-    const tags = [getCategoryLabel(inv.campaignCategory), "Convocatoria"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
-  }
-
-  // Hidden dev selector
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) devStateCard.style.display = "none";
-
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
-
-  // Hide postulation button
-  if (mPostulateBtn) {
-    mPostulateBtn.style.display = "none";
-  }
-
-  openModal("modal-profile-camp-detail");
-  
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
-
-// ==========================================
-// 4d. VOLUNTEERING LISTS & FILTERS
-// ==========================================
+// =========================================================================
+// 5. SECCIÓN DE HISTORIAL DE VOLUNTARIADO (EXCLUSIVO VOLUNTARIO)
+// =========================================================================
 function setupVolunteeringGrid() {
   const filterSelect = document.getElementById("filter-volunteering-select");
   const sortSelect = document.getElementById("sort-volunteering-select");
@@ -2163,7 +760,6 @@ function setupVolunteeringGrid() {
       renderVolunteering();
     });
   }
-
   if (sortSelect) {
     sortSelect.addEventListener("change", () => {
       currentVolunteeringPage = 1;
@@ -2179,20 +775,17 @@ function renderVolunteering() {
   const filterVal = document.getElementById("filter-volunteering-select")?.value || "";
   const sortVal = document.getElementById("sort-volunteering-select")?.value || "";
 
-  // 1. Filter
   let filtered = [...volunteering];
   if (filterVal) {
     filtered = filtered.filter(item => item.status === filterVal);
   }
 
-  // 2. Sort
   if (sortVal === "reciente") {
     filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
   } else if (sortVal === "antiguas") {
     filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
   }
 
-  // 3. Paginate
   const totalItems = filtered.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
@@ -2204,7 +797,6 @@ function renderVolunteering() {
   const endIndex = startIndex + itemsPerPage;
   const paginated = filtered.slice(startIndex, endIndex);
 
-  // 4. Render Grid HTML
   grid.innerHTML = "";
   if (paginated.length === 0) {
     grid.innerHTML = `
@@ -2217,7 +809,6 @@ function renderVolunteering() {
   }
 
   paginated.forEach(item => {
-    // Reuses the invite-card class layout (strictly image on the left)
     const imgUrl = item.images && item.images.length > 0 ? item.images[0] : "";
     const imgHTML = imgUrl 
       ? `<img src="${BASE_URL + imgUrl}" alt="${item.title}">` 
@@ -2225,15 +816,11 @@ function renderVolunteering() {
 
     const statusLabel = item.status === "activa" ? "Activa" : "Finalizada";
     const statusClass = item.status === "activa" ? "activa" : "finalizada";
-    
-    // Choose redirection URL type based on ownerType
     const profileUrl = item.ownerType === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
 
     const article = document.createElement("article");
     article.className = "invite-card";
-    article.addEventListener("click", () => {
-      openVolunteeringDetailsView(item.id);
-    });
+    article.addEventListener("click", () => openVolunteeringDetailsView(item.id));
 
     article.innerHTML = `
       <div class="invite-card-img-col campaign-img">
@@ -2327,7 +914,6 @@ function openVolunteeringDetailsView(volunteeringId) {
   const item = volunteering.find(v => v.id === volunteeringId);
   if (!item) return;
 
-  // Prefill shared modal labels
   const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");
   const mTags = document.getElementById("m-camp-tags");
@@ -2356,17 +942,13 @@ function openVolunteeringDetailsView(volunteeringId) {
     });
   }
 
-  // Hide or pre-set developer simulation state card inside the details modal
   const devStateCard = document.querySelector(".dev-state-selector-card");
   if (devStateCard) {
     devStateCard.style.display = "block";
     const radio = document.querySelector('input[name="dev-state-choice"][value="registrado-aceptado"]');
-    if (radio) {
-      radio.checked = true;
-    }
+    if (radio) radio.checked = true;
   }
 
-  // Pre-fill sensitive coordinator info
   if (mSensitive) {
     mSensitive.innerHTML = `
       <h4>Información de Coordinación (Exclusivo Voluntarios)</h4>
@@ -2382,9 +964,7 @@ function openVolunteeringDetailsView(volunteeringId) {
     mPostulateBtn.style.display = "block";
   }
 
-  // Trigger state simulator update logic (shows accepted badge, unlocks/reveals sensitive info block)
   updateModalStateBasedOnRadio();
-
   openModal("modal-profile-camp-detail");
   
   if (typeof lucide !== "undefined") {
@@ -2392,300 +972,73 @@ function openVolunteeringDetailsView(volunteeringId) {
   }
 }
 
-
-// ==========================================
-// MANEJO DE ARCHIVOS REALES PARA CAMPAÑAS Y PERFIL
-// ==========================================
-
-// Estado local para los archivos reales seleccionados para subir
-let selectedCampaignFiles = [];
-
-// Maneja la selección de archivos desde el input file
-window.handleFileSelect = function(event) {
-  const files = event.target.files;
+// =========================================================================
+// SIMULADOR DE ESTADOS EN EL MODAL DE DETALLE (EXCLUSIVO VOLUNTARIO)
+// =========================================================================
+function updateModalStateBasedOnRadio() {
+  const selectedState = document.querySelector('input[name="dev-state-choice"]:checked')?.value || 'no-login';
+  const badge = document.getElementById('m-camp-accepted-badge');
+  const infoBox = document.getElementById('m-camp-sensitive-info');
+  const postulateBtn = document.getElementById('m-camp-postulate-btn');
   
-  // Validación: máximo de 3 imágenes
-  if (selectedCampaignFiles.length + files.length > 3) {
-    if (typeof showToast !== "undefined") {
-      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes por campaña.", false);
+  if (!postulateBtn) return;
+
+  if (badge) {
+    badge.style.display = 'none';
+    badge.className = 'modal-status-badge';
+  }
+  if (infoBox) infoBox.style.display = 'none';
+  postulateBtn.disabled = false;
+  postulateBtn.className = 'btn btn-primary';
+  postulateBtn.textContent = 'Postularme';
+
+  if (selectedState === 'no-login') {
+    // Estado estándar
+  } else if (selectedState === 'registrado-pendiente') {
+    if (badge) {
+      badge.textContent = 'PENDIENTE';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'var(--color-primary-light)';
+      badge.style.color = 'var(--color-primary-dark)';
+      badge.style.border = '1px solid var(--color-primary)';
+      badge.style.display = 'inline-block';
     }
-    return;
-  }
-
-  // Agrega los nuevos archivos seleccionados a nuestra lista local
-  for (let i = 0; i < files.length; i++) {
-    selectedCampaignFiles.push(files[i]);
-  }
-
-  renderSelectedFilesPreview();
-};
-
-// Dibuja las previsualizaciones de las imágenes seleccionadas
-function renderSelectedFilesPreview() {
-  const grid = document.getElementById("create-images-preview-grid");
-  if (!grid) return;
-
-  grid.innerHTML = "";
-  selectedCampaignFiles.forEach((file, index) => {
-    const url = URL.createObjectURL(file); // Genera una URL temporal local
-    const div = document.createElement("div");
-    div.className = "uploaded-image-preview";
-    div.innerHTML = `
-      <img src="${url}" alt="Preview image">
-      <button type="button" class="remove-preview-img-btn" onclick="removeSelectedFile(${index})">×</button>
-    `;
-    grid.appendChild(div);
-  });
-
-  // Sincroniza la lista de archivos reales en el input file
-  syncFileInput();
-}
-
-// Remueve una imagen seleccionada
-window.removeSelectedFile = function(index) {
-  selectedCampaignFiles.splice(index, 1);
-  renderSelectedFilesPreview();
-};
-
-// Sincroniza el array de JS de vuelta con el elemento input file en el DOM
-function syncFileInput() {
-  const input = document.getElementById("campaign-images-input");
-  if (!input) return;
-
-  const dataTransfer = new DataTransfer();
-  selectedCampaignFiles.forEach(file => {
-    dataTransfer.items.add(file);
-  });
-  input.files = dataTransfer.files; // Asigna la nueva lista limpia de archivos
-}
-
-
-// ==========================================
-// MENSAJES DE ERROR O ÉXITO EN CREAR Y MODIFICAR CAMPAÑA
-// ==========================================
-
-/* Función para generar mensajes dentro de los modales */
-function renderModalMessage(messageBoxId, message, isSuccess) {
-  const messageBox = document.getElementById(messageBoxId);
-  if (!messageBox) return;
-
-  messageBox.innerHTML = '';
-
-  const alert = document.createElement('div');
-  alert.setAttribute('role', 'alert');
-  alert.style.marginBottom = '20px';
-  alert.style.padding = '14px';
-  alert.style.borderRadius = '10px';
-  alert.style.fontSize = '13px';
-  alert.style.lineHeight = '1.4';
-  alert.style.fontWeight = '500';
-  alert.style.border = '1px solid';
-  
-  // Colores
-  alert.style.backgroundColor = isSuccess ? 'rgba(220, 252, 231, 0.95)' : 'rgba(254, 226, 226, 0.95)';
-  alert.style.color = isSuccess ? '#166534' : '#b91c1c';
-  alert.style.borderColor = isSuccess ? '#86efac' : '#fca5a5';
-  
-  // Diseño de mensaje con icono de Lucide
-  alert.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <i data-lucide="${isSuccess ? 'check-circle' : 'alert-circle'}" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
-      <span>${message}</span>
-    </div>
-  `;
-
-  messageBox.appendChild(alert);
-
-  // Re-inicializar iconos de Lucide para que cargue el nuevo icono del alert
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Pendiente ✓';
+  } else if (selectedState === 'registrado-aceptado') {
+    if (badge) {
+      badge.textContent = 'ACEPTADO';
+      badge.className = 'modal-status-badge accepted-pill';
+      badge.style.display = 'inline-block';
+      badge.style.backgroundColor = '';
+      badge.style.color = '';
+      badge.style.border = '';
+    }
+    if (infoBox) infoBox.style.display = 'block';
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Aceptada ✓';
+  } else if (selectedState === 'registrado-rechazado') {
+    if (badge) {
+      badge.textContent = 'RECHAZADO';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+      badge.style.color = '#EF4444';
+      badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      badge.style.display = 'inline-block';
+    }
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Rechazada';
   }
 }
 
-/* --------- Configuración de validaciones y envío AJAX para Crear y Modificar Campañas --------- */
-function setupCampaignFormValidations() {
-  
-  // --- 1. FORMULARIO DE CREACIÓN (AJAX) ---
-  const createForm = document.getElementById("create-camp-form");
-  if (createForm) {
-    createForm.addEventListener("submit", async (event) => {
-      event.preventDefault(); // Detener el envío tradicional obligatorio
-
-      const title = document.getElementById("create-title").value.trim();
-      const desc = document.getElementById("create-desc").value.trim();
-      const location = document.getElementById("create-location").value.trim();
-      const startDateVal = document.getElementById("create-start-date").value;
-      const endDateVal = document.getElementById("create-end-date").value;
-      
-      const type = document.querySelector('input[name="tipo_campania"]:checked')?.value;
-      const additionalInfoInput = document.getElementById("create-additional");
-      const additionalInfo = additionalInfoInput ? additionalInfoInput.value.trim() : "";
-
-      // A. Validación de campos obligatorios en el cliente (Agregado !details)
-      if (!title || !desc || !location || !startDateVal || !endDateVal) {
-        renderModalMessage("create-camp-message-box", "Por favor, completa todos los campos obligatorios.", false);
-        return;
-      }
-
-      // B. Validación de campo adicional
-      if (type === "convocatoria" && !additionalInfo) {
-        renderModalMessage("create-camp-message-box", "Por favor, ingresa la información adicional requerida para la convocatoria.", false);
-        return;
-      }
-
-      // C. Validación de causas
-      if (tempCampaignCauses.length === 0) {
-        renderModalMessage("create-camp-message-box", "Debes seleccionar al menos una causa para la campaña.", false);
-        return;
-      }
-
-      // D. Validación de Fechas
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const start = new Date(startDateVal + "T00:00:00");
-      const end = new Date(endDateVal + "T00:00:00");
-
-      if (start < today) {
-        renderModalMessage("create-camp-message-box", "La fecha de inicio no puede ser anterior a la fecha actual.", false);
-        return;
-      }
-      if (end < today) {
-        renderModalMessage("create-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha actual.", false);
-        return;
-      }
-      if (end < start) {
-        renderModalMessage("create-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha de inicio.", false);
-        return;
-      }
-
-      // --- PASÓ VALIDACIONES CLIENTE: ENVÍO POR FETCH ---
-      const submitBtn = createForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn ? submitBtn.textContent : '';
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Creando...';
-      }
-
-      const formData = new FormData(createForm);
-
-      try {
-        const response = await fetch(createForm.action, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!response.ok) throw new Error('Error en el servidor');
-
-        const data = await response.json(); // Recibe la respuesta de PHP
-
-        if (data.success) {
-          closeModal("modal-create-campaign");
-          createForm.reset();
-          // Activa el toast flotante con la respuesta del servidor
-          if (typeof showToast !== "undefined") {
-            showToast("¡Campaña creada!", data.message, true);
-          }
-          // Espera 1.5 segundos para que el usuario pueda ver el mensaje antes de recargar
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        } else {
-          // Error devuelto por PHP: Lo pintamos dentro del modal
-          renderModalMessage("create-camp-message-box", data.message, false);
-        }
-      } catch (error) {
-        renderModalMessage("create-camp-message-box", "No se pudo conectar con el servidor. Intenta de nuevo.", false);
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-        }
-      }
+function setupMockUploads() {
+  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      updateModalStateBasedOnRadio();
     });
-  }
-
-  // --- 2. FORMULARIO DE MODIFICACIÓN (AJAX) ---
-  const modifyForm = document.getElementById("modify-camp-form");
-  if (modifyForm) {
-    modifyForm.addEventListener("submit", async (event) => {
-      event.preventDefault(); // Detener el envío tradicional obligatorio
-
-      const title = document.getElementById("modify-title").value.trim();
-      const desc = document.getElementById("modify-desc").value.trim();
-      const location = document.getElementById("modify-location").value.trim();
-      const startDateVal = document.getElementById("modify-start-date").value;
-      const endDateVal = document.getElementById("modify-end-date").value;
-      
-      const type = document.getElementById("modify-type-convocatoria").checked ? "convocatoria" : "informativa";
-      const additionalInfoInput = document.getElementById("modify-additional");
-      const additionalInfo = additionalInfoInput ? additionalInfoInput.value.trim() : "";
-
-      // Validación de campos obligatorios en el cliente
-      if (!title || !desc || !location || !startDateVal || !endDateVal) {
-        renderModalMessage("modify-camp-message-box", "Por favor, completa todos los campos obligatorios.", false);
-        return;
-      }
-
-      if (type === "convocatoria" && !additionalInfo) {
-        renderModalMessage("modify-camp-message-box", "Por favor, ingresa la información adicional requerida para la convocatoria.", false);
-        return;
-      }
-
-      // Validación de Fechas
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const start = new Date(startDateVal + "T00:00:00");
-      const end = new Date(endDateVal + "T00:00:00");
-
-      if (end < start) {
-        renderModalMessage("modify-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha de inicio.", false);
-        return;
-      }
-      if (end < today) {
-        renderModalMessage("modify-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha actual.", false);
-        return;
-      }
-
-      // --- PASÓ VALIDACIONES CLIENTE: ENVÍO POR FETCH ---
-      const submitBtn = modifyForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn ? submitBtn.textContent : '';
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Guardando...';
-      }
-
-      const formData = new FormData(modifyForm);
-
-      try {
-        const response = await fetch(modifyForm.action, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!response.ok) throw new Error('Error en el servidor');
-
-        const data = await response.json(); // Recibe la respuesta de PHP
-
-        if (data.success) {
-          closeModal("modal-modify-campaign");
-          modifyForm.reset();
-          // Activa el toast flotante con la respuesta del servidor
-          if (typeof showToast !== "undefined") {
-            showToast("¡Cambios guardados!", data.message, true);
-          }
-          // Espera 1.5 segundos para que el usuario pueda ver el mensaje antes de recargar
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        }
-      } catch (error) {
-        renderModalMessage("modify-camp-message-box", "No se pudo conectar con el servidor. Intenta de nuevo.", false);
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-        }
-      }
-    });
-  }
+  });
 }
