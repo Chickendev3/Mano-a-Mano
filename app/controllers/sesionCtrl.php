@@ -22,20 +22,6 @@ class sesionCtrl extends Controlador {
 				$perfil->index();
 
 				return;
-				/* if ($_SESSION['usuario_rol'] == 'voluntario') {
-					$datos = ['cssPropio' => 'perfil_voluntario_logueado.css',
-				      		  'jsPropio' => 'perfil_voluntario_logueado.js'];
-					$this->cargarVista('perfil_voluntario_logueado', $datos, 'Mano a Mano - Perfil');
-					return;
-				}
-				elseif ($_SESSION['usuario_rol'] == 'organizacion') {
-					$datos = [];
-					$this->cargarVista('perfil_pendiente', $datos, 'Mano a Mano - Perfil');		/* OJO QUE ACÁ VA EL PERFIL PROPIO DE LA ORGANIZACIÓN 
-					return;
-				} */
-				/* SI LLEGA ACÁ -> OCURRIÓ UN ERROR
-				$this->cargarVista('perfil_pendiente', $datos, 'Mano a Mano - Perfil');
-				return; */
 			}
 		}
 

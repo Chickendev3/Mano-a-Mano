@@ -113,8 +113,3 @@ window.showToast = function(title, message, isSuccess = true) {
     toast.classList.remove('active');
   }, 4000);
 };
-
-// Global close profile modal helper for shared modal_campana.php
-window.closeProfileModal = function(modalId) {
-  closeModal(modalId);
-};

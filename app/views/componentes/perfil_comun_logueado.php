@@ -374,7 +374,7 @@ function renderModalDetalleCampania() {
 <div class="modal-overlay" id="modal-profile-camp-detail" role="dialog" aria-modal="true" aria-labelledby="m-camp-title">
   <div class="modal-box modal-box-large">
     <!-- Botón de Cierre -->
-    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeProfileModal('modal-profile-camp-detail')">
+    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeModal('modal-profile-camp-detail')">
       <i data-lucide="x"></i>
     </button>
     
@@ -430,7 +430,7 @@ function renderModalDetalleCampania() {
 
     <!-- Acciones del Footer del Modal -->
     <div class="modal-footer-actions">
-      <button class="btn btn-ghost" onclick="closeProfileModal('modal-profile-camp-detail')">Cerrar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-profile-camp-detail')">Cerrar</button>
       <button class="btn btn-primary" id="m-camp-postulate-btn">Postularme</button>
     </div>
   </div>
