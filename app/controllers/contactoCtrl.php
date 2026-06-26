@@ -29,7 +29,9 @@ class contactoCtrl extends Controlador {
 			}
 		}
 
-		$datos = ['msj' => $msj];
+		$datos = ['msj' => $msj,
+				  'cssPropio' => 'contacto.css',
+				  'jsPropio' => 'contacto.js'];
 		$this->cargarVista('contacto', $datos, 'Mano a Mano - Contacto'); 
 	}
 

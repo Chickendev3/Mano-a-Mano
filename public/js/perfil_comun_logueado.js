@@ -1,0 +1,1439 @@
+/**
+ * Perfil Común Logueado - Lógica Interactiva Compartida
+ * Mano a Mano MVC
+ * 
+ * Este archivo contiene todas las variables de estado y funciones comunes
+ * para la gestión de campañas e invitaciones que comparten los perfiles
+ * de Voluntarios y de Organizaciones.
+ */
+
+// =========================================================================
+// VARIABLES DE ESTADO COMUNES
+// =========================================================================
+let tempCampaignCauses = [];             // Causas temporales seleccionadas en la creación
+let tempModifyCampaignCauses = [];       // Causas temporales seleccionadas en la modificación
+let selectedCampaignFiles = [];          // Archivos de imagen seleccionados para creación
+let selectedModifyCampaignFiles = [];    // Archivos de imagen seleccionados para modificación
+let existingCampaignImages = [];         // Rutas de imágenes guardadas previamente en la BD
+
+// Campañas e Invitaciones (Inicializadas con datos del servidor o fallback vacío)
+let campaigns = window.campaigns || [];
+let receivedInvitations = [];             // Se completará dinámicamente o vía simulación
+let sentInvitations = [];                 // Se completará dinámicamente o vía simulación
+
+// Variables de paginación común
+let currentPage = 1;
+const itemsPerPage = 2;
+let currentReceivedPage = 1;
+let currentSentPage = 1;
+
+// ID de campaña activo para edición o eliminación
+let currentEditCampaignId = null;
+let currentDeleteCampaignId = null;
+let currentCancelInvitationId = null;
+
+// =========================================================================
+// ENLACE DE EVENTOS EN DOMContentLoaded
+// =========================================================================
+document.addEventListener("DOMContentLoaded", () => {
+  // Inicialización de componentes comunes si los elementos existen en el DOM
+  if (document.getElementById("my-campaigns-grid")) {
+    setupCampaignsGrid();
+  }
+  if (document.getElementById("received-invitations-list") || document.getElementById("sent-invitations-list")) {
+    setupInvitationsGrid();
+  }
+  setupCampaignCausesEvents();
+  setupCampaignFormValidations();
+  setupCommonConfirmEvents();
+});
+
+// =========================================================================
+// MÉTODOS DE AYUDA Y TRADUCCIÓN
+// =========================================================================
+
+function scrollToCampaigns() {
+  const section = document.querySelector(".profile-tabs-sec");
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
+// =========================================================================
+// GESTIÓN DE LA GRILLA DE CAMPAÑAS PROPIAS
+// =========================================================================
+function setupCampaignsGrid() {
+  const filterSelect = document.getElementById("filter-campaigns-select");
+  const sortSelect = document.getElementById("sort-campaigns-select");
+  const createBtn = document.getElementById("btn-create-campaign-modal");
+
+  if (filterSelect) {
+    filterSelect.addEventListener("change", () => {
+      currentPage = 1;
+      renderCampaigns();
+    });
+  }
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      currentPage = 1;
+      renderCampaigns();
+    });
+  }
+  if (createBtn) {
+    createBtn.addEventListener("click", openCreateCampaignModal);
+  }
+
+  renderCampaigns();
+}
+
+// 1. RENDERIZADO DE LAS TARJETAS DE CAMPAÑAS EN LA GRILLA
+function renderCampaigns() {
+  const grid = document.getElementById("my-campaigns-grid");
+  if (!grid) return;
+  const filterVal = document.getElementById("filter-campaigns-select")?.value || "";
+  const sortVal = document.getElementById("sort-campaigns-select")?.value || "";
+
+  // 1. Filtrado
+  let filtered = [...campaigns];
+  if (filterVal) {
+    filtered = filtered.filter(c => c.type === filterVal);
+  }
+
+  // 2. Ordenamiento
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  // 3. Paginación
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  }
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+  
+  // 4. Renderizar HTML
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+        No se encontraron campañas registradas. ¡Crea una nueva campaña!
+      </div>
+    `;
+    renderPagination(0);
+    return;
+  }
+  
+  paginated.forEach((camp, index) => {
+    const isReverse = index % 2 !== 0;
+    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
+    const imgUrl = camp.images && camp.images.length > 0 ? camp.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${camp.title}" style="width:100%; height:100%; object-fit:cover;">` 
+      : `<i data-lucide="image"></i>`;
+    // Renderizamos las causas reales como badges pequeños en la tarjeta
+    const causesHTML = (camp.causes || []).map(cause => `
+      <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
+        ${cause}
+      </span>
+    `).join(" ");
+
+    const article = document.createElement("article");
+    article.className = cardClass;
+    article.addEventListener("click", () => openCampaignDetailsView(camp.id));
+    article.innerHTML = `
+      <div class="alt-card-img-col">
+        <div class="alt-card-img-placeholder">
+          ${imgHTML}
+        </div>
+      </div>
+      <div class="alt-card-content-col" style="position: relative;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+          <h3 class="alt-card-title">${camp.title}</h3>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+            ${causesHTML || `<span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">Solidario</span>`}
+          </div>
+        </div>
+        <p class="alt-card-desc">${camp.desc}</p>
+        
+        <div class="camp-card-actions" style="margin-top: auto;">
+          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Más información</button>
+          
+          <button class="camp-action-btn edit" title="Modificar campaña" onclick="event.stopPropagation(); openModifyCampaignModal(${camp.id});">
+            <i data-lucide="edit-2" style="width:18px; height:18px;"></i>
+          </button>
+          
+          <button class="camp-action-btn delete" title="Eliminar campaña" onclick="event.stopPropagation(); openDeleteConfirmModal(${camp.id});">
+            <i data-lucide="trash-2" style="width:18px; height:18px;"></i>
+          </button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderPagination(totalPages);
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderPagination(totalPages) {
+  const container = document.getElementById("campaigns-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderCampaigns();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentPage = i;
+      renderCampaigns();
+      scrollToCampaigns();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderCampaigns();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+// =========================================================================
+// MODAL DE DETALLE DE CAMPAÑA (COMPARTIDO)
+// =========================================================================
+function openCampaignDetailsView(campaignId) {
+  const camp = campaigns.find(c => c.id === campaignId);
+  if (!camp) return;
+
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = camp.title;
+  
+  // Respetamos la distribución original en forma de lista de párrafos dentro de mDesc,
+  // dividiendo el período en dos campos lógicos.
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.desc}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.location}</p>
+      <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.startDate}</p>
+      <p><strong>Fecha de finalización:</strong> ${camp.endDate}</p>
+    `;
+  }
+
+  // Renderizado de causas directamente como etiquetas
+  if (mTags) {
+    mTags.innerHTML = "";
+    const causesList = camp.causes || (camp.category ? [camp.category] : []);
+    causesList.forEach(cause => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${cause}`;
+      mTags.appendChild(span);
+    });
+
+    // Tipo de campaña
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    const typeLabel = camp.type === "convocatoria" ? "Convocatoria" : "Informativa";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
+    mTags.appendChild(typeSpan);
+  }
+
+  // Carga de Galería (respetando la clase original gallery-placeholder-img para mantener los estilos intactos)
+  const gallerySec = document.getElementById("m-camp-gallery-sec");
+  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+  if (gallerySec && galleryGrid) {
+    galleryGrid.innerHTML = "";
+    if (camp.images && camp.images.length > 0) {
+      camp.images.forEach(imgUrl => {
+        const div = document.createElement("div");
+        div.className = "gallery-placeholder-img"; // Mantiene la clase de estilos original
+        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campaña" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
+        galleryGrid.appendChild(div);
+      });
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+    }
+  }
+
+  // Organizaciones en asociación (Ocultas por falta de relación en BD)
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  if (assocSec) assocSec.style.display = "none";
+
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = camp.type === "convocatoria" ? "inline-flex" : "none";
+  }
+
+  openModal("modal-profile-camp-detail");
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+// =========================================================================
+// MODAL DE CREACIÓN DE CAMPAÑA
+// =========================================================================
+function openCreateCampaignModal() {
+  const msgBox = document.getElementById("create-camp-message-box");
+  if (msgBox) msgBox.innerHTML = "";
+  const form = document.getElementById("create-camp-form");
+  if (form) form.reset();
+
+  selectedCampaignFiles = [];
+  renderSelectedFilesPreview();
+
+  tempCampaignCauses = [];
+  renderCampaignCauses();
+  
+  openModal("modal-create-campaign");
+}
+
+window.toggleCreateAddInfoField = function() {
+  const typeVal = document.querySelector('input[name="tipo_campania"]:checked')?.value || "convocatoria";
+  const infoGroup = document.getElementById("create-additional-info-group");
+  if (infoGroup) {
+    if (typeVal === "convocatoria") {
+      infoGroup.style.display = "block";
+      document.getElementById("create-additional").required = true;
+    } else {
+      infoGroup.style.display = "none";
+      document.getElementById("create-additional").required = false;
+    }
+  }
+};
+
+// =========================================================================
+// GESTIÓN DE CAUSAS (ETIQUETAS DINÁMICAS EN MODALES)
+// =========================================================================
+function setupCampaignCausesEvents() {
+  // Buscador de causas en Creación
+  const causeInput = document.getElementById("campaign-cause-search-input");
+  const causeSuggestions = document.getElementById("campaign-cause-suggestions");
+
+  if (causeInput) {
+    causeInput.addEventListener("focus", () => showCampaignCauseSuggestions(causeInput.value));
+    causeInput.addEventListener("input", () => showCampaignCauseSuggestions(causeInput.value));
+  }
+
+  // Buscador de causas en Modificación
+  const modifyCauseInput = document.getElementById("modify-campaign-cause-search-input");
+  const modifyCauseSuggestions = document.getElementById("modify-campaign-cause-suggestions");
+
+  if (modifyCauseInput) {
+    modifyCauseInput.addEventListener("focus", () => showModifyCampaignCauseSuggestions(modifyCauseInput.value));
+    modifyCauseInput.addEventListener("input", () => showModifyCampaignCauseSuggestions(modifyCauseInput.value));
+  }
+  
+  // Cierre de sugerencias al hacer clic fuera
+  document.addEventListener("click", (e) => {
+    if (causeInput && causeSuggestions && !causeInput.contains(e.target) && !causeSuggestions.contains(e.target)) {
+      causeSuggestions.classList.remove("active");
+    }
+    if (modifyCauseInput && modifyCauseSuggestions && !modifyCauseInput.contains(e.target) && !modifyCauseSuggestions.contains(e.target)) {
+      modifyCauseSuggestions.classList.remove("active");
+    }
+  });
+}
+
+// Lógica de causas en Creación
+function renderCampaignCauses() {
+  const container = document.getElementById("create-campaign-causes-list");
+  const form = document.getElementById("create-camp-form");
+  if (!container || !form) return;
+
+  container.innerHTML = "";
+  form.querySelectorAll('input[name="causas[]"]').forEach(input => input.remove());
+
+  tempCampaignCauses.forEach((cause, index) => {
+    const div = document.createElement("div");
+    div.className = "edit-tag-item";
+    div.innerHTML = `
+      <span>${cause}</span>
+      <button type="button" class="edit-tag-remove-btn" onclick="removeCampaignCause(${index})">×</button>
+    `;
+    container.appendChild(div);
+
+    const hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "causas[]";
+    hiddenInput.value = cause;
+    form.appendChild(hiddenInput);
+  });
+}
+
+window.removeCampaignCause = function(index) {
+  tempCampaignCauses.splice(index, 1);
+  renderCampaignCauses();
+  const causeInput = document.getElementById("campaign-cause-search-input");
+  if (causeInput) showCampaignCauseSuggestions(causeInput.value);
+};
+
+function showCampaignCauseSuggestions(filterText) {
+  const listElement = document.getElementById("campaign-cause-suggestions");
+  if (!listElement) return;
+
+  const searchVal = filterText.toLowerCase().trim();
+  const causesList = window.availableCampaignCauses || [];
+  
+  const filtered = causesList.filter(cause => {
+    const isAlreadySelected = tempCampaignCauses.includes(cause);
+    const matchesSearch = cause.toLowerCase().includes(searchVal);
+    return !isAlreadySelected && matchesSearch;
+  });
+
+  if (filtered.length > 0) {
+    listElement.innerHTML = "";
+    filtered.forEach(cause => {
+      const li = document.createElement("li");
+      li.className = "tag-suggestion-item";
+      li.textContent = cause;
+      li.addEventListener("click", () => {
+        tempCampaignCauses.push(cause);
+        renderCampaignCauses();
+        const causeInput = document.getElementById("campaign-cause-search-input");
+        if (causeInput) {
+          causeInput.value = "";
+          causeInput.focus();
+        }
+        listElement.classList.remove("active");
+      });
+      listElement.appendChild(li);
+    });
+    listElement.classList.add("active");
+  } else {
+    listElement.classList.remove("active");
+  }
+}
+
+// Lógica de causas en Modificación
+function renderModifyCampaignCauses() {
+  const container = document.getElementById("modify-campaign-causes-list");
+  const form = document.getElementById("modify-camp-form");
+  if (!container || !form) return;
+
+  container.innerHTML = "";
+  form.querySelectorAll('input[name="causas[]"]').forEach(input => input.remove());
+
+  tempModifyCampaignCauses.forEach((cause, index) => {
+    const div = document.createElement("div");
+    div.className = "edit-tag-item";
+    div.innerHTML = `
+      <span>${cause}</span>
+      <button type="button" class="edit-tag-remove-btn" onclick="removeModifyCampaignCause(${index})">×</button>
+    `;
+    container.appendChild(div);
+
+    const hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "causas[]";
+    hiddenInput.value = cause;
+    form.appendChild(hiddenInput);
+  });
+}
+
+window.removeModifyCampaignCause = function(index) {
+  tempModifyCampaignCauses.splice(index, 1);
+  renderModifyCampaignCauses();
+  const causeInput = document.getElementById("modify-campaign-cause-search-input");
+  if (causeInput) showModifyCampaignCauseSuggestions(causeInput.value);
+};
+
+function showModifyCampaignCauseSuggestions(filterText) {
+  const listElement = document.getElementById("modify-campaign-cause-suggestions");
+  if (!listElement) return;
+
+  const searchVal = filterText.toLowerCase().trim();
+  const causesList = window.availableCampaignCauses || [];
+  
+  const filtered = causesList.filter(cause => {
+    const isAlreadySelected = tempModifyCampaignCauses.includes(cause);
+    const matchesSearch = cause.toLowerCase().includes(searchVal);
+    return !isAlreadySelected && matchesSearch;
+  });
+
+  if (filtered.length > 0) {
+    listElement.innerHTML = "";
+    filtered.forEach(cause => {
+      const li = document.createElement("li");
+      li.className = "tag-suggestion-item";
+      li.textContent = cause;
+      li.addEventListener("click", () => {
+        tempModifyCampaignCauses.push(cause);
+        renderModifyCampaignCauses();
+        const causeInput = document.getElementById("modify-campaign-cause-search-input");
+        if (causeInput) {
+          causeInput.value = "";
+          causeInput.focus();
+        }
+        listElement.classList.remove("active");
+      });
+      listElement.appendChild(li);
+    });
+    listElement.classList.add("active");
+  } else {
+    listElement.classList.remove("active");
+  }
+}
+
+// =========================================================================
+// GESTIÓN DE IMÁGENES REALES EN MODALES
+// =========================================================================
+
+// Subida de imágenes en Creación
+window.handleFileSelect = function(event) {
+  const files = event.target.files;
+  if (selectedCampaignFiles.length + files.length > 3) {
+    if (typeof showToast !== "undefined") {
+      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes por campaña.", false);
+    }
+    return;
+  }
+  for (let i = 0; i < files.length; i++) {
+    selectedCampaignFiles.push(files[i]);
+  }
+  renderSelectedFilesPreview();
+};
+
+function renderSelectedFilesPreview() {
+  const grid = document.getElementById("create-images-preview-grid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  selectedCampaignFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file);
+    const div = document.createElement("div");
+    div.className = "uploaded-image-preview";
+    div.innerHTML = `
+      <img src="${url}" alt="Preview image">
+      <button type="button" class="remove-preview-img-btn" onclick="removeSelectedFile(${index})">×</button>
+    `;
+    grid.appendChild(div);
+  });
+  syncFileInput();
+}
+
+window.removeSelectedFile = function(index) {
+  selectedCampaignFiles.splice(index, 1);
+  renderSelectedFilesPreview();
+};
+
+function syncFileInput() {
+  const input = document.getElementById("campaign-images-input");
+  if (!input) return;
+  const dataTransfer = new DataTransfer();
+  selectedCampaignFiles.forEach(file => {
+    dataTransfer.items.add(file);
+  });
+  input.files = dataTransfer.files;
+}
+
+// Subida y conservación de imágenes en Modificación
+window.handleModifyFileSelect = function(event) {
+  const files = event.target.files;
+  if (selectedModifyCampaignFiles.length + existingCampaignImages.length + files.length > 3) {
+    if (typeof showToast !== "undefined") {
+      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes en total.", false);
+    }
+    return;
+  }
+  for (let i = 0; i < files.length; i++) {
+    selectedModifyCampaignFiles.push(files[i]);
+  }
+  renderModifyImagesPreview();
+};
+
+function renderModifyImagesPreview() {
+  const grid = document.getElementById("modify-images-preview-grid");
+  const form = document.getElementById("modify-camp-form");
+  if (!grid || !form) return;
+
+  grid.innerHTML = "";
+  form.querySelectorAll('input[name="imagenes_existentes[]"]').forEach(input => input.remove());
+
+  // 1. Imágenes ya existentes en la Base de Datos
+  existingCampaignImages.forEach((imgUrl, index) => {
+    const div = document.createElement("div");
+    div.className = "uploaded-image-preview";
+    div.innerHTML = `
+      <img src="${BASE_URL + imgUrl}" alt="Imagen guardada">
+      <button type="button" class="remove-preview-img-btn" onclick="removeExistingCampaignImage(${index})">×</button>
+    `;
+    grid.appendChild(div);
+
+    const hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "imagenes_existentes[]";
+    hiddenInput.value = imgUrl;
+    form.appendChild(hiddenInput);
+  });
+
+  // 2. Nuevas imágenes locales a subir
+  selectedModifyCampaignFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file);
+    const div = document.createElement("div");
+    div.className = "uploaded-image-preview";
+    div.innerHTML = `
+      <img src="${url}" alt="Nueva imagen a subir">
+      <button type="button" class="remove-preview-img-btn" onclick="removeSelectedModifyFile(${index})">×</button>
+    `;
+    grid.appendChild(div);
+  });
+
+  syncModifyFileInput();
+}
+
+window.removeExistingCampaignImage = function(index) {
+  existingCampaignImages.splice(index, 1);
+  renderModifyImagesPreview();
+};
+
+window.removeSelectedModifyFile = function(index) {
+  selectedModifyCampaignFiles.splice(index, 1);
+  renderModifyImagesPreview();
+};
+
+function syncModifyFileInput() {
+  const input = document.getElementById("modify-campaign-images-input");
+  if (!input) return;
+  const dataTransfer = new DataTransfer();
+  selectedModifyCampaignFiles.forEach(file => {
+    dataTransfer.items.add(file);
+  });
+  input.files = dataTransfer.files;
+}
+
+// =========================================================================
+// MODAL DE MODIFICACIÓN DE CAMPAÑA
+// =========================================================================
+window.openModifyCampaignModal = function(id) {
+  const camp = campaigns.find(c => c.id === id);
+  if (!camp) return;
+
+  currentEditCampaignId = id;
+
+  const idInput = document.getElementById("modify-campaign-id-input");
+  if (idInput) idInput.value = id;
+
+  const titleInput = document.getElementById("modify-title");
+  if (titleInput) titleInput.value = camp.title || "";
+
+  const descInput = document.getElementById("modify-desc");
+  if (descInput) descInput.value = camp.desc || "";
+
+  const locationInput = document.getElementById("modify-location");
+  if (locationInput) locationInput.value = camp.location || "";
+
+  const startDateInput = document.getElementById("modify-start-date");
+  if (startDateInput) startDateInput.value = camp.startDate || "";
+
+  const endDateInput = document.getElementById("modify-end-date");
+  if (endDateInput) endDateInput.value = camp.endDate || "";
+
+  // Selección defensiva y excluyente de los radios de tipo
+  const additionalInput = document.getElementById("modify-additional");
+  const radioConvocatoria = document.getElementById("modify-type-convocatoria");
+  const radioInformativa = document.getElementById("modify-type-informativa");
+
+  if (camp.type === "convocatoria") {
+    if (radioConvocatoria) radioConvocatoria.checked = true;
+    if (radioInformativa) radioInformativa.checked = false;
+    if (additionalInput) additionalInput.value = camp.additionalInfo || "";
+  } else {
+    if (radioConvocatoria) radioConvocatoria.checked = false;
+    if (radioInformativa) radioInformativa.checked = true;
+    if (additionalInput) additionalInput.value = "";
+  }
+
+  // Pre-carga de causas en la modificación
+  if (camp.causes && Array.isArray(camp.causes)) {
+    tempModifyCampaignCauses = [...camp.causes];
+  } else if (camp.category) {
+    tempModifyCampaignCauses = [camp.category];
+  } else {
+    tempModifyCampaignCauses = [];
+  }
+  renderModifyCampaignCauses();
+
+  existingCampaignImages = [...(camp.images || [])];
+  selectedModifyCampaignFiles = [];
+  renderModifyImagesPreview();
+
+  toggleModifyAddInfoField();
+  openModal("modal-modify-campaign");
+
+  const msgBox = document.getElementById("modify-camp-message-box");
+  if (msgBox) msgBox.innerHTML = "";
+};
+
+window.toggleModifyAddInfoField = function() {
+  const isConvocatoria = document.getElementById("modify-type-convocatoria")?.checked ?? true;
+  const infoGroup = document.getElementById("modify-additional-info-group");
+  const additionalInput = document.getElementById("modify-additional");
+  
+  if (infoGroup && additionalInput) {
+    if (isConvocatoria) {
+      infoGroup.style.display = "block";
+      additionalInput.required = true;
+    } else {
+      infoGroup.style.display = "none";
+      additionalInput.required = false;
+      additionalInput.value = "";
+    }
+  }
+};
+
+// =========================================================================
+// MODALES DE CONFIRMACIÓN (ELIMINAR CAMPAÑA Y CANCELAR INVITACIÓN)
+// =========================================================================
+window.openDeleteConfirmModal = function(id) {
+  currentDeleteCampaignId = id;
+  openModal("modal-delete-confirm");
+};
+
+window.openCancelInvitationConfirmModal = function(id) {
+  currentCancelInvitationId = id;
+  openModal("modal-cancel-invitation-confirm");
+};
+
+function setupCommonConfirmEvents() {
+  // Confirmar eliminación de campaña (Enlace con PHP en próximas fases)
+  const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener("click", () => {
+      if (currentDeleteCampaignId) {
+        // Por ahora lo removemos localmente
+        campaigns = campaigns.filter(c => c.id !== currentDeleteCampaignId);
+        closeModal("modal-delete-confirm");
+        currentDeleteCampaignId = null;
+        currentPage = 1;
+        renderCampaigns();
+
+        if (typeof showToast !== "undefined") {
+          showToast("Campaña eliminada", "La campaña se eliminó correctamente de tu perfil.", true);
+        }
+      }
+    });
+  }
+
+  // Confirmar cancelación de invitación enviada
+  const confirmCancelBtn = document.getElementById("confirm-cancel-invitation-btn");
+  if (confirmCancelBtn) {
+    confirmCancelBtn.addEventListener("click", () => {
+      if (currentCancelInvitationId) {
+        sentInvitations = sentInvitations.filter(inv => inv.id !== currentCancelInvitationId);
+        closeModal("modal-cancel-invitation-confirm");
+        currentCancelInvitationId = null;
+        currentSentPage = 1;
+        renderSentInvitations();
+
+        if (typeof showToast !== "undefined") {
+          showToast("Invitación cancelada", "La invitación enviada ha sido retirada.", true);
+        }
+      }
+    });
+  }
+}
+
+// =========================================================================
+// SECCIÓN DE INVITACIONES (COMÚN)
+// =========================================================================
+function setupInvitationsGrid() {
+  const filterReceived = document.getElementById("filter-received-select");
+  const sortReceived = document.getElementById("sort-received-select");
+  const filterSent = document.getElementById("filter-sent-select");
+  const sortSent = document.getElementById("sort-sent-select");
+
+  if (filterReceived) {
+    filterReceived.addEventListener("change", () => {
+      currentReceivedPage = 1;
+      renderReceivedInvitations();
+    });
+  }
+  if (sortReceived) {
+    sortReceived.addEventListener("change", () => {
+      currentReceivedPage = 1;
+      renderReceivedInvitations();
+    });
+  }
+  if (filterSent) {
+    filterSent.addEventListener("change", () => {
+      currentSentPage = 1;
+      renderSentInvitations();
+    });
+  }
+  if (sortSent) {
+    sortSent.addEventListener("change", () => {
+      currentSentPage = 1;
+      renderSentInvitations();
+    });
+  }
+
+  renderReceivedInvitations();
+  renderSentInvitations();
+}
+
+function renderReceivedInvitations() {
+  const grid = document.getElementById("received-invitations-list");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-received-select")?.value || "";
+  const sortVal = document.getElementById("sort-received-select")?.value || "";
+
+  let filtered = [...receivedInvitations];
+  if (filterVal) {
+    filtered = filtered.filter(inv => inv.category === filterVal);
+  }
+
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentReceivedPage > totalPages && totalPages > 0) {
+    currentReceivedPage = totalPages;
+  }
+
+  const startIndex = (currentReceivedPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+        No tienes invitaciones recibidas pendientes.
+      </div>
+    `;
+    renderReceivedPagination(0);
+    return;
+  }
+
+  paginated.forEach(inv => {
+    const imgUrl = inv.images && inv.images.length > 0 ? inv.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${inv.title}">` 
+      : `<i data-lucide="image"></i>`;
+
+    const article = document.createElement("article");
+    article.className = "invite-card";
+    article.addEventListener("click", () => openReceivedCampaignDetailsView(inv.id));
+
+    article.innerHTML = `
+      <div class="invite-card-img-col campaign-img">
+        ${imgHTML}
+      </div>
+      <div class="invite-card-content-col">
+        <span style="font-size: 11px; font-weight: 700; color: var(--color-primary); display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+          <i data-lucide="mail" style="width:12px; height:12px;"></i> ¡Te invitaron a una campaña!
+        </span>
+        <h3 class="alt-card-title">${inv.title}</h3>
+        <p class="alt-card-desc">${inv.desc}</p>
+        <span style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px; display: block;">
+          <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${inv.location}
+        </span>
+      </div>
+      
+      <div class="invite-card-actions-col">
+        <button class="btn btn-primary aceptar-invite-btn" type="button" onclick="event.stopPropagation(); acceptReceivedInvitation(${inv.id});">
+          Aceptar
+        </button>
+        <button class="btn btn-ghost" type="button" onclick="event.stopPropagation(); rejectReceivedInvitation(${inv.id});">
+          Rechazar
+        </button>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderReceivedPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderReceivedPagination(totalPages) {
+  const container = document.getElementById("received-invitations-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentReceivedPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentReceivedPage > 1) {
+      currentReceivedPage--;
+      renderReceivedInvitations();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentReceivedPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentReceivedPage = i;
+      renderReceivedInvitations();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentReceivedPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentReceivedPage < totalPages) {
+      currentReceivedPage++;
+      renderReceivedInvitations();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+window.acceptReceivedInvitation = function(id) {
+  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
+  renderReceivedInvitations();
+  if (typeof showToast !== "undefined") {
+    showToast("Invitación aceptada", "Te has unido a la campaña. Ya está programada en tu voluntariado.", true);
+  }
+};
+
+window.rejectReceivedInvitation = function(id) {
+  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
+  renderReceivedInvitations();
+  if (typeof showToast !== "undefined") {
+    showToast("Invitación rechazada", "Has rechazado la invitación.", true);
+  }
+};
+
+function renderSentInvitations() {
+  const grid = document.getElementById("sent-invitations-list");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-sent-select")?.value || "";
+  const sortVal = document.getElementById("sort-sent-select")?.value || "";
+
+  let filtered = [...sentInvitations];
+  if (filterVal) {
+    filtered = filtered.filter(inv => inv.status === filterVal);
+  }
+  if (sortVal === "antiguas") {
+    filtered.reverse();
+  }
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentSentPage > totalPages && totalPages > 0) {
+    currentSentPage = totalPages;
+  }
+
+  const startIndex = (currentSentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
+        No has enviado invitaciones aún.
+      </div>
+    `;
+    renderSentPagination(0);
+    return;
+  }
+
+  paginated.forEach(inv => {
+    const avatarHTML = inv.avatar 
+      ? `<img src="${BASE_URL + inv.avatar}" alt="${inv.name}">` 
+      : `<i data-lucide="user"></i>`;
+
+    const profileUrl = inv.type === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+    const labelType = inv.type === "voluntario" ? "Voluntario" : "Organización";
+
+    let statusLabel = "";
+    let statusClass = "";
+    if (inv.status === "aceptado") {
+      statusLabel = "Aceptado";
+      statusClass = "aceptado";
+    } else if (inv.status === "pendiente") {
+      statusLabel = "Pendiente";
+      statusClass = "pendiente";
+    } else if (inv.status === "rechazado") {
+      statusLabel = "Rechazado";
+      statusClass = "rechazado";
+    }
+
+    const cancelHTML = (inv.status === "pendiente" || inv.status === "aceptado")
+      ? `<button class="post-cancel-btn" type="button" onclick="event.stopPropagation(); openCancelInvitationConfirmModal(${inv.id});">
+          Cancelar invitación
+         </button>`
+      : "";
+
+    const article = document.createElement("article");
+    article.className = "invite-card";
+    article.addEventListener("click", () => {
+      window.location.href = BASE_URL + profileUrl;
+    });
+
+    article.innerHTML = `
+      <div class="invite-card-img-col user-avatar">
+        ${avatarHTML}
+      </div>
+      <div class="invite-card-content-col">
+        <h3 class="alt-card-title" style="margin-bottom: 2px;">${inv.name}</h3>
+        <span style="font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase;">${labelType}</span>
+        
+        <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
+          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
+            <i data-lucide="user" style="width:12px; height:12px;"></i> Ir al perfil de ${inv.name}
+          </a>
+          <button type="button" class="invite-meta-link" onclick="event.stopPropagation(); openSentCampaignDetailsView(${inv.id});">
+            <i data-lucide="external-link" style="width:12px; height:12px;"></i> Campaña invitada: <strong>${inv.campaignTitle}</strong>
+          </button>
+        </div>
+      </div>
+      
+      <div class="invite-card-actions-col">
+        <button class="postulation-status-btn ${statusClass}" type="button" style="pointer-events: none;">
+          ${statusLabel}
+        </button>
+        ${cancelHTML}
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderSentPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderSentPagination(totalPages) {
+  const container = document.getElementById("sent-invitations-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentSentPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentSentPage > 1) {
+      currentSentPage--;
+      renderSentInvitations();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentSentPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentSentPage = i;
+      renderSentInvitations();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentSentPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentSentPage < totalPages) {
+      currentSentPage++;
+      renderSentInvitations();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+function openReceivedCampaignDetailsView(invitationId) {
+  const inv = receivedInvitations.find(i => i.id === invitationId);
+  if (!inv) return;
+
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = inv.title;
+  
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.desc}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.location}</p>
+      <p><strong>Período:</strong> ${inv.startDate} al ${inv.endDate}</p>
+    `;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const label = inv.category || "Solidario";
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${label}`;
+    mTags.appendChild(span);
+
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
+  }
+
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = "none";
+  }
+
+  openModal("modal-profile-camp-detail");
+  
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function openSentCampaignDetailsView(invitationId) {
+  const inv = sentInvitations.find(i => i.id === invitationId);
+  if (!inv) return;
+
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = inv.campaignTitle;
+  
+  if (mDesc) {
+    mDesc.innerHTML = `
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.campaignDesc}</p>
+      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.campaignLocation}</p>
+      <p><strong>Período:</strong> ${inv.campaignStartDate} al ${inv.campaignEndDate}</p>
+    `;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const label = inv.campaignCategory || "Solidario";
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${label}`;
+    mTags.appendChild(span);
+    
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
+  }
+
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  if (mPostulateBtn) {
+    mPostulateBtn.style.display = "none";
+  }
+
+  openModal("modal-profile-camp-detail");
+  
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+// =========================================================================
+// MENSAJES DINÁMICOS Y VALIDACIONES DE FORMULARIO AJAX (FETCH)
+// =========================================================================
+function renderModalMessage(messageBoxId, message, isSuccess) {
+  const messageBox = document.getElementById(messageBoxId);
+  if (!messageBox) return;
+
+  messageBox.innerHTML = '';
+
+  const alert = document.createElement('div');
+  alert.setAttribute('role', 'alert');
+  alert.style.marginBottom = '20px';
+  alert.style.padding = '14px';
+  alert.style.borderRadius = '10px';
+  alert.style.fontSize = '13px';
+  alert.style.lineHeight = '1.4';
+  alert.style.fontWeight = '500';
+  alert.style.border = '1px solid';
+  
+  alert.style.backgroundColor = isSuccess ? 'rgba(220, 252, 231, 0.95)' : 'rgba(254, 226, 226, 0.95)';
+  alert.style.color = isSuccess ? '#166534' : '#b91c1c';
+  alert.style.borderColor = isSuccess ? '#86efac' : '#fca5a5';
+  
+  alert.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <i data-lucide="${isSuccess ? 'check-circle' : 'alert-circle'}" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+      <span>${message}</span>
+    </div>
+  `;
+
+  messageBox.appendChild(alert);
+
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+function setupCampaignFormValidations() {
+  
+  // A. Formulario de Creación
+  const createForm = document.getElementById("create-camp-form");
+  if (createForm) {
+    createForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const title = document.getElementById("create-title").value.trim();
+      const desc = document.getElementById("create-desc").value.trim();
+      const location = document.getElementById("create-location").value.trim();
+      const startDateVal = document.getElementById("create-start-date").value;
+      const endDateVal = document.getElementById("create-end-date").value;
+      
+      const type = document.querySelector('input[name="tipo_campania"]:checked')?.value;
+      const additionalInfoInput = document.getElementById("create-additional");
+      const additionalInfo = additionalInfoInput ? additionalInfoInput.value.trim() : "";
+
+      if (!title || !desc || !location || !startDateVal || !endDateVal) {
+        renderModalMessage("create-camp-message-box", "Por favor, completa todos los campos obligatorios.", false);
+        return;
+      }
+
+      if (type === "convocatoria" && !additionalInfo) {
+        renderModalMessage("create-camp-message-box", "Por favor, ingresa la información adicional requerida para la convocatoria.", false);
+        return;
+      }
+
+      if (tempCampaignCauses.length === 0) {
+        renderModalMessage("create-camp-message-box", "Debes seleccionar al menos una causa para la campaña.", false);
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const start = new Date(startDateVal + "T00:00:00");
+      const end = new Date(endDateVal + "T00:00:00");
+
+      if (start < today) {
+        renderModalMessage("create-camp-message-box", "La fecha de inicio no puede ser anterior a la fecha actual.", false);
+        return;
+      }
+      if (end < today) {
+        renderModalMessage("create-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha actual.", false);
+        return;
+      }
+      if (end < start) {
+        renderModalMessage("create-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha de inicio.", false);
+        return;
+      }
+
+      const submitBtn = createForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creando...';
+      }
+
+      const formData = new FormData(createForm);
+
+      try {
+        const response = await fetch(createForm.action, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Error en el servidor');
+
+        const data = await response.json();
+
+        if (data.success) {
+          closeModal("modal-create-campaign");
+          createForm.reset();
+          if (typeof showToast !== "undefined") {
+            showToast("¡Campaña creada!", data.message, true);
+          }
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          renderModalMessage("create-camp-message-box", data.message, false);
+        }
+      } catch (error) {
+        renderModalMessage("create-camp-message-box", "No se pudo conectar con el servidor. Intenta de nuevo.", false);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
+  }
+
+  // B. Formulario de Modificación
+  const modifyForm = document.getElementById("modify-camp-form");
+  if (modifyForm) {
+    modifyForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const title = document.getElementById("modify-title").value.trim();
+      const desc = document.getElementById("modify-desc").value.trim();
+      const location = document.getElementById("modify-location").value.trim();
+      const startDateVal = document.getElementById("modify-start-date").value;
+      const endDateVal = document.getElementById("modify-end-date").value;
+      
+      const type = document.getElementById("modify-type-convocatoria").checked ? "convocatoria" : "informativa";
+      const additionalInfoInput = document.getElementById("modify-additional");
+      const additionalInfo = additionalInfoInput ? additionalInfoInput.value.trim() : "";
+
+      if (!title || !desc || !location || !startDateVal || !endDateVal) {
+        renderModalMessage("modify-camp-message-box", "Por favor, completa todos los campos obligatorios.", false);
+        return;
+      }
+
+      if (type === "convocatoria" && !additionalInfo) {
+        renderModalMessage("modify-camp-message-box", "Por favor, ingresa la información adicional requerida para la convocatoria.", false);
+        return;
+      }
+
+      if (tempModifyCampaignCauses.length === 0) {
+        renderModalMessage("modify-camp-message-box", "Debes seleccionar al menos una causa para la campaña.", false);
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const start = new Date(startDateVal + "T00:00:00");
+      const end = new Date(endDateVal + "T00:00:00");
+
+      if (end < start) {
+        renderModalMessage("modify-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha de inicio.", false);
+        return;
+      }
+      if (end < today) {
+        renderModalMessage("modify-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha actual.", false);
+        return;
+      }
+
+      const submitBtn = modifyForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+      }
+
+      const formData = new FormData(modifyForm);
+
+      try {
+        const response = await fetch(modifyForm.action, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Error en el servidor');
+
+        const data = await response.json();
+
+        if (data.success) {
+          closeModal("modal-modify-campaign");
+          modifyForm.reset();
+          if (typeof showToast !== "undefined") {
+            showToast("¡Cambios guardados!", data.message, true);
+          }
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          renderModalMessage("modify-camp-message-box", data.message, false);
+        }
+      } catch (error) {
+        renderModalMessage("modify-camp-message-box", "No se pudo conectar con el servidor. Intenta de nuevo.", false);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
+  }
+}

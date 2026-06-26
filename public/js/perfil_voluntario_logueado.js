@@ -1,0 +1,1110 @@
+/**
+ * Perfil Voluntario Logueado - Lógica Interactiva Específica
+ * Mano a Mano MVC
+ * 
+ * Este archivo contiene la lógica y variables de estado exclusivas del perfil
+ * de Voluntario (datos de perfil personal, insignias, oficios, postulaciones
+ * a otras campañas e historial de voluntariado).
+ */
+
+// =========================================================================
+// VARIABLES DE ESTADO Y SIMULACIÓN (MOCK DATA)
+// =========================================================================
+let userProfile = {
+  name: "Voluntario de Prueba",
+  desc: "Apasionado por la educación y el trabajo social. Busco colaborar en proyectos comunitarios que generen un impacto positivo en la niñez y el medio ambiente.",
+  location: "Buenos Aires, Argentina",
+  availability: "Lunes a Viernes de 14:00 a 18:00",
+  email: "voluntario@gmail.com",
+  phone1: "+54 11 5555-5678",
+  phone2: "+54 11 9999-1234",
+  avatar: "", 
+  skills: ["Cocinero", "Profesor"]
+};
+
+const availableSkills = [
+  "Cocinero", "Profesor", "Carpintero", "Electricista", "Plomero", 
+  "Pintor", "Jardinero", "Albañil", "Costurero", "Peluquero", 
+  "Conductor", "Cuidador", "Tallerista", "Logística", "Apoyo Escolar"
+];
+
+let tempSkills = [];                     // Oficios temporales en edición de perfil
+let currentPostulationsPage = 1;
+let currentCancelPostulationId = null;
+let currentVolunteeringPage = 1;
+
+// Base de Datos Simulada para Postulaciones (Voluntario a campañas externas)
+let postulations = [
+  {
+    id: 501,
+    campaignId: 1,
+    title: "Reforestación Parque Central",
+    desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia.",
+    status: "aceptado",
+    category: "medio Ambiente",
+    startDate: "2026-06-14",
+    endDate: "2026-06-21",
+    location: "Parque Central, Buenos Aires",
+    details: "Actividades de plantación, riego y tutorado de 50 plantines autóctonos. Se proveen herramientas y guantes.",
+    additionalInfo: "Dirección: Av. Sarmiento 2300 (junto al lago). Coordinador: Martín Silva (+54 11 9876-5432).",
+    images: ["img/campaign_park.png"]
+  },
+  {
+    id: 502,
+    campaignId: 2,
+    title: "Clases de Apoyo Digital",
+    desc: "Buscamos tutores para enseñar el uso de herramientas de oficina básicas y programación web inicial a jóvenes.",
+    status: "rechazado",
+    category: "Educacion",
+    startDate: "2026-06-18",
+    endDate: "2026-07-18",
+    location: "San Martín, Rosario",
+    details: "Tutorías presenciales de herramientas de oficina básicas (Word, Excel) y nociones iniciales de HTML/CSS para jóvenes de 12 a 18 años.",
+    additionalInfo: "Dirección: Belgrano 1200, Rosario. Coordinadora: Clara Gómez (+54 341 555-4321).",
+    images: ["img/campaign_tutoring.png"]
+  },
+  {
+    id: 503,
+    campaignId: 3,
+    title: "Colecta de Alimentos",
+    desc: "Ayudanos a clasificar, empaquetar y distribuir las donaciones del banco de alimentos destinadas a comedores.",
+    status: "pendiente",
+    category: "Accion Social",
+    startDate: "2026-06-21",
+    endDate: "2026-06-30",
+    location: "Centro, Córdoba",
+    details: "Recepción, control de vencimiento y clasificación por rubros de alimentos no perecederos. Distribución posterior a comedores infantiles.",
+    additionalInfo: "Dirección: Deán Funes 450, Córdoba. Coordinador: Juan Pérez (+54 351 444-1234).",
+    images: ["img/campaign_food.png"]
+  }
+];
+
+// Base de Datos Simulada para Voluntariados (Historial de participación)
+let volunteering = [
+  {
+    id: 901,
+    title: "Reforestación Parque Central",
+    desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad.",
+    category: "Medio Ambiente",
+    startDate: "2026-06-14",
+    endDate: "2026-06-21",
+    location: "Parque Central, Buenos Aires",
+    status: "activa",
+    ownerName: "Techo Verde",
+    ownerType: "organizacion",
+    images: ["img/campaign_park.png"],
+    details: "Actividades de plantación, riego y tutorado de 50 plantines autóctonos. Se proveen herramientas y guantes.",
+    additionalInfo: "Dirección: Av. Sarmiento 2300 (junto al lago). Coordinador: Martín Silva (+54 11 9876-5432)."
+  },
+  {
+    id: 902,
+    title: "Apoyo Escolar Primario",
+    desc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
+    category: "Educacion",
+    startDate: "2026-06-20",
+    endDate: "2026-12-20",
+    location: "San Martín, Buenos Aires",
+    status: "activa",
+    ownerName: "Mentes Brillantes",
+    ownerType: "organizacion",
+    images: ["img/campaign_tutoring.png"],
+    details: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
+    additionalInfo: "Dirección exacta: Belgrano 456, San Martín. Coordinador: Lucas Gómez (+54 11 5555-1234). Traer cartuchera y cuaderno."
+  },
+  {
+    id: 903,
+    title: "Taller de RCP y Primeros Auxilios",
+    desc: "Taller teórico-práctico de reanimación cardiopulmonar y primeros auxilios básicos para la comunidad.",
+    category: "Salud",
+    startDate: "2026-03-01",
+    endDate: "2026-03-15",
+    location: "Salguero 120, CABA",
+    status: "finalizada",
+    ownerName: "Juan Pérez",
+    ownerType: "voluntario",
+    images: ["img/camp_placeholder.png"],
+    details: "Taller interactivo abierto a la comunidad sobre maniobras básicas de reanimación y primeros auxilios.",
+    additionalInfo: "Dirección: Salguero 120, CABA. Coordinador: Juan Pérez (+54 11 3333-7777). Se entrega certificado de asistencia."
+  },
+  {
+    id: 904,
+    title: "Colecta Navideña",
+    desc: "Recepción y empaquetado de juguetes y alimentos navideños para familias necesitadas.",
+    category: "Accion Social",
+    startDate: "2025-12-01",
+    endDate: "2025-12-25",
+    location: "Mansilla 2900, CABA",
+    status: "finalizada",
+    ownerName: "Cáritas",
+    ownerType: "organizacion",
+    images: ["img/campaign_food.png"],
+    details: "Campaña para recolectar y clasificar alimentos no perecederos y juguetes para la mesa navideña.",
+    additionalInfo: "Dirección: Mansilla 2900, CABA. Coordinadora: Hermana Teresa (+54 11 2222-1111)."
+  }
+];
+
+// Base de Datos Simulada para Invitaciones en el Voluntario
+// Nota: Se vinculan a las globales para ser visualizadas
+window.addEventListener("DOMContentLoaded", () => {
+  receivedInvitations = [
+    {
+      id: 701,
+      campaignId: 401,
+      title: "Clases de Pintura Infantil",
+      desc: "Buscamos voluntarios para dictar talleres recreativos de dibujo y pintura a niños del barrio.",
+      category: "Cultura",
+      startDate: "2026-07-05",
+      endDate: "2026-07-26",
+      location: "Rosario, Santa Fe",
+      details: "Talleres grupales los domingos para fomentar la expresión artística e integración de los niños de la zona.",
+      images: ["img/camp_placeholder.png"]
+    },
+    {
+      id: 702,
+      campaignId: 402,
+      title: "Limpieza de Río Luján",
+      desc: "Jornada ecológica para recolectar plásticos, vidrios y residuos en las costas del río.",
+      category: "Medio Ambiente",
+      startDate: "2026-07-12",
+      endDate: "2026-07-12",
+      location: "Tigre, Buenos Aires",
+      details: "Limpieza participativa en la costa del río con provisión de bolsas de residuos, pinzas de agarre y chalecos.",
+      images: ["img/campaign_park.png"]
+    }
+  ];
+
+  sentInvitations = [
+    {
+      id: 801,
+      name: "Brian Clark",
+      type: "voluntario",
+      status: "pendiente",
+      campaignId: 301,
+      campaignTitle: "Apoyo Escolar Primario",
+      campaignDesc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
+      campaignCategory: "Educacion",
+      campaignStartDate: "2026-06-20",
+      campaignEndDate: "2026-12-20",
+      campaignLocation: "San Martín, Buenos Aires",
+      campaignDetails: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
+      avatar: "img/org_placeholder.png"
+    },
+    {
+      id: 802,
+      name: "Techo Verde",
+      type: "organizacion",
+      status: "aceptado",
+      campaignId: 302,
+      campaignTitle: "Taller de Huertas Comunitarias",
+      campaignDesc: "Aprende sobre agricultura urbana, compostaje y cuidado del medio ambiente en nuestro taller semanal.",
+      campaignCategory: "Medio Ambiente",
+      campaignStartDate: "2026-06-25",
+      campaignEndDate: "2026-08-25",
+      campaignLocation: "Villa Crespo, CABA",
+      campaignDetails: "Un espacio interactivo y gratuito para todos los vecinos donde se aprende a crear huertas orgánicas.",
+      avatar: "img/org_placeholder.png"
+    }
+  ];
+
+  // Dispara el renderizado común de las invitaciones cargadas
+  if (typeof renderReceivedInvitations !== "undefined") {
+    renderReceivedInvitations();
+    renderSentInvitations();
+  }
+});
+
+// =========================================================================
+// INICIALIZACIÓN ESPECÍFICA DEL VOLUNTARIO
+// =========================================================================
+document.addEventListener("DOMContentLoaded", () => {
+  renderProfileData();
+  setupProfileEditEvents();
+  setupTabs();
+  setupPostulationsGrid();
+  setupVolunteeringGrid();
+  setupMockUploads();
+});
+
+// =========================================================================
+// 1. RENDERIZADO DE DATOS DEL PERFIL DEL VOLUNTARIO
+// =========================================================================
+function renderProfileData() {
+  const avatarView = document.getElementById("avatar-img-view");
+  const avatarPlaceholder = document.getElementById("avatar-icon-placeholder");
+  const viewName = document.getElementById("view-profile-name");
+  const viewDesc = document.getElementById("view-profile-desc");
+  const viewLocation = document.getElementById("view-profile-location");
+  const viewAvailability = document.getElementById("view-profile-availability");
+  const viewEmail = document.getElementById("view-profile-email");
+  const viewPhone1 = document.getElementById("view-profile-phone1");
+  const viewPhone2 = document.getElementById("view-profile-phone2");
+  const viewSkills = document.getElementById("view-skills-badges");
+
+  if (userProfile.avatar) {
+    if (avatarView) {
+      avatarView.src = userProfile.avatar;
+      avatarView.style.display = "block";
+    }
+    if (avatarPlaceholder) avatarPlaceholder.style.display = "none";
+  } else {
+    if (avatarView) avatarView.style.display = "none";
+    if (avatarPlaceholder) avatarPlaceholder.style.display = "block";
+  }
+
+  if (viewName) viewName.textContent = userProfile.name;
+  if (viewDesc) viewDesc.textContent = userProfile.desc;
+  if (viewLocation) viewLocation.textContent = userProfile.location;
+  if (viewAvailability) viewAvailability.textContent = userProfile.availability;
+  if (viewEmail) viewEmail.textContent = userProfile.email;
+  if (viewPhone1) viewPhone1.textContent = userProfile.phone1;
+  if (viewPhone2) viewPhone2.textContent = userProfile.phone2;
+
+  if (viewSkills) {
+    viewSkills.innerHTML = "";
+    userProfile.skills.forEach(skill => {
+      const span = document.createElement("span");
+      span.className = "skill-badge-text";
+      span.textContent = skill;
+      viewSkills.appendChild(span);
+    });
+  }
+
+  const navDropdownSpan = document.querySelector(".nav-dropdown-toggle span");
+  if (navDropdownSpan) {
+    navDropdownSpan.textContent = userProfile.name;
+  }
+}
+
+// =========================================================================
+// 2. GESTIÓN DE EDICIÓN DEL PERFIL DE VOLUNTARIO
+// =========================================================================
+function setupProfileEditEvents() {
+  const editBtn = document.getElementById("edit-profile-btn");
+  const cancelBtn = document.getElementById("cancel-profile-btn");
+  const saveBtn = document.getElementById("save-profile-btn");
+  const editState = document.getElementById("profile-edit-state");
+  const viewState = document.getElementById("profile-view-state");
+
+  const editName = document.getElementById("edit-name");
+  const editDesc = document.getElementById("edit-desc");
+  const editLocation = document.getElementById("edit-location");
+  const editAvailability = document.getElementById("edit-availability");
+  const editEmail = document.getElementById("edit-email");
+  const editPhone1 = document.getElementById("edit-phone1");
+  const editPhone2 = document.getElementById("edit-phone2");
+  const avatarInput = document.getElementById("edit-avatar-input");
+
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      editName.value = userProfile.name;
+      editDesc.value = userProfile.desc;
+      editLocation.value = userProfile.location;
+      editAvailability.value = userProfile.availability;
+      editEmail.value = userProfile.email;
+      editPhone1.value = userProfile.phone1 || "";
+      editPhone2.value = userProfile.phone2 || "";
+      
+      tempSkills = [...userProfile.skills];
+      renderEditableSkills();
+
+      viewState.style.display = "none";
+      editState.style.display = "block";
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      viewState.style.display = "block";
+      editState.style.display = "none";
+      document.getElementById("tag-suggestions")?.classList.remove("active");
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", () => {
+      userProfile.name = editName.value.trim() || "Voluntario de Prueba";
+      userProfile.desc = editDesc.value.trim() || "Sin descripción.";
+      userProfile.location = editLocation.value.trim() || "No especificada";
+      userProfile.availability = editAvailability.value.trim() || "No especificada";
+      userProfile.email = editEmail.value.trim() || "voluntario@gmail.com";
+      userProfile.phone1 = editPhone1.value.trim() || "";
+      userProfile.phone2 = editPhone2.value.trim() || "";
+      userProfile.skills = [...tempSkills];
+
+      renderProfileData();
+
+      viewState.style.display = "block";
+      editState.style.display = "none";
+
+      if (typeof showToast !== "undefined") {
+        showToast("Perfil actualizado", "Los datos personales se guardaron correctamente.", true);
+      }
+    });
+  }
+
+  if (avatarInput) {
+    avatarInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const avatarView = document.getElementById("avatar-img-view");
+          const avatarPlaceholder = document.getElementById("avatar-icon-placeholder");
+          if (avatarView) {
+            avatarView.src = event.target.result;
+            avatarView.style.display = "block";
+          }
+          if (avatarPlaceholder) avatarPlaceholder.style.display = "none";
+          
+          userProfile.avatar = event.target.result;
+          if (typeof showToast !== "undefined") {
+            showToast("Imagen de perfil", "Foto de perfil actualizada con éxito.", true);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Buscador de oficios
+  const tagInput = document.getElementById("tag-search-input");
+  const tagSuggestions = document.getElementById("tag-suggestions");
+
+  if (tagInput) {
+    tagInput.addEventListener("focus", () => showSuggestions(tagInput.value));
+    tagInput.addEventListener("input", () => showSuggestions(tagInput.value));
+    
+    document.addEventListener("click", (e) => {
+      if (tagInput && tagSuggestions && !tagInput.contains(e.target) && !tagSuggestions.contains(e.target)) {
+        tagSuggestions.classList.remove("active");
+      }
+    });
+  }
+}
+
+function renderEditableSkills() {
+  const container = document.getElementById("edit-tags-list");
+  if (!container) return;
+
+  container.innerHTML = "";
+  tempSkills.forEach((skill, index) => {
+    const div = document.createElement("div");
+    div.className = "edit-tag-item";
+    div.innerHTML = `
+      <span>${skill}</span>
+      <button type="button" class="edit-tag-remove-btn" onclick="removeTempSkill(${index})">×</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+window.removeTempSkill = function(index) {
+  tempSkills.splice(index, 1);
+  renderEditableSkills();
+  const tagInput = document.getElementById("tag-search-input");
+  if (tagInput) showSuggestions(tagInput.value);
+};
+
+function showSuggestions(filterText) {
+  const listElement = document.getElementById("tag-suggestions");
+  if (!listElement) return;
+
+  const searchVal = filterText.toLowerCase().trim();
+  const filtered = availableSkills.filter(skill => {
+    const isAlreadySelected = tempSkills.includes(skill);
+    const matchesSearch = skill.toLowerCase().includes(searchVal);
+    return !isAlreadySelected && matchesSearch;
+  });
+
+  if (filtered.length > 0) {
+    listElement.innerHTML = "";
+    filtered.forEach(skill => {
+      const li = document.createElement("li");
+      li.className = "tag-suggestion-item";
+      li.textContent = skill;
+      li.addEventListener("click", () => {
+        tempSkills.push(skill);
+        renderEditableSkills();
+        const tagInput = document.getElementById("tag-search-input");
+        if (tagInput) {
+          tagInput.value = "";
+          tagInput.focus();
+        }
+        listElement.classList.remove("active");
+      });
+      listElement.appendChild(li);
+    });
+    listElement.classList.add("active");
+  } else {
+    listElement.classList.remove("active");
+  }
+}
+
+// =========================================================================
+// 3. CONTROLADOR DE PESTAÑAS (TABS EXCLUSIVO VOLUNTARIO)
+// =========================================================================
+function setupTabs() {
+  const tabBtns = document.querySelectorAll(".profile-tab-btn");
+  const panes = document.querySelectorAll(".profile-pane");
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("aria-controls");
+
+      tabBtns.forEach(b => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      panes.forEach(p => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      
+      const targetPane = document.getElementById(targetId);
+      if (targetPane) targetPane.classList.add("active");
+
+      // Recarga de grillas según pestaña activa
+      if (targetId === "pane-gestionar" && typeof renderCampaigns !== "undefined") {
+        currentPage = 1;
+        renderCampaigns();
+      }
+      if (targetId === "pane-postulaciones") {
+        currentPostulationsPage = 1;
+        renderPostulations();
+      }
+      if (targetId === "pane-invitaciones" && typeof renderReceivedInvitations !== "undefined") {
+        currentReceivedPage = 1;
+        currentSentPage = 1;
+        renderReceivedInvitations();
+        renderSentInvitations();
+      }
+      if (targetId === "pane-voluntariado") {
+        currentVolunteeringPage = 1;
+        renderVolunteering();
+      }
+
+      if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+      }
+    });
+  });
+}
+
+// =========================================================================
+// 4. SECCIÓN DE POSTULACIONES (EXCLUSIVO VOLUNTARIO)
+// =========================================================================
+function setupPostulationsGrid() {
+  const filterSelect = document.getElementById("filter-postulations-select");
+  const sortSelect = document.getElementById("sort-postulations-select");
+
+  if (filterSelect) {
+    filterSelect.addEventListener("change", () => {
+      currentPostulationsPage = 1;
+      renderPostulations();
+    });
+  }
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      currentPostulationsPage = 1;
+      renderPostulations();
+    });
+  }
+
+  const confirmCancelBtn = document.getElementById("confirm-cancel-postulation-btn");
+  if (confirmCancelBtn) {
+    confirmCancelBtn.addEventListener("click", () => {
+      if (currentCancelPostulationId) {
+        postulations = postulations.filter(p => p.id !== currentCancelPostulationId);
+        closeModal("modal-cancel-postulation-confirm");
+        currentCancelPostulationId = null;
+        currentPostulationsPage = 1;
+        renderPostulations();
+
+        if (typeof showToast !== "undefined") {
+          showToast("Postulación cancelada", "Tu postulación ha sido cancelada y retirada de la lista.", true);
+        }
+      }
+    });
+  }
+
+  renderPostulations();
+}
+
+function renderPostulations() {
+  const grid = document.getElementById("my-postulations-grid");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-postulations-select")?.value || "";
+  const sortVal = document.getElementById("sort-postulations-select")?.value || "";
+
+  let filtered = [...postulations];
+  if (filterVal) {
+    filtered = filtered.filter(p => p.status === filterVal);
+  }
+
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  if (currentPostulationsPage > totalPages && totalPages > 0) {
+    currentPostulationsPage = totalPages;
+  }
+
+  const startIndex = (currentPostulationsPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--color-text-secondary);">
+        No tenés postulaciones registradas en este momento.
+      </div>
+    `;
+    renderPostulationsPagination(0);
+    return;
+  }
+
+  paginated.forEach((post, index) => {
+    const isReverse = index % 2 !== 0;
+    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
+    const imgUrl = post.images && post.images.length > 0 ? post.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${post.title}" style="width:100%; height:100%; object-fit:cover;">` 
+      : `<i data-lucide="image"></i>`;
+
+    const statusLabels = {
+      pendiente: "Pendiente",
+      aceptado: "Aceptado",
+      rechazado: "Rechazado"
+    };
+
+    let statusPillClass = "pending-pill";
+    if (post.status === "aceptado") statusPillClass = "accepted-pill";
+    else if (post.status === "rechazado") statusPillClass = "rejected-pill";
+
+    const article = document.createElement("article");
+    article.className = cardClass;
+    article.addEventListener("click", () => openPostulationDetailsView(post.id));
+
+    article.innerHTML = `
+      <div class="alt-card-img-col">
+        <div class="alt-card-img-placeholder">
+          ${imgHTML}
+        </div>
+      </div>
+      <div class="alt-card-content-col" style="position: relative;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+
+          <h3 class="alt-card-title">${post.title}</h3>
+          
+          <!-- Imprime la causa directamente -->
+          <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
+            ${post.category || "Solidario"}
+          </span>
+        </div>
+        <p class="alt-card-desc">${post.desc}</p>
+        
+        <div class="camp-card-actions" style="margin-top: auto;">
+          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Ver detalles</button>
+          
+          <span class="modal-status-badge ${statusPillClass}" style="font-size: 11px; padding: 6px 12px;">
+            ${statusLabels[post.status] || "Pendiente"}
+          </span>
+
+          <button class="camp-action-btn delete" title="Cancelar postulación" onclick="event.stopPropagation(); window.openCancelPostulationConfirmModal(${post.id});" style="margin-left: 12px;">
+            <i data-lucide="x-circle" style="width:18px; height:18px;"></i>
+          </button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderPostulationsPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderPostulationsPagination(totalPages) {
+  const container = document.getElementById("postulations-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentPostulationsPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentPostulationsPage > 1) {
+      currentPostulationsPage--;
+      renderPostulations();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentPostulationsPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentPostulationsPage = i;
+      renderPostulations();
+      scrollToCampaigns();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentPostulationsPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentPostulationsPage < totalPages) {
+      currentPostulationsPage++;
+      renderPostulations();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+window.openCancelPostulationConfirmModal = function(id) {
+  currentCancelPostulationId = id;
+  openModal("modal-cancel-postulation-confirm");
+};
+
+function openPostulationDetailsView(postulationId) {
+  const post = postulations.find(p => p.id === postulationId);
+  if (!post) return;
+
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mLocation = document.getElementById("m-camp-location");
+  const mStartDate = document.getElementById("m-camp-start-date");
+  const mEndDate = document.getElementById("m-camp-end-date");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = post.title;
+  if (mDesc) mDesc.textContent = post.desc;
+  
+  if (mLocation) {
+    mLocation.innerHTML = `<i data-lucide="map-pin" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.location}</span>`;
+  }
+  if (mStartDate) {
+    mStartDate.innerHTML = `<i data-lucide="calendar" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.startDate}</span>`;
+  }
+  if (mEndDate) {
+    mEndDate.innerHTML = `<i data-lucide="calendar-check" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.endDate}</span>`;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${post.category || "Solidario"}`;
+    mTags.appendChild(span);
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
+  }
+
+  if (mBadge) {
+    const statusLabels = {
+      pendiente: "PENDIENTE",
+      aceptado: "ACEPTADO",
+      rechazado: "RECHAZADO"
+    };
+    mBadge.textContent = statusLabels[post.status] || "PENDIENTE";
+    mBadge.className = `modal-status-badge ${post.status === "aceptado" ? "accepted-pill" : (post.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+    mBadge.style.display = "inline-block";
+  }
+
+  if (mSensitive) {
+    if (post.status === "aceptado") {
+      mSensitive.innerHTML = `
+        <h4>Información de coordinación</h4>
+        <div class="info-alert-content">
+          <p>${post.additionalInfo || "No hay información adicional registrada."}</p>
+        </div>
+      `;
+      mSensitive.style.display = "block";
+    } else {
+      mSensitive.style.display = "none";
+    }
+  }
+
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+  
+  if (mPostulateBtn) mPostulateBtn.style.display = "none";
+  
+  const gallerySec = document.getElementById("m-camp-gallery-sec");
+  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+  if (gallerySec && galleryGrid) {
+    galleryGrid.innerHTML = "";
+    if (post.images && post.images.length > 0) {
+      post.images.forEach(imgUrl => {
+        const div = document.createElement("div");
+        div.className = "gallery-img-wrapper";
+        div.style.borderRadius = "var(--radius-md)";
+        div.style.overflow = "hidden";
+        div.style.aspectRatio = "1 / 1";
+        div.style.backgroundColor = "var(--color-surface-hover)";
+        div.style.border = "1px solid var(--color-border)";
+        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+        galleryGrid.appendChild(div);
+      });
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+    }
+  }
+
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  if (assocSec) assocSec.style.display = "none";
+
+  openModal("modal-profile-camp-detail");
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+// =========================================================================
+// 5. SECCIÓN DE HISTORIAL DE VOLUNTARIADO (EXCLUSIVO VOLUNTARIO)
+// =========================================================================
+function setupVolunteeringGrid() {
+  const filterSelect = document.getElementById("filter-volunteering-select");
+  const sortSelect = document.getElementById("sort-volunteering-select");
+
+  if (filterSelect) {
+    filterSelect.addEventListener("change", () => {
+      currentVolunteeringPage = 1;
+      renderVolunteering();
+    });
+  }
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      currentVolunteeringPage = 1;
+      renderVolunteering();
+    });
+  }
+}
+
+function renderVolunteering() {
+  const grid = document.getElementById("my-volunteering-grid");
+  if (!grid) return;
+
+  const filterVal = document.getElementById("filter-volunteering-select")?.value || "";
+  const sortVal = document.getElementById("sort-volunteering-select")?.value || "";
+
+  let filtered = [...volunteering];
+  if (filterVal) {
+    filtered = filtered.filter(v => v.status === filterVal);
+  }
+
+  if (sortVal === "reciente") {
+    filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  } else if (sortVal === "antiguas") {
+    filtered.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  }
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  if (currentVolunteeringPage > totalPages && totalPages > 0) {
+    currentVolunteeringPage = totalPages;
+  }
+
+  const startIndex = (currentVolunteeringPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginated = filtered.slice(startIndex, endIndex);
+
+  grid.innerHTML = "";
+  if (paginated.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--color-text-secondary);">
+        No participás en ningún voluntariado actualmente.
+      </div>
+    `;
+    renderVolunteeringPagination(0);
+    return;
+  }
+
+  paginated.forEach((item, index) => {
+    const isReverse = index % 2 !== 0;
+    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
+    const imgUrl = item.images && item.images.length > 0 ? item.images[0] : "";
+    const imgHTML = imgUrl 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;">` 
+      : `<i data-lucide="image"></i>`;
+
+    const article = document.createElement("article");
+    article.className = cardClass;
+    article.addEventListener("click", () => openVolunteeringDetailsView(item.id));
+
+    article.innerHTML = `
+      <div class="alt-card-img-col">
+        <div class="alt-card-img-placeholder">
+          ${imgHTML}
+        </div>
+      </div>
+      <div class="alt-card-content-col" style="position: relative;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <h3 class="alt-card-title">${item.title}</h3>
+          
+          <!-- Imprime la causa directamente -->
+          <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
+            ${item.category || "Solidario"}
+          </span>
+        </div>
+        <p class="alt-card-desc">${item.desc}</p>
+        
+        <div class="camp-card-actions" style="margin-top: auto;">
+          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Ver detalles</button>
+          
+          <span class="modal-status-badge accepted-pill" style="font-size:11px; padding: 6px 12px; text-transform:uppercase;">
+            ${item.status}
+          </span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(article);
+  });
+
+  renderVolunteeringPagination(totalPages);
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function renderVolunteeringPagination(totalPages) {
+  const container = document.getElementById("volunteering-pagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pag-btn";
+  prevBtn.innerHTML = "&lt; Previous";
+  prevBtn.disabled = currentVolunteeringPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentVolunteeringPage > 1) {
+      currentVolunteeringPage--;
+      renderVolunteering();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(prevBtn);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const numBtn = document.createElement("button");
+    numBtn.className = i === currentVolunteeringPage ? "pag-num active" : "pag-num";
+    numBtn.textContent = i;
+    numBtn.addEventListener("click", () => {
+      currentVolunteeringPage = i;
+      renderVolunteering();
+      scrollToCampaigns();
+    });
+    container.appendChild(numBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pag-btn";
+  nextBtn.innerHTML = "Next &gt;";
+  nextBtn.disabled = currentVolunteeringPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentVolunteeringPage < totalPages) {
+      currentVolunteeringPage++;
+      renderVolunteering();
+      scrollToCampaigns();
+    }
+  });
+  container.appendChild(nextBtn);
+}
+
+function openVolunteeringDetailsView(volunteeringId) {
+  const item = volunteering.find(v => v.id === volunteeringId);
+  if (!item) return;
+  
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mLocation = document.getElementById("m-camp-location");
+  const mStartDate = document.getElementById("m-camp-start-date");
+  const mEndDate = document.getElementById("m-camp-end-date");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  if (mTitle) mTitle.textContent = item.title;
+  if (mDesc) mDesc.textContent = item.desc;
+  
+  if (mLocation) {
+    mLocation.innerHTML = `<i data-lucide="map-pin" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.location}</span>`;
+  }
+  if (mStartDate) {
+    mStartDate.innerHTML = `<i data-lucide="calendar" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.startDate}</span>`;
+  }
+  if (mEndDate) {
+    mEndDate.innerHTML = `<i data-lucide="calendar-check" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.endDate}</span>`;
+  }
+
+  if (mTags) {
+    mTags.innerHTML = "";
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${item.category || "Solidario"}`;
+    mTags.appendChild(span);
+
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
+  }
+
+  if (mBadge) {
+    mBadge.textContent = "ACTIVA";
+    mBadge.className = "modal-status-badge accepted-pill";
+    mBadge.style.display = "inline-block";
+  }
+
+  if (mSensitive) {
+    mSensitive.innerHTML = `
+      <h4>Información de coordinación</h4>
+      <div class="info-alert-content">
+        <p>${item.additionalInfo || "No hay información adicional registrada."}</p>
+      </div>
+    `;
+    mSensitive.style.display = "block";
+  }
+
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mPostulateBtn) mPostulateBtn.style.display = "none";
+
+  const gallerySec = document.getElementById("m-camp-gallery-sec");
+  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+  if (gallerySec && galleryGrid) {
+    galleryGrid.innerHTML = "";
+    if (item.images && item.images.length > 0) {
+      item.images.forEach(imgUrl => {
+        const div = document.createElement("div");
+        div.className = "gallery-img-wrapper";
+        div.style.borderRadius = "var(--radius-md)";
+        div.style.overflow = "hidden";
+        div.style.aspectRatio = "1 / 1";
+        div.style.backgroundColor = "var(--color-surface-hover)";
+        div.style.border = "1px solid var(--color-border)";
+        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+        galleryGrid.appendChild(div);
+      });
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+    }
+  }
+
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  if (assocSec) assocSec.style.display = "none";
+
+  openModal("modal-profile-camp-detail");
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+// =========================================================================
+// SIMULADOR DE ESTADOS EN EL MODAL DE DETALLE (EXCLUSIVO VOLUNTARIO)
+// =========================================================================
+function updateModalStateBasedOnRadio() {
+  const selectedState = document.querySelector('input[name="dev-state-choice"]:checked')?.value || 'no-login';
+  const badge = document.getElementById('m-camp-accepted-badge');
+  const infoBox = document.getElementById('m-camp-sensitive-info');
+  const postulateBtn = document.getElementById('m-camp-postulate-btn');
+  
+  if (!postulateBtn) return;
+
+  if (badge) {
+    badge.style.display = 'none';
+    badge.className = 'modal-status-badge';
+  }
+  if (infoBox) infoBox.style.display = 'none';
+  postulateBtn.disabled = false;
+  postulateBtn.className = 'btn btn-primary';
+  postulateBtn.textContent = 'Postularme';
+
+  if (selectedState === 'no-login') {
+    // Estado estándar
+  } else if (selectedState === 'registrado-pendiente') {
+    if (badge) {
+      badge.textContent = 'PENDIENTE';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'var(--color-primary-light)';
+      badge.style.color = 'var(--color-primary-dark)';
+      badge.style.border = '1px solid var(--color-primary)';
+      badge.style.display = 'inline-block';
+    }
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Pendiente ✓';
+  } else if (selectedState === 'registrado-aceptado') {
+    if (badge) {
+      badge.textContent = 'ACEPTADO';
+      badge.className = 'modal-status-badge accepted-pill';
+      badge.style.display = 'inline-block';
+      badge.style.backgroundColor = '';
+      badge.style.color = '';
+      badge.style.border = '';
+    }
+    if (infoBox) infoBox.style.display = 'block';
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Aceptada ✓';
+  } else if (selectedState === 'registrado-rechazado') {
+    if (badge) {
+      badge.textContent = 'RECHAZADO';
+      badge.className = 'modal-status-badge';
+      badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+      badge.style.color = '#EF4444';
+      badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      badge.style.display = 'inline-block';
+    }
+    postulateBtn.disabled = true;
+    postulateBtn.className = 'btn btn-ghost';
+    postulateBtn.textContent = 'Postulación Rechazada';
+  }
+}
+
+function setupMockUploads() {
+  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      updateModalStateBasedOnRadio();
+    });
+  });
+}

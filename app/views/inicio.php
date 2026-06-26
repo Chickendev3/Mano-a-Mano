@@ -15,10 +15,10 @@
       <h1 class="hero-title">Conectamos personas con causas que generan impacto</h1>
       <p class="hero-subtitle">Encontrá oportunidades de voluntariado o publicá campañas para sumar personas comprometidas con tu misión.</p>
       <div class="hero-buttons">
-        <a href="<?= BASE_URL ?>registro_voluntario" class="btn btn-primary btn-lg" id="hero-volunteer-btn">
+        <a href="<?= BASE_URL ?>registro/voluntario" class="btn btn-primary btn-lg" id="hero-volunteer-btn">
           Quiero ser voluntario <i data-lucide="arrow-right"></i>
         </a>
-        <a href="<?= BASE_URL ?>registro_organizacion" class="btn btn-outline btn-lg" id="hero-org-btn">
+        <a href="<?= BASE_URL ?>registro/organizacion" class="btn btn-outline btn-lg" id="hero-org-btn">
           Soy una organización
         </a>
       </div>

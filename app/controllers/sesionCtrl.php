@@ -2,7 +2,9 @@
 class sesionCtrl extends Controlador {
     
 	public function index() : void {
-		$datos = ['msj' => null];
+		$datos = ['msj' => null,
+				  'cssPropio' => 'sesion.css',
+				  'jsPropio' => 'sesion.js'];
 
 		/* Hacer más verificaciones de seguridad --------------------------------------------------------------------------- PENDIENTE !!!! */
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -14,7 +16,11 @@ class sesionCtrl extends Controlador {
 
 			if ($msj == null){
 				/* header("location: " . BASE_URL ); */
-				$this->cargarVista('perfil_pendiente', $datos, 'Mano a Mano - Perfil');
+				include_once '../app/controllers/perfilCtrl.php';
+				
+				$perfil = new perfilCtrl();
+				$perfil->index();
+
 				return;
 			}
 		}

@@ -1,0 +1,292 @@
+<?php 
+/* Vista de Perfil de Voluntario (Logueado - Dashboard Privado)
+  Esta vista incluye los paneles y modales comunes mediante llamados a funciones PHP. */
+
+/** @var array $causas */
+/** @var array $campaniasUsuario */
+
+/* Carga de componentes comunes (Campañas e Invitaciones) */
+include_once '../app/views/componentes/perfil_comun_logueado.php';
+?>
+<main class="profile-view-container">
+  
+  <!-- CABECERA DEL PERFIL DE VOLUNTARIO -->
+  <section class="profile-header-sec">
+    <div class="container profile-header-grid">
+      <!-- Izquierda: Foto de Perfil (Editable) -->
+      <div class="profile-avatar-wrapper">
+        <div class="profile-avatar-circle editable" id="profile-avatar-clickable" onclick="document.getElementById('edit-avatar-input').click()">
+          <img id="avatar-img-view" src="" alt="Avatar voluntario" style="display: none;">
+          <i data-lucide="image" class="avatar-placeholder-icon" id="avatar-icon-placeholder"></i>
+          <div class="avatar-edit-overlay">
+            <i data-lucide="camera"></i>
+            <span>Cambiar foto</span>
+          </div>
+        </div>
+        <input type="file" id="edit-avatar-input" accept="image/*" style="display: none;">
+      </div>
+      
+      <!-- Derecha: Datos, Descripción y Estadísticas (Editable) -->
+      <div class="profile-info-content">
+        
+        <!-- ESTADO LECTURA (Visible por defecto) -->
+        <div id="profile-view-state">
+          <h1 class="profile-name"> <?php echo htmlspecialchars($usuario['nombre completo'] ?? ''); ?> </h1>
+          
+          <p class="profile-desc-text">
+            <?php echo htmlspecialchars($usuario['descripcion'] ?? 'Sin descripción.'); ?>
+          </p>
+
+          <div class="profile-meta-row">
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
+            </div>
+            <?php if (!empty($usuario['disponibilidad_horaria'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="clock"></i>
+              <span><?php echo htmlspecialchars($usuario['disponibilidad_horaria']); ?></span>
+            </div>
+            <?php endif; ?>
+          </div>
+
+          <!-- Información Privada (Solo visible para el propio voluntario) -->
+          <div class="private-info-section" style="margin-top: 16px; padding: 16px; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.12); border-radius: var(--radius-md);">
+            <h4 style="font-size: 13px; font-weight: 700; color: var(--color-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Información Privada (Brindada al aceptar postulaciones)
+            </h4>
+            <div class="profile-meta-row" style="margin-top: 0; gap: 12px 24px;">
+              <div class="profile-meta-item">
+                <i data-lucide="mail"></i>
+                <span> <?php echo htmlspecialchars($usuario['email'] ?? ''); ?> </span>
+              </div>
+              <div class="profile-meta-item">
+                <i data-lucide="phone"></i>
+                <span>Tel. Principal: <strong> <?php echo htmlspecialchars($usuario['telefono'] ?? ''); ?> </strong></span>
+              </div>
+              <div class="profile-meta-item">
+                <i data-lucide="phone-call"></i>
+                <span>Tel. Secundario: 
+                  <strong>
+                  <?php if (!empty($usuario['telefono_emergencia'])):
+                    echo htmlspecialchars($usuario['telefono_emergencia']);
+                  else:
+                    echo 'No asignado';
+                  endif; ?>
+                  </strong>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insignias y Estadísticas del Voluntario (Estático) -->
+          <div class="profile-badges-container" style="margin-top: 20px;">
+            <div class="badge-row-item">
+              <i data-lucide="award" class="badge-icon-gold"></i>
+              <span>Insignia de Voluntariado Fijo en organización: Techo Verde</span>
+            </div>
+            <div class="badge-row-item">
+              <i data-lucide="award" class="badge-icon-gold"></i>
+              <span>Insignia de Voluntariado Fijo en organización: Mentes Brillantes</span>
+            </div>
+            <div class="badge-row-item">
+              <i data-lucide="check-square" class="badge-icon-blue"></i>
+              <span>Asistencia a voluntariado: +7</span>
+            </div>
+            <div class="badge-row-item skills-list-row">
+              <i data-lucide="bookmark" class="badge-icon-tag"></i>
+              <div class="skills-badges" id="view-skills-badges">
+                <!-- Se completa dinámicamente con JS -->
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-ghost" id="edit-profile-btn" style="margin-top: 16px;">
+            <i data-lucide="edit-3"></i> Editar perfil
+          </button>
+        </div>
+
+        <!-- FORMULARIO DE EDICIÓN DEL PERFIL (Oculto por defecto) -->
+        <div class="profile-info-edit-form" id="profile-edit-state" style="display: none;">
+          <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary);">Información Pública</h3>
+          
+          <div class="form-group-row" style="margin-bottom: 12px;">
+            <div class="edit-row">
+              <label for="edit-name">Nombre y Apellido</label>
+              <input type="text" id="edit-name" class="edit-input">
+            </div>
+            <div class="edit-row">
+              <label for="edit-location">Ubicación</label>
+              <input type="text" id="edit-location" class="edit-input">
+            </div>
+          </div>
+
+          <div class="edit-row" style="margin-bottom: 12px;">
+            <label for="edit-desc">Descripción</label>
+            <textarea id="edit-desc" class="edit-input" rows="3"></textarea>
+          </div>
+
+          <div class="edit-row" style="margin-bottom: 12px;">
+            <label for="edit-availability">Horario de Disponibilidad</label>
+            <input type="text" id="edit-availability" class="edit-input" placeholder="Ej: Lunes a Viernes de 9:00 a 13:00 o Sábados todo el día">
+          </div>
+
+          <div class="edit-row" style="margin-bottom: 16px;">
+            <label>Etiquetas de oficio</label>
+            <div class="edit-tags-container" id="edit-tags-list">
+              <!-- Se completa dinámicamente con JS -->
+            </div>
+            <div class="tag-search-wrapper">
+              <input type="text" id="tag-search-input" class="edit-input" placeholder="Buscar oficios (ej: Cocinero, Profesor, Electricista...)">
+              <ul class="tag-suggestions-list" id="tag-suggestions">
+                <!-- Se completa dinámicamente con JS -->
+              </ul>
+            </div>
+          </div>
+
+          <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary); margin-top: 20px;">Información Privada</h3>
+
+          <div class="edit-row" style="margin-bottom: 12px;">
+            <label for="edit-email">Email</label>
+            <input type="email" id="edit-email" class="edit-input">
+          </div>
+
+          <div class="form-group-row" style="margin-bottom: 16px;">
+            <div class="edit-row">
+              <label for="edit-phone1">Teléfono Principal</label>
+              <input type="text" id="edit-phone1" class="edit-input">
+            </div>
+            <div class="edit-row">
+              <label for="edit-phone2">Teléfono Secundario</label>
+              <input type="text" id="edit-phone2" class="edit-input">
+            </div>
+          </div>
+
+          <div class="camp-card-actions" style="margin-top: 16px;">
+            <button class="btn btn-primary" id="save-profile-btn">Guardar</button>
+            <button class="btn btn-ghost" id="cancel-profile-btn">Cancelar</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑAS DE NAVEGACIÓN INTERNA -->
+  <section class="profile-tabs-sec">
+    <div class="container">
+      <div class="tabs-nav-bar">
+        <button class="profile-tab-btn active" id="tab-btn-gestionar" aria-controls="pane-gestionar" aria-selected="true">
+          Gestionar campañas
+        </button>
+        <button class="profile-tab-btn" id="tab-btn-postulaciones" aria-controls="pane-postulaciones" aria-selected="false">
+          Postulaciones
+        </button>
+        <button class="profile-tab-btn" id="tab-btn-invitaciones" aria-controls="pane-invitaciones" aria-selected="false">
+          Invitaciones
+        </button>
+        <button class="profile-tab-btn" id="tab-btn-voluntariado" aria-controls="pane-voluntariado" aria-selected="false">
+          Voluntariado
+        </button>
+      </div>
+
+      <!-- CONTENEDOR DE PANELES DINÁMICOS -->
+      <div class="dynamic-panes-wrapper">
+        
+        <!-- PANE A: GESTIONAR CAMPAÑAS (ABM COMÚN) -->
+        <?php renderPanelGestionarCampanias(); ?>
+
+        <!-- PANE B: POSTULACIONES (EXCLUSIVO VOLUNTARIO) -->
+        <div class="profile-pane" id="pane-postulaciones" role="tabpanel">
+          <div class="pane-header-actions">
+            <h2>Postulaciones</h2>
+          </div>
+
+          <!-- Filtros de Postulaciones -->
+          <div class="tabs-filters-bar">
+            <div class="filter-group">
+              <select class="filter-select" id="filter-postulations-select" aria-label="Filtrar por">
+                <option value="">Filtrar por (Todas)</option>
+                <option value="aceptado">Aceptadas</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="rechazado">Rechazadas</option>
+              </select>
+              <select class="filter-select" id="sort-postulations-select" aria-label="Ordenar por">
+                <option value="">Ordenar por (Por defecto)</option>
+                <option value="reciente">Más recientes</option>
+                <option value="antiguas">Más antiguas</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="alternating-grid" id="my-postulations-grid">
+            <!-- Se completa dinámicamente con JS -->
+          </div>
+
+          <div class="pagination-container" id="postulations-pagination">
+            <!-- Se completa dinámicamente con JS -->
+          </div>
+        </div>
+
+        <!-- PANE C: INVITACIONES (COMÚN) -->
+        <?php renderPanelInvitaciones($causas); ?>
+
+        <!-- PANE D: VOLUNTARIADO (EXCLUSIVO VOLUNTARIO) -->
+        <div class="profile-pane" id="pane-voluntariado" role="tabpanel">
+          <div class="pane-header-actions">
+            <h2>Voluntariados</h2>
+          </div>
+
+          <!-- Filtros de Voluntariado -->
+          <div class="tabs-filters-bar">
+            <div class="filter-group">
+              <select class="filter-select" id="filter-volunteering-select" aria-label="Filtrar por">
+                <option value="">Filtrar por (Todas)</option>
+                <option value="activa">Activas</option>
+                <option value="finalizada">Finalizadas</option>
+              </select>
+              <select class="filter-select" id="sort-volunteering-select" aria-label="Ordenar por">
+                <option value="">Ordenar por (Por defecto)</option>
+                <option value="reciente">Más recientes</option>
+                <option value="antiguas">Más antiguas</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="invites-list-container alternating-grid" id="my-volunteering-grid">
+            <!-- Se completa dinámicamente con JS -->
+          </div>
+
+          <div class="pagination-container" id="volunteering-pagination">
+            <!-- Se completa dinámicamente con JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- =========================================================================
+     INYECCIÓN DE VISTAS DE MODALES
+     ========================================================================= -->
+
+<!-- 1. DETALLE DE CAMPAÑA GENERAL (SHARED) -->
+<?php renderModalDetalleCampania(); ?>
+
+<!-- 2. INYECCIÓN DE MODALES COMUNES (CREACIÓN, MODIFICACIÓN, ELIMINACIÓN Y CANCELAR INVITACIÓN) -->
+<?php renderModalesComunesPerfil($causas, $campaniasUsuario); ?>
+
+<!-- 3. CONFIRMACIÓN CANCELACIÓN DE POSTULACIÓN (EXCLUSIVO VOLUNTARIO) -->
+<div class="modal-overlay" id="modal-cancel-postulation-confirm" role="dialog" aria-modal="true" aria-labelledby="cancel-postulation-title">
+  <div class="modal-box modal-box-small" style="max-width: 400px; padding: 24px; text-align: center;">
+    <h3 class="modal-title" id="cancel-postulation-title" style="color: #EF4444; font-size: 18px; margin-bottom: 12px;">¿Cancelar postulación?</h3>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; line-height: 1.5;">Esta acción retirará tu postulación de la campaña y ya no aparecerá en tu lista.</p>
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-cancel-postulation-confirm')">Volver</button>
+      <button class="btn btn-primary" id="confirm-cancel-postulation-btn" style="background-color: #EF4444; border-color: #EF4444; color: #ffffff;">Cancelar postulación</button>
+    </div>
+  </div>
+</div>
