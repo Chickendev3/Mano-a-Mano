@@ -52,11 +52,11 @@ function renderPanelGestionarCampanias() {
 // =========================================================================
 // 2. PANEL DE INVITACIONES
 // =========================================================================
-function renderPanelInvitaciones() {
+function renderPanelInvitaciones($causas = []) {
 ?>
 <div class="profile-pane" id="pane-invitaciones" role="tabpanel">
   
-  <!-- SECCIÓN A: INVITACIONES RECIBIDAS (De Organizaciones a Voluntarios) -->
+  <!-- SECCIÓN A: INVITACIONES RECIBIDAS -->
   <div class="invites-section" style="margin-bottom: 40px;">
     <div class="pane-header-actions">
       <h2>Invitaciones Recibidas</h2>
@@ -64,13 +64,16 @@ function renderPanelInvitaciones() {
     
     <div class="tabs-filters-bar">
       <div class="filter-group">
+        <!-- Filtro Dinámico de Causas desde MariaDB -->
         <select class="filter-select" id="filter-received-select" aria-label="Filtrar por">
-          <option value="">Filtrar por (Todas)</option>
-          <option value="medio-ambiente">Medio Ambiente</option>
-          <option value="educacion">Educación</option>
-          <option value="accion-social">Acción Social</option>
-          <option value="cultura">Cultura</option>
+          <option value="">Filtrar por (Todas las causas)</option>
+          <?php foreach ($causas as $causa): ?>
+            <option value="<?php echo htmlspecialchars($causa); ?>">
+              <?php echo htmlspecialchars($causa); ?>
+            </option>
+          <?php endforeach; ?>
         </select>
+        
         <select class="filter-select" id="sort-received-select" aria-label="Ordenar por">
           <option value="">Ordenar por (Por defecto)</option>
           <option value="reciente">Más recientes</option>
@@ -78,22 +81,18 @@ function renderPanelInvitaciones() {
         </select>
       </div>
     </div>
-
     <div class="invites-list-container alternating-grid" id="received-invitations-list">
       <!-- Se completa dinámicamente con JS -->
     </div>
-
     <div class="pagination-container" id="received-invitations-pagination">
       <!-- Se completa dinámicamente con JS -->
     </div>
   </div>
-
-  <!-- SECCIÓN B: TUS INVITACIONES (Enviadas por el Usuario) -->
+  <!-- SECCIÓN B: TUS INVITACIONES -->
   <div class="invites-section">
     <div class="pane-header-actions">
       <h2>Tus invitaciones</h2>
     </div>
-
     <div class="tabs-filters-bar">
       <div class="filter-group">
         <select class="filter-select" id="filter-sent-select" aria-label="Filtrar por">
@@ -109,16 +108,13 @@ function renderPanelInvitaciones() {
         </select>
       </div>
     </div>
-
     <div class="invites-list-container alternating-grid" id="sent-invitations-list">
       <!-- Se completa dinámicamente con JS -->
     </div>
-
     <div class="pagination-container" id="sent-invitations-pagination">
       <!-- Se completa dinámicamente con JS -->
     </div>
   </div>
-
 </div>
 <?php
 }
@@ -369,4 +365,78 @@ function renderModalesComunesPerfil( $causas = [], $campaniasUsuario = [] ) {
 </div>
 <?php
 }
+
+// =========================================================================
+// 4. MODAL DE DETALLE GENERAL DE CAMPAÑA (SHARED)
+// =========================================================================
+function renderModalDetalleCampania() {
 ?>
+<div class="modal-overlay" id="modal-profile-camp-detail" role="dialog" aria-modal="true" aria-labelledby="m-camp-title">
+  <div class="modal-box modal-box-large">
+    <!-- Botón de Cierre -->
+    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeProfileModal('modal-profile-camp-detail')">
+      <i data-lucide="x"></i>
+    </button>
+    
+    <!-- Cabecera: Título y Badge de Estado -->
+    <div class="modal-header-with-badge">
+      <h3 class="modal-title" id="m-camp-title">Nombre campaña</h3>
+      <span class="modal-status-badge accepted-pill" id="m-camp-accepted-badge" style="display: none;">ACEPTADO</span>
+    </div>
+    
+    <!-- Contenido Principal -->
+    <div class="modal-main-content">
+      <!-- Párrafo original único para la descripción y los datos estructurados por JS -->
+      <div class="modal-desc-para" id="m-camp-desc">
+        Descripción de la campaña y sus objetivos solidarios.
+      </div>
+      
+      <div class="modal-tags-row" id="m-camp-tags">
+        <!-- Inyectado por JS -->
+      </div>
+      
+      <!-- Selector de simulación de estado (Solo para desarrollo/pruebas) -->
+      <div class="dev-state-selector-card">
+        <span class="dev-label">Simular Estado (Voluntario Logueado):</span>
+        <div class="dev-options">
+          <label><input type="radio" name="dev-state-choice" value="no-login" checked> No registrado</label>
+          <label><input type="radio" name="dev-state-choice" value="registrado-pendiente"> Registrado (Pendiente)</label>
+          <label><input type="radio" name="dev-state-choice" value="registrado-aceptado"> Registrado (Aceptado)</label>
+          <label><input type="radio" name="dev-state-choice" value="registrado-rechazado"> Registrado (Rechazado)</label>
+        </div>
+      </div>
+
+      <!-- Información de Coordinación (Desbloqueada cuando el voluntario es ACEPTADO) -->
+      <div class="unlocked-info-box" id="m-camp-sensitive-info" style="display: none;">
+        <!-- Se completa dinámicamente con JS -->
+      </div>
+
+      <!-- Galería de Fotos -->
+      <div class="modal-gallery-sec" id="m-camp-gallery-sec" style="display: none;">
+        <h4>Galería de fotos</h4>
+        <div class="modal-gallery-grid" id="m-camp-gallery-grid">
+          <!-- Imágenes inyectadas por JS -->
+        </div>
+      </div>
+
+      <!-- Organizaciones Asociadas -->
+      <div class="modal-associations-sec" id="m-camp-associations-sec" style="display: none;">
+        <h4>Organizaciones en asociación</h4>
+        <div class="modal-associations-circles" id="m-camp-associations-list">
+          <!-- Organizaciones inyectadas por JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones del Footer del Modal -->
+    <div class="modal-footer-actions">
+      <button class="btn btn-ghost" onclick="closeProfileModal('modal-profile-camp-detail')">Cerrar</button>
+      <button class="btn btn-primary" id="m-camp-postulate-btn">Postularme</button>
+    </div>
+  </div>
+</div>
+<?php
+}
+?>
+
+

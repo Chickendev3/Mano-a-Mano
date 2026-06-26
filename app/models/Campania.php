@@ -144,7 +144,7 @@ class Campania {
                 'id' => $idCamp,
                 'title' => $camp['titulo'],
                 'desc' => $camp['descripcion'], 
-                'category' => !empty($causes) ? $causes[0] : '', // Categoría principal
+                'category' => !empty($causes) ? $causes[0] : '',
                 'causes' => $causes, // Listado completo de causas
                 'type' => strtolower($camp['nombre_tipo']) === 'convocatoria' ? 'convocatoria' : 'informativa',
                 'startDate' => $camp['fecha_inicio'],

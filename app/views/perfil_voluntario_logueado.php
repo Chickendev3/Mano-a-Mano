@@ -229,7 +229,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
         </div>
 
         <!-- PANE C: INVITACIONES (COMÚN) -->
-        <?php renderPanelInvitaciones(); ?>
+        <?php renderPanelInvitaciones($causas); ?>
 
         <!-- PANE D: VOLUNTARIADO (EXCLUSIVO VOLUNTARIO) -->
         <div class="profile-pane" id="pane-voluntariado" role="tabpanel">
@@ -274,7 +274,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
      ========================================================================= -->
 
 <!-- 1. DETALLE DE CAMPAÑA GENERAL (SHARED) -->
-<?php include '../app/views/componentes/modal_campana.php'; ?>
+<?php renderModalDetalleCampania(); ?>
 
 <!-- 2. INYECCIÓN DE MODALES COMUNES (CREACIÓN, MODIFICACIÓN, ELIMINACIÓN Y CANCELAR INVITACIÓN) -->
 <?php renderModalesComunesPerfil($causas, $campaniasUsuario); ?>

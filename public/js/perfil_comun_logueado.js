@@ -51,16 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // =========================================================================
 // MÉTODOS DE AYUDA Y TRADUCCIÓN
 // =========================================================================
-function getCategoryLabel(cat) {
-  switch (cat) {
-    case "medio-ambiente": return "Medio Ambiente";
-    case "educacion": return "Educación";
-    case "accion-social": return "Acción Social";
-    case "salud": return "Salud";
-    case "cultura": return "Cultura";
-    default: return "Solidario";
-  }
-}
 
 function scrollToCampaigns() {
   const section = document.querySelector(".profile-tabs-sec");
@@ -96,10 +86,10 @@ function setupCampaignsGrid() {
   renderCampaigns();
 }
 
+// 1. RENDERIZADO DE LAS TARJETAS DE CAMPAÑAS EN LA GRILLA
 function renderCampaigns() {
   const grid = document.getElementById("my-campaigns-grid");
   if (!grid) return;
-
   const filterVal = document.getElementById("filter-campaigns-select")?.value || "";
   const sortVal = document.getElementById("sort-campaigns-select")?.value || "";
 
@@ -123,11 +113,10 @@ function renderCampaigns() {
   if (currentPage > totalPages && totalPages > 0) {
     currentPage = totalPages;
   }
-
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginated = filtered.slice(startIndex, endIndex);
-
+  
   // 4. Renderizar HTML
   grid.innerHTML = "";
   if (paginated.length === 0) {
@@ -139,7 +128,7 @@ function renderCampaigns() {
     renderPagination(0);
     return;
   }
-
+  
   paginated.forEach((camp, index) => {
     const isReverse = index % 2 !== 0;
     const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
@@ -147,11 +136,16 @@ function renderCampaigns() {
     const imgHTML = imgUrl 
       ? `<img src="${BASE_URL + imgUrl}" alt="${camp.title}" style="width:100%; height:100%; object-fit:cover;">` 
       : `<i data-lucide="image"></i>`;
+    // Renderizamos las causas reales como badges pequeños en la tarjeta
+    const causesHTML = (camp.causes || []).map(cause => `
+      <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
+        ${cause}
+      </span>
+    `).join(" ");
 
     const article = document.createElement("article");
     article.className = cardClass;
     article.addEventListener("click", () => openCampaignDetailsView(camp.id));
-
     article.innerHTML = `
       <div class="alt-card-img-col">
         <div class="alt-card-img-placeholder">
@@ -159,11 +153,11 @@ function renderCampaigns() {
         </div>
       </div>
       <div class="alt-card-content-col" style="position: relative;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
           <h3 class="alt-card-title">${camp.title}</h3>
-          <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
-            ${getCategoryLabel(camp.category)}
-          </span>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+            ${causesHTML || `<span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">Solidario</span>`}
+          </div>
         </div>
         <p class="alt-card-desc">${camp.desc}</p>
         
@@ -184,7 +178,6 @@ function renderCampaigns() {
   });
 
   renderPagination(totalPages);
-
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
@@ -252,24 +245,60 @@ function openCampaignDetailsView(campaignId) {
 
   if (mTitle) mTitle.textContent = camp.title;
   
+  // Respetamos la distribución original en forma de lista de párrafos dentro de mDesc,
+  // dividiendo el período en dos campos lógicos.
   if (mDesc) {
     mDesc.innerHTML = `
       <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.desc}</p>
       <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.location}</p>
-      <p><strong>Período:</strong> ${camp.startDate} al ${camp.endDate}</p>
+      <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.startDate}</p>
+      <p><strong>Fecha de finalización:</strong> ${camp.endDate}</p>
     `;
   }
 
+  // Renderizado de causas directamente como etiquetas
   if (mTags) {
     mTags.innerHTML = "";
-    const tags = [getCategoryLabel(camp.category), camp.type === "convocatoria" ? "Convocatoria" : "Informativa"];
-    tags.forEach(tag => {
+    const causesList = camp.causes || (camp.category ? [camp.category] : []);
+    causesList.forEach(cause => {
       const span = document.createElement("span");
       span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${cause}`;
       mTags.appendChild(span);
     });
+
+    // Tipo de campaña
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    const typeLabel = camp.type === "convocatoria" ? "Convocatoria" : "Informativa";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
+    mTags.appendChild(typeSpan);
   }
+
+  // Carga de Galería (respetando la clase original gallery-placeholder-img para mantener los estilos intactos)
+  const gallerySec = document.getElementById("m-camp-gallery-sec");
+  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+  if (gallerySec && galleryGrid) {
+    galleryGrid.innerHTML = "";
+    if (camp.images && camp.images.length > 0) {
+      camp.images.forEach(imgUrl => {
+        const div = document.createElement("div");
+        div.className = "gallery-placeholder-img"; // Mantiene la clase de estilos original
+        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campaña" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
+        galleryGrid.appendChild(div);
+      });
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+    }
+  }
+
+  // Organizaciones en asociación (Ocultas por falta de relación en BD)
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  if (assocSec) assocSec.style.display = "none";
 
   if (mBadge) mBadge.style.display = "none";
   if (mSensitive) mSensitive.style.display = "none";
@@ -278,11 +307,11 @@ function openCampaignDetailsView(campaignId) {
   if (devStateCard) devStateCard.style.display = "none";
 
   if (mPostulateBtn) {
-    mPostulateBtn.style.display = "none"; // Ocultar porque es el dueño el que la ve
+    mPostulateBtn.style.display = camp.type === "convocatoria" ? "inline-flex" : "none";
   }
 
   openModal("modal-profile-camp-detail");
-  
+
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
@@ -666,7 +695,7 @@ window.openModifyCampaignModal = function(id) {
   if (camp.causes && Array.isArray(camp.causes)) {
     tempModifyCampaignCauses = [...camp.causes];
   } else if (camp.category) {
-    tempModifyCampaignCauses = [getCategoryLabel(camp.category)];
+    tempModifyCampaignCauses = [camp.category];
   } else {
     tempModifyCampaignCauses = [];
   }
@@ -1104,13 +1133,19 @@ function openReceivedCampaignDetailsView(invitationId) {
 
   if (mTags) {
     mTags.innerHTML = "";
-    const tags = [getCategoryLabel(inv.category), "Convocatoria"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
+    const label = inv.category || "Solidario";
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${label}`;
+    mTags.appendChild(span);
+
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
   }
 
   const devStateCard = document.querySelector(".dev-state-selector-card");
@@ -1153,13 +1188,19 @@ function openSentCampaignDetailsView(invitationId) {
 
   if (mTags) {
     mTags.innerHTML = "";
-    const tags = [getCategoryLabel(inv.campaignCategory), "Convocatoria"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
+    const label = inv.campaignCategory || "Solidario";
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${label}`;
+    mTags.appendChild(span);
+    
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
   }
 
   const devStateCard = document.querySelector(".dev-state-selector-card");

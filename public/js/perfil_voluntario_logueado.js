@@ -41,7 +41,7 @@ let postulations = [
     title: "Reforestación Parque Central",
     desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia.",
     status: "aceptado",
-    category: "medio-ambiente",
+    category: "medio Ambiente",
     startDate: "2026-06-14",
     endDate: "2026-06-21",
     location: "Parque Central, Buenos Aires",
@@ -55,7 +55,7 @@ let postulations = [
     title: "Clases de Apoyo Digital",
     desc: "Buscamos tutores para enseñar el uso de herramientas de oficina básicas y programación web inicial a jóvenes.",
     status: "rechazado",
-    category: "educacion",
+    category: "Educacion",
     startDate: "2026-06-18",
     endDate: "2026-07-18",
     location: "San Martín, Rosario",
@@ -69,7 +69,7 @@ let postulations = [
     title: "Colecta de Alimentos",
     desc: "Ayudanos a clasificar, empaquetar y distribuir las donaciones del banco de alimentos destinadas a comedores.",
     status: "pendiente",
-    category: "accion-social",
+    category: "Accion Social",
     startDate: "2026-06-21",
     endDate: "2026-06-30",
     location: "Centro, Córdoba",
@@ -85,7 +85,7 @@ let volunteering = [
     id: 901,
     title: "Reforestación Parque Central",
     desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad.",
-    category: "medio-ambiente",
+    category: "Medio Ambiente",
     startDate: "2026-06-14",
     endDate: "2026-06-21",
     location: "Parque Central, Buenos Aires",
@@ -100,7 +100,7 @@ let volunteering = [
     id: 902,
     title: "Apoyo Escolar Primario",
     desc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
-    category: "educacion",
+    category: "Educacion",
     startDate: "2026-06-20",
     endDate: "2026-12-20",
     location: "San Martín, Buenos Aires",
@@ -115,7 +115,7 @@ let volunteering = [
     id: 903,
     title: "Taller de RCP y Primeros Auxilios",
     desc: "Taller teórico-práctico de reanimación cardiopulmonar y primeros auxilios básicos para la comunidad.",
-    category: "salud",
+    category: "Salud",
     startDate: "2026-03-01",
     endDate: "2026-03-15",
     location: "Salguero 120, CABA",
@@ -130,7 +130,7 @@ let volunteering = [
     id: 904,
     title: "Colecta Navideña",
     desc: "Recepción y empaquetado de juguetes y alimentos navideños para familias necesitadas.",
-    category: "accion-social",
+    category: "Accion Social",
     startDate: "2025-12-01",
     endDate: "2025-12-25",
     location: "Mansilla 2900, CABA",
@@ -152,7 +152,7 @@ window.addEventListener("DOMContentLoaded", () => {
       campaignId: 401,
       title: "Clases de Pintura Infantil",
       desc: "Buscamos voluntarios para dictar talleres recreativos de dibujo y pintura a niños del barrio.",
-      category: "cultura",
+      category: "Cultura",
       startDate: "2026-07-05",
       endDate: "2026-07-26",
       location: "Rosario, Santa Fe",
@@ -164,7 +164,7 @@ window.addEventListener("DOMContentLoaded", () => {
       campaignId: 402,
       title: "Limpieza de Río Luján",
       desc: "Jornada ecológica para recolectar plásticos, vidrios y residuos en las costas del río.",
-      category: "medio-ambiente",
+      category: "Medio Ambiente",
       startDate: "2026-07-12",
       endDate: "2026-07-12",
       location: "Tigre, Buenos Aires",
@@ -182,7 +182,7 @@ window.addEventListener("DOMContentLoaded", () => {
       campaignId: 301,
       campaignTitle: "Apoyo Escolar Primario",
       campaignDesc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
-      campaignCategory: "educacion",
+      campaignCategory: "Educacion",
       campaignStartDate: "2026-06-20",
       campaignEndDate: "2026-12-20",
       campaignLocation: "San Martín, Buenos Aires",
@@ -197,7 +197,7 @@ window.addEventListener("DOMContentLoaded", () => {
       campaignId: 302,
       campaignTitle: "Taller de Huertas Comunitarias",
       campaignDesc: "Aprende sobre agricultura urbana, compostaje y cuidado del medio ambiente en nuestro taller semanal.",
-      campaignCategory: "medio-ambiente",
+      campaignCategory: "Medio Ambiente",
       campaignStartDate: "2026-06-25",
       campaignEndDate: "2026-08-25",
       campaignLocation: "Villa Crespo, CABA",
@@ -550,7 +550,7 @@ function renderPostulations() {
 
   const totalItems = filtered.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
+
   if (currentPostulationsPage > totalPages && totalPages > 0) {
     currentPostulationsPage = totalPages;
   }
@@ -562,8 +562,8 @@ function renderPostulations() {
   grid.innerHTML = "";
   if (paginated.length === 0) {
     grid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
-        No se encontraron postulaciones registradas.
+      <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--color-text-secondary);">
+        No tenés postulaciones registradas en este momento.
       </div>
     `;
     renderPostulationsPagination(0);
@@ -578,22 +578,18 @@ function renderPostulations() {
       ? `<img src="${BASE_URL + imgUrl}" alt="${post.title}" style="width:100%; height:100%; object-fit:cover;">` 
       : `<i data-lucide="image"></i>`;
 
-    let statusLabel = "";
-    let statusClass = "";
-    if (post.status === "aceptado") {
-      statusLabel = "Aceptado";
-      statusClass = "aceptado";
-    } else if (post.status === "pendiente") {
-      statusLabel = "Pendiente";
-      statusClass = "pendiente";
-    } else if (post.status === "rechazado") {
-      statusLabel = "Rechazado";
-      statusClass = "rechazado";
-    }
+    const statusLabels = {
+      pendiente: "Pendiente",
+      aceptado: "Aceptado",
+      rechazado: "Rechazado"
+    };
+
+    let statusPillClass = "pending-pill";
+    if (post.status === "aceptado") statusPillClass = "accepted-pill";
+    else if (post.status === "rechazado") statusPillClass = "rejected-pill";
 
     const article = document.createElement("article");
     article.className = cardClass;
-    article.style.cursor = "pointer";
     article.addEventListener("click", () => openPostulationDetailsView(post.id));
 
     article.innerHTML = `
@@ -602,24 +598,27 @@ function renderPostulations() {
           ${imgHTML}
         </div>
       </div>
-      <div class="alt-card-content-col" style="position: relative; display: flex; flex-direction: row; align-items: center; width: 100%; gap: 24px; box-sizing: border-box;">
-        <div style="flex: 1; display: flex; flex-direction: column; height: 100%;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
-            <h3 class="alt-card-title">${post.title}</h3>
-            <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
-              ${getCategoryLabel(post.category)}
-            </span>
-          </div>
-          <p class="alt-card-desc" style="margin-bottom: auto;">${post.desc}</p>
-        </div>
-        
-        <div class="postulation-actions-col">
-          <button class="postulation-status-btn ${statusClass}" type="button" style="pointer-events: none;">
-            ${statusLabel}
-          </button>
+      <div class="alt-card-content-col" style="position: relative;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+
+          <h3 class="alt-card-title">${post.title}</h3>
           
-          <button class="post-cancel-btn" type="button" onclick="event.stopPropagation(); openCancelPostulationConfirmModal(${post.id});">
-            Cancelar postulación
+          <!-- Imprime la causa directamente -->
+          <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
+            ${post.category || "Solidario"}
+          </span>
+        </div>
+        <p class="alt-card-desc">${post.desc}</p>
+        
+        <div class="camp-card-actions" style="margin-top: auto;">
+          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Ver detalles</button>
+          
+          <span class="modal-status-badge ${statusPillClass}" style="font-size: 11px; padding: 6px 12px;">
+            ${statusLabels[post.status] || "Pendiente"}
+          </span>
+
+          <button class="camp-action-btn delete" title="Cancelar postulación" onclick="event.stopPropagation(); window.openCancelPostulationConfirmModal(${post.id});" style="margin-left: 12px;">
+            <i data-lucide="x-circle" style="width:18px; height:18px;"></i>
           </button>
         </div>
       </div>
@@ -691,57 +690,99 @@ function openPostulationDetailsView(postulationId) {
 
   const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");
+  const mLocation = document.getElementById("m-camp-location");
+  const mStartDate = document.getElementById("m-camp-start-date");
+  const mEndDate = document.getElementById("m-camp-end-date");
   const mTags = document.getElementById("m-camp-tags");
   const mBadge = document.getElementById("m-camp-accepted-badge");
   const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
   const mSensitive = document.getElementById("m-camp-sensitive-info");
 
   if (mTitle) mTitle.textContent = post.title;
+  if (mDesc) mDesc.textContent = post.desc;
   
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${post.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${post.location}</p>
-      <p><strong>Período:</strong> ${post.startDate} al ${post.endDate}</p>
-    `;
+  if (mLocation) {
+    mLocation.innerHTML = `<i data-lucide="map-pin" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.location}</span>`;
+  }
+  if (mStartDate) {
+    mStartDate.innerHTML = `<i data-lucide="calendar" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.startDate}</span>`;
+  }
+  if (mEndDate) {
+    mEndDate.innerHTML = `<i data-lucide="calendar-check" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.endDate}</span>`;
   }
 
   if (mTags) {
     mTags.innerHTML = "";
-    const tags = [getCategoryLabel(post.category), "Convocatoria"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${post.category || "Solidario"}`;
+    mTags.appendChild(span);
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
   }
 
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
+  if (mBadge) {
+    const statusLabels = {
+      pendiente: "PENDIENTE",
+      aceptado: "ACEPTADO",
+      rechazado: "RECHAZADO"
+    };
+    mBadge.textContent = statusLabels[post.status] || "PENDIENTE";
+    mBadge.className = `modal-status-badge ${post.status === "aceptado" ? "accepted-pill" : (post.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+    mBadge.style.display = "inline-block";
+  }
+
+  if (mSensitive) {
+    if (post.status === "aceptado") {
+      mSensitive.innerHTML = `
+        <h4>Información de coordinación</h4>
+        <div class="info-alert-content">
+          <p>${post.additionalInfo || "No hay información adicional registrada."}</p>
+        </div>
+      `;
+      mSensitive.style.display = "block";
+    } else {
+      mSensitive.style.display = "none";
+    }
+  }
 
   const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) {
-    devStateCard.style.display = "block";
-    let radioVal = "no-login";
-    if (post.status === "aceptado") {
-      radioVal = "registrado-aceptado";
-    } else if (post.status === "pendiente") {
-      radioVal = "registrado-pendiente";
-    } else if (post.status === "rechazado") {
-      radioVal = "registrado-rechazado";
-    }
-    const radio = document.querySelector(`input[name="dev-state-choice"][value="${radioVal}"]`);
-    if (radio) radio.checked = true;
-  }
-
-  if (mPostulateBtn) {
-    mPostulateBtn.style.display = "block";
-  }
-
-  updateModalStateBasedOnRadio();
-  openModal("modal-profile-camp-detail");
+  if (devStateCard) devStateCard.style.display = "none";
   
+  if (mPostulateBtn) mPostulateBtn.style.display = "none";
+  
+  const gallerySec = document.getElementById("m-camp-gallery-sec");
+  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+  if (gallerySec && galleryGrid) {
+    galleryGrid.innerHTML = "";
+    if (post.images && post.images.length > 0) {
+      post.images.forEach(imgUrl => {
+        const div = document.createElement("div");
+        div.className = "gallery-img-wrapper";
+        div.style.borderRadius = "var(--radius-md)";
+        div.style.overflow = "hidden";
+        div.style.aspectRatio = "1 / 1";
+        div.style.backgroundColor = "var(--color-surface-hover)";
+        div.style.border = "1px solid var(--color-border)";
+        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+        galleryGrid.appendChild(div);
+      });
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+    }
+  }
+
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  if (assocSec) assocSec.style.display = "none";
+
+  openModal("modal-profile-camp-detail");
+
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
@@ -777,7 +818,7 @@ function renderVolunteering() {
 
   let filtered = [...volunteering];
   if (filterVal) {
-    filtered = filtered.filter(item => item.status === filterVal);
+    filtered = filtered.filter(v => v.status === filterVal);
   }
 
   if (sortVal === "reciente") {
@@ -788,7 +829,6 @@ function renderVolunteering() {
 
   const totalItems = filtered.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
   if (currentVolunteeringPage > totalPages && totalPages > 0) {
     currentVolunteeringPage = totalPages;
   }
@@ -800,58 +840,50 @@ function renderVolunteering() {
   grid.innerHTML = "";
   if (paginated.length === 0) {
     grid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
-        No tienes campañas registradas en esta sección.
+      <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--color-text-secondary);">
+        No participás en ningún voluntariado actualmente.
       </div>
     `;
     renderVolunteeringPagination(0);
     return;
   }
 
-  paginated.forEach(item => {
+  paginated.forEach((item, index) => {
+    const isReverse = index % 2 !== 0;
+    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
     const imgUrl = item.images && item.images.length > 0 ? item.images[0] : "";
     const imgHTML = imgUrl 
-      ? `<img src="${BASE_URL + imgUrl}" alt="${item.title}">` 
+      ? `<img src="${BASE_URL + imgUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;">` 
       : `<i data-lucide="image"></i>`;
 
-    const statusLabel = item.status === "activa" ? "Activa" : "Finalizada";
-    const statusClass = item.status === "activa" ? "activa" : "finalizada";
-    const profileUrl = item.ownerType === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
-
     const article = document.createElement("article");
-    article.className = "invite-card";
+    article.className = cardClass;
     article.addEventListener("click", () => openVolunteeringDetailsView(item.id));
 
     article.innerHTML = `
-      <div class="invite-card-img-col campaign-img">
-        ${imgHTML}
+      <div class="alt-card-img-col">
+        <div class="alt-card-img-placeholder">
+          ${imgHTML}
+        </div>
       </div>
-      <div class="invite-card-content-col">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 2px; flex-wrap: wrap; gap: 8px;">
+      <div class="alt-card-content-col" style="position: relative;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
           <h3 class="alt-card-title">${item.title}</h3>
+          
+          <!-- Imprime la causa directamente -->
           <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
-            ${getCategoryLabel(item.category)}
+            ${item.category || "Solidario"}
           </span>
         </div>
         <p class="alt-card-desc">${item.desc}</p>
         
-        <div style="display:flex; flex-direction:column; gap:4px; margin-top: auto;">
-          <span style="font-size: 12px; color: var(--color-text-muted);">
-            <i data-lucide="calendar" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> Período: ${item.startDate} al ${item.endDate}
+        <div class="camp-card-actions" style="margin-top: auto;">
+          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Ver detalles</button>
+          
+          <span class="modal-status-badge accepted-pill" style="font-size:11px; padding: 6px 12px; text-transform:uppercase;">
+            ${item.status}
           </span>
-          <span style="font-size: 12px; color: var(--color-text-muted);">
-            <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${item.location}
-          </span>
-          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
-            <i data-lucide="user" style="width:12px; height:12px;"></i> Creado por: <strong>${item.ownerName}</strong>
-          </a>
         </div>
-      </div>
-      
-      <div class="invite-card-actions-col">
-        <span class="vol-status-badge ${statusClass}">
-          ${statusLabel}
-        </span>
       </div>
     `;
     grid.appendChild(article);
@@ -913,60 +945,94 @@ function renderVolunteeringPagination(totalPages) {
 function openVolunteeringDetailsView(volunteeringId) {
   const item = volunteering.find(v => v.id === volunteeringId);
   if (!item) return;
-
+  
   const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");
+  const mLocation = document.getElementById("m-camp-location");
+  const mStartDate = document.getElementById("m-camp-start-date");
+  const mEndDate = document.getElementById("m-camp-end-date");
   const mTags = document.getElementById("m-camp-tags");
   const mBadge = document.getElementById("m-camp-accepted-badge");
   const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
   const mSensitive = document.getElementById("m-camp-sensitive-info");
 
   if (mTitle) mTitle.textContent = item.title;
+  if (mDesc) mDesc.textContent = item.desc;
   
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${item.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${item.location}</p>
-      <p><strong>Período:</strong> ${item.startDate} al ${item.endDate}</p>
-    `;
+  if (mLocation) {
+    mLocation.innerHTML = `<i data-lucide="map-pin" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.location}</span>`;
+  }
+  if (mStartDate) {
+    mStartDate.innerHTML = `<i data-lucide="calendar" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.startDate}</span>`;
+  }
+  if (mEndDate) {
+    mEndDate.innerHTML = `<i data-lucide="calendar-check" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.endDate}</span>`;
   }
 
   if (mTags) {
     mTags.innerHTML = "";
-    const tags = [getCategoryLabel(item.category), "Convocatoria"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
+    const span = document.createElement("span");
+    span.className = "tag-badge";
+    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${item.category || "Solidario"}`;
+    mTags.appendChild(span);
+
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+    mTags.appendChild(typeSpan);
   }
 
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) {
-    devStateCard.style.display = "block";
-    const radio = document.querySelector('input[name="dev-state-choice"][value="registrado-aceptado"]');
-    if (radio) radio.checked = true;
+  if (mBadge) {
+    mBadge.textContent = "ACTIVA";
+    mBadge.className = "modal-status-badge accepted-pill";
+    mBadge.style.display = "inline-block";
   }
 
   if (mSensitive) {
     mSensitive.innerHTML = `
-      <h4>Información de Coordinación (Exclusivo Voluntarios)</h4>
+      <h4>Información de coordinación</h4>
       <div class="info-alert-content">
-        <p style="font-size: 13px; line-height: 1.5; margin: 0; color: var(--color-text-secondary);">
-          ${item.additionalInfo || "No se ha proporcionado información de contacto adicional."}
-        </p>
+        <p>${item.additionalInfo || "No hay información adicional registrada."}</p>
       </div>
     `;
+    mSensitive.style.display = "block";
   }
 
-  if (mPostulateBtn) {
-    mPostulateBtn.style.display = "block";
+  const devStateCard = document.querySelector(".dev-state-selector-card");
+  if (devStateCard) devStateCard.style.display = "none";
+
+  if (mPostulateBtn) mPostulateBtn.style.display = "none";
+
+  const gallerySec = document.getElementById("m-camp-gallery-sec");
+  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+  if (gallerySec && galleryGrid) {
+    galleryGrid.innerHTML = "";
+    if (item.images && item.images.length > 0) {
+      item.images.forEach(imgUrl => {
+        const div = document.createElement("div");
+        div.className = "gallery-img-wrapper";
+        div.style.borderRadius = "var(--radius-md)";
+        div.style.overflow = "hidden";
+        div.style.aspectRatio = "1 / 1";
+        div.style.backgroundColor = "var(--color-surface-hover)";
+        div.style.border = "1px solid var(--color-border)";
+        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+        galleryGrid.appendChild(div);
+      });
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+    }
   }
 
-  updateModalStateBasedOnRadio();
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  if (assocSec) assocSec.style.display = "none";
+
   openModal("modal-profile-camp-detail");
-  
+
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
