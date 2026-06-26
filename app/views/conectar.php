@@ -63,7 +63,7 @@
               <?php endif; ?>
             </div>
             <div class="camp-content">
-              <span class="camp-org"><?= htmlspecialchars($camp['nombre']) ?></span>
+              <span class="camp-org"><?= htmlspecialchars($camp['usuario_nombre']) ?></span>
               <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
               <p class="camp-desc"><?= htmlspecialchars($camp['descripcion']) ?></p>
               

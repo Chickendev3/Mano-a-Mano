@@ -19,7 +19,7 @@ class Campania {
     public function obtenerTodasCampanias() :array {
         /* Actualizalizar el estado de la campaña en caso de fecha de finalización vencida */
 
-        $consulta = "SELECT c.id, u.nombre, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+        $consulta = "SELECT c.id, c.usuario_id, u.nombre, u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
                         FROM campanias c 
                             JOIN usuarios u ON c.usuario_id = u.id
                             JOIN tipos_campanias t ON t.id = c.tipo_id
@@ -28,7 +28,7 @@ class Campania {
         $this->bd->ejecutar();
         $campaniasOrgs = $this->bd->resultados();
 
-        $consulta = "SELECT c.id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre', t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+        $consulta = "SELECT c.id, c.usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre', u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
                         FROM campanias c 
                             JOIN usuarios u ON c.usuario_id = u.id
                             JOIN tipos_campanias t ON t.id = c.tipo_id
@@ -47,7 +47,9 @@ class Campania {
             
             $campaniasMapeadas[] = [
                 'id' => $idCamp,
-                'nombre' => $camp['nombre'],
+                'usuario_nombre' => $camp['nombre'],
+                'usuario_id' => (int)$camp['usuario_id'],
+                'usuario_img_perfil' => $camp['img_perfil'],
                 'tipo' => strtolower($camp['tipo']) === 'convocatoria' ? 'convocatoria' : 'informativa',
                 'titulo' => $camp['titulo'],
                 'descripcion' => $camp['descripcion'],
@@ -158,9 +160,11 @@ class Campania {
     }
 
     public function obtenerCampaniasDeUsuario(int $idUsuario) : array {
-        $consulta = "SELECT c.*, t.tipo as 'nombre_tipo'
+        $consulta = "SELECT c.*, t.tipo as 'nombre_tipo', u.nombre, u.img_perfil, v.apellido as 'vol_apellido'
                      FROM campanias c
                      JOIN tipos_campanias t ON t.id = c.tipo_id
+                     JOIN usuarios u ON u.id = c.usuario_id
+                     LEFT JOIN voluntarios v ON u.id = v.usuario_id
                      WHERE c.usuario_id = :usu_id
                      ORDER BY c.id DESC;";
         $this->bd->consulta($consulta);
@@ -174,12 +178,19 @@ class Campania {
             $idCamp = (int)$camp['id'];
             $causes = $this->obtenerCausasDeCampania($idCamp);
             $images = $this->obtenerArchivosDeCampania($idCamp);
+            $nombreCompleto = $camp['nombre'];
+            if (!empty($camp['vol_apellido'])) {
+                $nombreCompleto .= ' ' . $camp['vol_apellido'];
+            }
             
             // Array mapeado para la lectura de perfil_voluntario_logueado.js
             $campaniasMapeadas[] = [
                 'id' => $idCamp,
                 'title' => $camp['titulo'],
-                'desc' => $camp['descripcion'], 
+                'desc' => $camp['descripcion'],
+                'usuario_id' => $camp['usuario_id'],
+                'usuario_nombre' => $nombreCompleto,
+                'usuario_img_perfil' => $camp['img_perfil'],
                 'category' => !empty($causes) ? $causes[0] : '',
                 'causes' => $causes, // Listado completo de causas
                 'type' => strtolower($camp['nombre_tipo']) === 'convocatoria' ? 'convocatoria' : 'informativa',

@@ -56,6 +56,31 @@ window.openCampaignDetails = function(campaignId) {
       mTags.appendChild(span);
     });
 
+  // Lógica de inyección del Creador
+  const mCreatorLink = document.getElementById("m-camp-creator-link");
+  if (mCreatorLink) {
+    if (camp.usuario_id) {
+      mCreatorLink.href = `${BASE_URL}perfil.php?id=${camp.usuario_id}`;                 // Esto de corrige!!!
+      mCreatorLink.style.display = "flex";
+      
+      const mCreatorName = document.getElementById("m-camp-creator-name");
+      if (mCreatorName) {
+        mCreatorName.textContent = camp.usuario_nombre || camp.nombre || "Organización";
+      }
+      
+      const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
+      if (mCreatorAvatar) {
+        if (camp.usuario_img_perfil) {
+          mCreatorAvatar.innerHTML = `<img src="${BASE_URL + camp.usuario_img_perfil}" alt="Logo creador" class="creator-avatar-img">`;
+        } else {
+          mCreatorAvatar.innerHTML = `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
+        }
+      }
+    } else {
+      mCreatorLink.style.display = "none";
+    }
+  }
+
     // Tipo de campaña
     const typeSpan = document.createElement("span");
     typeSpan.className = "tag-badge";

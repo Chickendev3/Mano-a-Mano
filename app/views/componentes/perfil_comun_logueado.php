@@ -386,6 +386,18 @@ function renderModalDetalleCampania() {
     
     <!-- Contenido Principal -->
     <div class="modal-main-content">
+      <!-- Creador de la Campaña -->
+      <a href="#" class="modal-creator-container" id="m-camp-creator-link" style="display: none;">
+        <div class="modal-creator-avatar" id="m-camp-creator-avatar">
+          <!-- Inyectado dinámicamente por JS -->
+        </div>
+        <div class="modal-creator-info">
+          <span class="modal-creator-label">Publicado por</span>
+          <span class="modal-creator-name" id="m-camp-creator-name">Nombre del Creador</span>
+        </div>
+        <i data-lucide="chevron-right" class="modal-creator-arrow"></i>
+      </a>
+      
       <!-- Párrafo original único para la descripción y los datos estructurados por JS -->
       <div class="modal-desc-para" id="m-camp-desc">
         Descripción de la campaña y sus objetivos solidarios.

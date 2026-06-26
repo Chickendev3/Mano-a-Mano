@@ -245,7 +245,31 @@ function openCampaignDetailsView(campaignId) {
 
   if (mTitle) mTitle.textContent = camp.title;
   
-  // Respetamos la distribución original en forma de lista de párrafos dentro de mDesc,
+  // Lógica de inyección del Creador (añadir en ambas funciones de apertura del modal)
+  const mCreatorLink = document.getElementById("m-camp-creator-link");
+  if (mCreatorLink) {
+    if (camp.usuario_id) {
+      mCreatorLink.href = `${BASE_URL}perfil.php?id=${camp.usuario_id}`;         // Esto es lo que se corrigeee
+      mCreatorLink.style.display = "flex";
+      
+      const mCreatorName = document.getElementById("m-camp-creator-name");
+      if (mCreatorName) {
+        mCreatorName.textContent = camp.usuario_nombre || camp.nombre || "Organización";
+      }
+      
+      const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
+      if (mCreatorAvatar) {
+        if (camp.usuario_img_perfil) {
+          mCreatorAvatar.innerHTML = `<img src="${BASE_URL + camp.usuario_img_perfil}" alt="Logo creador" class="creator-avatar-img">`;
+        } else {
+          mCreatorAvatar.innerHTML = `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
+        }
+      }
+    } else {
+      mCreatorLink.style.display = "none";
+    }
+  }
+
   // dividiendo el período en dos campos lógicos.
   if (mDesc) {
     mDesc.innerHTML = `
