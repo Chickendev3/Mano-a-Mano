@@ -31,6 +31,8 @@ class perfilCtrl extends Controlador {
         }, $causasDb);
 
         /* Obteniendo Datos de Usuarios (ambos)*/
+        $modeloCampania = $this->cargarModelo('Campania');
+        $campaniasUsuario = $modeloCampania->obtenerCampaniasDeUsuario($_SESSION['id_usuario']);
         // Traer etiquetas del usuario.
 
         /* Voluntarios Particular */
@@ -44,7 +46,8 @@ class perfilCtrl extends Controlador {
         $datos = ['cssPropio' => $css,
 				  'jsPropio' => $js,
                   'usuario' => $infoUsuario,
-                  'causas' => $causasMapeadas   // Array de causas de campañas
+                  'causas' => $causasMapeadas,
+                  'campaniasUsuario' => $campaniasUsuario ?? []
         ];
         
         if ($_SESSION['usuario_rol'] == 'voluntario') {
@@ -60,6 +63,7 @@ class perfilCtrl extends Controlador {
         $msj = null;
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            header('Content-Type: application/json'); // Se notifica al navegador, una respuesta JSON
 
             $tipoCamp = trim($_POST['tipo_campania'] ?? '');
             $titulo = trim($_POST['titulo_campania'] ?? '');
@@ -70,6 +74,21 @@ class perfilCtrl extends Controlador {
             $fechaFin = trim($_POST['fecha_fin'] ?? '');
             $infoAdicional = isset($_POST['info_adicional']) ? htmlspecialchars($_POST['info_adicional'], ENT_QUOTES, 'UTF-8') : null;
             $imagenes = $_FILES['imagenes'] ?? null;
+
+
+            /* Verificaciones */
+            if (empty($titulo) || empty($descripcion) || empty($ubicacion) || empty($fechaInicio) || empty($fechaFin)) {
+                echo json_encode(['success' => false, 'message' => 'Por favor, completa todos los campos requeridos.']);
+                return;
+            }
+            if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+                echo json_encode(['success' => false, 'message' => 'La fecha de finalización no puede ser anterior a la fecha de inicio.']);
+                return;
+            }
+            if (strtotime($fechaInicio) < strtotime(date('Y-m-d'))) {
+                echo json_encode(['success' => false, 'message' => 'La fecha de inicio no puede ser anterior a la fecha actual.']);
+                return;
+            }
 
             // Agrupar para pasar al modelo
             $datosCampania = [
@@ -85,13 +104,13 @@ class perfilCtrl extends Controlador {
             
             $exito = $this->agregarCampaniaBD($datosCampania, $causas, $imagenes);
             if ($exito) {
-                $_SESSION['mensaje'] = "Campaña creada con éxito";
+                echo json_encode(['success' => true, 
+                                  'message' => 'Campaña creada con éxito.']);
             } else {
-                $_SESSION['error'] = "Hubo un error al intentar crear la campaña.";
+                echo json_encode(['success' => false, 
+                                  'message' => 'Hubo un error al crear la Campaña.']);
             }
-            // Redireccionar de vuelta al perfil
-            header('Location: ' . BASE_URL . 'perfil');
-            exit;
+            return;
         }
     }
 
@@ -113,13 +132,13 @@ class perfilCtrl extends Controlador {
             return false;
         }
 
-        // Se toma el ID de la campaña recién insertada por usuario
+        // Se agarra el ID de la campaña recién insertada por el usuario
         $idCampania = $modeloCampania->obtenerUltimoIDCampaniaDeUsuario($idUsuario);
         if (!$idCampania) {
             return false;
         }
 
-        // C. Se registran las causas seleccionadas en la tabla 'campanias_causas'
+        // Se registran las causas seleccionadas en la tabla 'campanias_causas'
         foreach ($causas as $nombreCausa) {
             $idCausa = $modeloCampania->obtenerIDCausaPorNombre($nombreCausa);
             if ($idCausa) {
@@ -127,7 +146,7 @@ class perfilCtrl extends Controlador {
             }
         }
 
-        // D. Se procesan y guardan físicamente los archivos, registrándolos en la tabla 'archivos'
+        // Se procesan y guardan físicamente los archivos, registrándolos en la tabla 'archivos'
         if ($imagenes && isset($imagenes['name'])) {
             $totalFiles = count($imagenes['name']);
             $dirDestino = 'archivos/'; // public/archivos/
@@ -157,6 +176,107 @@ class perfilCtrl extends Controlador {
         return true;
     }
 
+
+    public function modificarCampania() : void {
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            header('Content-Type: application/json'); // Envío al navegador que se responde un JSON
+
+            $idCampania = (int)($_POST['id_campania'] ?? 0);
+            if ($idCampania <= 0) {
+                header('Location: ' . BASE_URL . 'perfil');
+                exit;
+            }
+
+            $titulo = trim($_POST['titulo_campania'] ?? '');
+            $descripcion = htmlspecialchars($_POST['descripcion_campania'] ?? '', ENT_QUOTES, 'UTF-8');
+            $fechaInicio = trim($_POST['fecha_inicio'] ?? '');
+            $fechaFin = trim($_POST['fecha_fin'] ?? '');
+            $ubicacion = trim($_POST['ubicacion'] ?? '');
+            $infoAdicional = isset($_POST['info_adicional']) ? trim($_POST['info_adicional']) : null;
+
+            $causas = $_POST['causas'] ?? [];
+            $imagenes = $_FILES['imagenes'] ?? null;
+            $imagenesExistentes = $_POST['imagenes_existentes'] ?? [];
+
+            /* Verificaciones */
+            if (empty($titulo) || empty($descripcion) || empty($ubicacion) || empty($fechaInicio) || empty($fechaFin)) {
+                echo json_encode(['success' => false, 
+                                  'message' => 'Por favor, completa todos los campos requeridos.']);
+                return;
+            }
+             if (strtotime($fechaFin) < strtotime($fechaInicio)) {
+                echo json_encode(['success' => false, 
+                                  'message' => 'La fecha de finalización no puede ser anterior a la fecha de inicio.']);
+                return;
+            }
+            if (strtotime($fechaInicio) < strtotime(date('Y-m-d'))) {
+                echo json_encode(['success' => false, 
+                                  'message' => 'La fecha de inicio no puede ser anterior a la fecha actual.']);
+                return;
+            }
+
+            $datosNuevos = [
+                'titulo' => $titulo,
+                'descripcion' => $descripcion,
+                'fecha_inicio' => $fechaInicio,
+                'fecha_finalizacion' => $fechaFin,
+                'ubicacion' => $ubicacion,
+                'info_adicional' => $infoAdicional
+            ];
+
+            $modeloCampania = $this->cargarModelo('Campania');
+            $actualizado = $modeloCampania->actualizarDatosCampania($idCampania, $datosNuevos);
+
+            if ($actualizado) {
+                /* Causas */
+                // Se eliminan las relaciones previas 
+                $modeloCampania->eliminarCausasDeCampania($idCampania); 
+                // Se guardan las nuevas
+                foreach ($causas as $nombreCausa) {
+                    $idCausa = $modeloCampania->obtenerIDCausaPorNombre($nombreCausa);
+                    if ($idCausa) {
+                        $modeloCampania->agregarCausaACampania($idCampania, $idCausa);
+                    }
+                }
+
+                /* Impagenes */
+                $modeloCampania->sincronizarImagenesExistentes($idCampania, $imagenesExistentes);   // Se eliminan las anteriores, se conservan las anteriores 
+                
+                if ($imagenes && !empty($imagenes['name'][0])) {
+                    $totalFiles = count($imagenes['name']);
+                    $dirDestino = 'archivos/';
+
+                    if (!file_exists($dirDestino)) {
+                        mkdir($dirDestino, 0777, true);
+                    }
+
+                    for ($i = 0; $i < $totalFiles; $i++) {
+                        if ($imagenes['error'][$i] === UPLOAD_ERR_OK) {
+                            $nombreTemporal = $imagenes['tmp_name'][$i];
+                            $nombreOriginal = basename($imagenes['name'][$i]);
+                            $extension = pathinfo($nombreOriginal, PATHINFO_EXTENSION);
+                            
+                            $nuevoNombre = uniqid('camp_', true) . '.' . $extension;
+                            $rutaCompleta = $dirDestino . $nuevoNombre;
+
+                            if (move_uploaded_file($nombreTemporal, $rutaCompleta)) {
+                                $modeloCampania->agregarArchivoCampania($idCampania, 'archivos/' . $nuevoNombre, 'imagen');
+                            }
+                        }
+                    }
+                }
+
+                echo json_encode(['success' => true, 'message' => 'Campaña modificada con éxito.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No se pudieron guardar los cambios de la Campaña.']);
+            }
+
+            /* header('Location: ' . BASE_URL . 'perfil');
+            exit; */
+            return;
+        }
+    }
     
 }
 ?>

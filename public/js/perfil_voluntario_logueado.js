@@ -38,49 +38,13 @@ const availableSkills = [
 let tempSkills = [];
 // Local state for temporary campaign causes tags being selected
 let tempCampaignCauses = [];
+// Estado local para causas e imágenes en la edición de campaña
+let tempModifyCampaignCauses = [];
+let selectedModifyCampaignFiles = [];
+let existingCampaignImages = [];        // Array vacío para guardar las rutas de imágenes que ya existen en MariaDB
 
-// Campaign Mock Database
-let campaigns = [
-  {
-    id: 301,
-    title: "Apoyo Escolar Primario",
-    desc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
-    type: "convocatoria", // Campaña con postulaciones
-    category: "educacion",
-    startDate: "2026-06-20",
-    endDate: "2026-12-20",
-    location: "San Martín, Buenos Aires",
-    details: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua. Se realiza en la Biblioteca Popular San Martín.",
-    additionalInfo: "Dirección exacta: Belgrano 456, San Martín. Coordinador: Lucas Gómez (+54 11 5555-1234). Traer cartuchera y cuaderno.",
-    images: ["img/campaign_tutoring.png"]
-  },
-  {
-    id: 302,
-    title: "Taller de Huertas Comunitarias",
-    desc: "Aprende sobre agricultura urbana, compostaje y cuidado del medio ambiente en nuestro taller semanal.",
-    type: "informativa", // Campaña informativa (sin postulaciones)
-    category: "medio-ambiente",
-    startDate: "2026-06-25",
-    endDate: "2026-08-25",
-    location: "Villa Crespo, CABA",
-    details: "Un espacio interactivo y gratuito para todos los vecinos donde se aprende a crear huertas orgánicas en balcones y patios. No requiere conocimientos previos.",
-    additionalInfo: "", // Informativa
-    images: ["img/campaign_park.png"]
-  },
-  {
-    id: 303,
-    title: "Colecta y Clasificación de Ropa",
-    desc: "Ayudanos a recibir y clasificar donaciones de ropa y abrigo que serán enviadas a comedores en el invierno.",
-    type: "convocatoria",
-    category: "accion-social",
-    startDate: "2026-07-01",
-    endDate: "2026-07-15",
-    location: "Palermo, CABA",
-    details: "Campaña de invierno para clasificar abrigos, calzado y frazadas recibidas. Las donaciones se empaquetan por edad y talle para una distribución ágil.",
-    additionalInfo: "Dirección del galpón: Av. Santa Fe 3400. Coordinadora: Estela Maris (+54 11 4444-5678). Venir con ropa cómoda.",
-    images: ["img/campaign_food.png"]
-  }
-];
+// Las campañas se cargan dinámicamente desde MariaDB mediante PHP en window.campaigns
+let campaigns = window.campaigns || [];
 
 // Postulations Mock Database
 let postulations = [
@@ -313,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupVolunteeringGrid();
   setupMockUploads();
   setupCampaignCausesEvents();
+  setupCampaignFormValidations();
 });
 
 // ==========================================
@@ -922,8 +887,7 @@ function openCampaignDetailsView(campaignId) {
   // Composite detailed content in description
   if (mDesc) {
     mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${camp.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${camp.details}</p>
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.desc}</p>
       <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.location}</p>
       <p><strong>Período:</strong> ${camp.startDate} al ${camp.endDate}</p>
     `;
@@ -965,8 +929,9 @@ function openCampaignDetailsView(campaignId) {
 // ==========================================
 // 6. CREATE CAMPAIGN CRUD FLOW
 // ==========================================
-/* Ésta funcion se queda */
 function openCreateCampaignModal() {
+  const msgBox = document.getElementById("create-camp-message-box");
+  if (msgBox) msgBox.innerHTML = "";
   const form = document.getElementById("create-camp-form");
   if (form) form.reset();
 
@@ -1045,20 +1010,33 @@ window.removeUploadedImage = function(index, gridId) {
 
 /* Maneja el comportamiento del buscador de causas */
 function setupCampaignCausesEvents() {
+  // --- Para el formulario de Creación ---
   const causeInput = document.getElementById("campaign-cause-search-input");
   const causeSuggestions = document.getElementById("campaign-cause-suggestions");
 
   if (causeInput) {
     causeInput.addEventListener("focus", () => showCampaignCauseSuggestions(causeInput.value));
     causeInput.addEventListener("input", () => showCampaignCauseSuggestions(causeInput.value));
-    
-    // Cierra la lista de sugerencias al hacer clic afuera
-    document.addEventListener("click", (e) => {
-      if (!causeInput.contains(e.target) && !causeSuggestions.contains(e.target)) {
-        causeSuggestions.classList.remove("active");
-      }
-    });
   }
+
+  // --- Para el formulario de Modificación ---
+  const modifyCauseInput = document.getElementById("modify-campaign-cause-search-input");
+  const modifyCauseSuggestions = document.getElementById("modify-campaign-cause-suggestions");
+
+  if (modifyCauseInput) {
+    modifyCauseInput.addEventListener("focus", () => showModifyCampaignCauseSuggestions(modifyCauseInput.value));
+    modifyCauseInput.addEventListener("input", () => showModifyCampaignCauseSuggestions(modifyCauseInput.value));
+  }
+  
+  // Cierra los desplegables al hacer clic afuera de los buscadores
+  document.addEventListener("click", (e) => {
+    if (causeInput && causeSuggestions && !causeInput.contains(e.target) && !causeSuggestions.contains(e.target)) {
+      causeSuggestions.classList.remove("active");
+    }
+    if (modifyCauseInput && modifyCauseSuggestions && !modifyCauseInput.contains(e.target) && !modifyCauseSuggestions.contains(e.target)) {
+      modifyCauseSuggestions.classList.remove("active");
+    }
+  });
 }
 
 // ==========================================
@@ -1070,41 +1048,72 @@ window.openModifyCampaignModal = function(id) {
 
   currentEditCampaignId = id;
 
-  // Fill in form inputs
-  document.getElementById("modify-title").value = camp.title;
-  document.getElementById("modify-desc").value = camp.desc;
-  document.getElementById("modify-category").value = camp.category;
-  document.getElementById("modify-location").value = camp.location;
-  document.getElementById("modify-start-date").value = camp.startDate;
-  document.getElementById("modify-end-date").value = camp.endDate;
-  document.getElementById("modify-details").value = camp.details;
-  
+  // Guarda el ID de la campaña en el input oculto (si existe)
+  const idInput = document.getElementById("modify-campaign-id-input");
+  if (idInput) idInput.value = id;
+
+  // Llena inputs de texto tradicionales de manera defensiva (solo si existen en el HTML)
+  const titleInput = document.getElementById("modify-title");
+  if (titleInput) titleInput.value = camp.title || "";
+
+  const descInput = document.getElementById("modify-desc");
+  if (descInput) descInput.value = camp.desc || "";
+
+  const locationInput = document.getElementById("modify-location");
+  if (locationInput) locationInput.value = camp.location || "";
+
+  const startDateInput = document.getElementById("modify-start-date");
+  if (startDateInput) startDateInput.value = camp.startDate || "";
+
+  const endDateInput = document.getElementById("modify-end-date");
+  if (endDateInput) endDateInput.value = camp.endDate || "";
+
+  // Maneja el tipo de campaña y la información adicional de manera defensiva
+  const additionalInput = document.getElementById("modify-additional");
   if (camp.type === "convocatoria") {
-    document.getElementById("modify-type-convocatoria").checked = true;
-    document.getElementById("modify-additional").value = camp.additionalInfo;
+    const radioConvocatoria = document.getElementById("modify-type-convocatoria");
+    if (radioConvocatoria) radioConvocatoria.checked = true;
+    if (additionalInput) additionalInput.value = camp.additionalInfo || "";
   } else {
-    document.getElementById("modify-type-informativa").checked = true;
-    document.getElementById("modify-additional").value = "";
+    const radioInformativa = document.getElementById("modify-type-informativa");
+    if (radioInformativa) radioInformativa.checked = true;
+    if (additionalInput) additionalInput.value = "";
   }
 
-  // Load images
-  uploadedImagesForForm = [...(camp.images || [])];
-  renderFormImagesPreview("modify-images-preview-grid");
+  // Pre-carga las causas actuales de la campaña en nuestro arreglo temporal
+  if (camp.causes && Array.isArray(camp.causes)) {
+    tempModifyCampaignCauses = [...camp.causes];
+  } else if (camp.category) {
+    tempModifyCampaignCauses = [getCategoryLabel(camp.category)];
+  } else {
+    tempModifyCampaignCauses = [];
+  }
+  renderModifyCampaignCauses();
+
+  existingCampaignImages = [...(camp.images || [])];
+  selectedModifyCampaignFiles = [];                       // Limpiar y resetear nuevos archivos
+  renderModifyImagesPreview();                            // Renderizar ambas listas (existentes y nuevas)
 
   toggleModifyAddInfoField();
   openModal("modal-modify-campaign");
+
+  const msgBox = document.getElementById("modify-camp-message-box");
+  if (msgBox) msgBox.innerHTML = "";
 };
 
 window.toggleModifyAddInfoField = function() {
-  const typeVal = document.querySelector('input[name="modify-camp-type"]:checked')?.value || "convocatoria";
+  const isConvocatoria = document.getElementById("modify-type-convocatoria")?.checked ?? true;
   const infoGroup = document.getElementById("modify-additional-info-group");
-  if (infoGroup) {
-    if (typeVal === "convocatoria") {
+  const additionalInput = document.getElementById("modify-additional");
+  
+  if (infoGroup && additionalInput) {
+    if (isConvocatoria) {
       infoGroup.style.display = "block";
-      document.getElementById("modify-additional").required = true;
+      additionalInput.required = true;
     } else {
       infoGroup.style.display = "none";
-      document.getElementById("modify-additional").required = false;
+      additionalInput.required = false;
+      additionalInput.value = ""; // Limpia el texto para que viaje vacío al servidor
     }
   }
 };
@@ -1128,45 +1137,177 @@ window.simulateModifyCampaignImageUpload = function() {
   renderFormImagesPreview("modify-images-preview-grid");
 };
 
-window.handleModifyCampaignSubmit = function() {
-  if (!currentEditCampaignId) return;
 
-  const campIndex = campaigns.findIndex(c => c.id === currentEditCampaignId);
-  if (campIndex === -1) return;
 
-  const title = document.getElementById("modify-title").value.trim();
-  const desc = document.getElementById("modify-desc").value.trim();
-  const category = document.getElementById("modify-category").value;
-  const location = document.getElementById("modify-location").value.trim();
-  const startDate = document.getElementById("modify-start-date").value;
-  const endDate = document.getElementById("modify-end-date").value;
-  const details = document.getElementById("modify-details").value.trim();
-  const type = document.querySelector('input[name="modify-camp-type"]:checked').value;
-  const additionalInfo = type === "convocatoria" ? document.getElementById("modify-additional").value.trim() : "";
+// Dibuja las etiquetas de causas seleccionadas en el formulario de modificación
+function renderModifyCampaignCauses() {
+  const container = document.getElementById("modify-campaign-causes-list");
+  const form = document.getElementById("modify-camp-form");
+  if (!container || !form) return;
 
-  // Update mock item
-  campaigns[campIndex] = {
-    ...campaigns[campIndex],
-    title,
-    desc,
-    category,
-    type,
-    startDate,
-    endDate,
-    location,
-    details,
-    additionalInfo,
-    images: [...uploadedImagesForForm]
-  };
+  container.innerHTML = "";
+  
+  // Elimina inputs ocultos previos de causas
+  form.querySelectorAll('input[name="causas[]"]').forEach(input => input.remove());
 
-  closeModal("modal-modify-campaign");
-  currentEditCampaignId = null;
-  renderCampaigns();
+  tempModifyCampaignCauses.forEach((cause, index) => {
+    // Renderiza etiqueta visual
+    const div = document.createElement("div");
+    div.className = "edit-tag-item";
+    div.innerHTML = `
+      <span>${cause}</span>
+      <button type="button" class="edit-tag-remove-btn" onclick="removeModifyCampaignCause(${index})">×</button>
+    `;
+    container.appendChild(div);
 
-  if (typeof showToast !== "undefined") {
-    showToast("Campaña modificada", `Se guardaron los cambios para "${title}".`, true);
-  }
+    // Crear el input oculto para el envío POST a PHP
+    const hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "causas[]";
+    hiddenInput.value = cause;
+    form.appendChild(hiddenInput);
+  });
+}
+
+// Elimina una causa seleccionada en la edición
+window.removeModifyCampaignCause = function(index) {
+  tempModifyCampaignCauses.splice(index, 1);
+  renderModifyCampaignCauses();
+  const causeInput = document.getElementById("modify-campaign-cause-search-input");
+  if (causeInput) showModifyCampaignCauseSuggestions(causeInput.value);
 };
+
+// Muestra sugerencias en el buscador de la edición
+function showModifyCampaignCauseSuggestions(filterText) {
+  const listElement = document.getElementById("modify-campaign-cause-suggestions");
+  if (!listElement) return;
+
+  const searchVal = filterText.toLowerCase().trim();
+  const causesList = window.availableCampaignCauses || [];
+  
+  const filtered = causesList.filter(cause => {
+    const isAlreadySelected = tempModifyCampaignCauses.includes(cause);
+    const matchesSearch = cause.toLowerCase().includes(searchVal);
+    return !isAlreadySelected && matchesSearch;
+  });
+
+  if (filtered.length > 0) {
+    listElement.innerHTML = "";
+    filtered.forEach(cause => {
+      const li = document.createElement("li");
+      li.className = "tag-suggestion-item";
+      li.textContent = cause;
+      li.addEventListener("click", () => {
+        tempModifyCampaignCauses.push(cause);
+        renderModifyCampaignCauses();
+        const causeInput = document.getElementById("modify-campaign-cause-search-input");
+        if (causeInput) {
+          causeInput.value = "";
+          causeInput.focus();
+        }
+        listElement.classList.remove("active");
+      });
+      listElement.appendChild(li);
+    });
+    listElement.classList.add("active");
+  } else {
+    listElement.classList.remove("active");
+  }
+}
+
+// Maneja la selección de archivos de imágenes en la modificación
+window.handleModifyFileSelect = function(event) {
+  const files = event.target.files;
+  
+  if (selectedModifyCampaignFiles.length + files.length > 3) {
+    if (typeof showToast !== "undefined") {
+      showToast("Límite de imágenes", "Solo puedes subir hasta 3 imágenes por campaña.", false);
+    }
+    return;
+  }
+
+  for (let i = 0; i < files.length; i++) {
+    selectedModifyCampaignFiles.push(files[i]);
+  }
+
+  renderModifyImagesPreview();
+};
+
+
+// Dibuja la previsualización de imágenes seleccionadas para modificar
+function renderModifyImagesPreview() {
+  const grid = document.getElementById("modify-images-preview-grid");
+  const form = document.getElementById("modify-camp-form");
+  if (!grid || !form) return;
+
+  grid.innerHTML = "";
+
+  // 1. Eliminar inputs ocultos previos de imágenes existentes para no duplicar
+  form.querySelectorAll('input[name="imagenes_existentes[]"]').forEach(input => input.remove());
+
+  // 2. Renderizar las imágenes que ya existen en la base de datos
+  existingCampaignImages.forEach((imgUrl, index) => {
+    const div = document.createElement("div");
+    div.className = "uploaded-image-preview";
+    div.innerHTML = `
+      <img src="${BASE_URL + imgUrl}" alt="Imagen guardada">
+      <button type="button" class="remove-preview-img-btn" onclick="removeExistingCampaignImage(${index})">×</button>
+    `;
+    grid.appendChild(div);
+
+    // Creamos un input oculto para que viaje en el POST y PHP sepa qué imágenes queremos MANTENER
+    const hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "imagenes_existentes[]";
+    hiddenInput.value = imgUrl;
+    form.appendChild(hiddenInput);
+  });
+
+  // 3. Renderizar los nuevos archivos locales seleccionados en este momento
+  selectedModifyCampaignFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file);
+    const div = document.createElement("div");
+    div.className = "uploaded-image-preview";
+    div.innerHTML = `
+      <img src="${url}" alt="Nueva imagen a subir">
+      <button type="button" class="remove-preview-img-btn" onclick="removeSelectedModifyFile(${index})">×</button>
+    `;
+    grid.appendChild(div);
+  });
+
+  // Sincronizar el input de archivos oculto
+  syncModifyFileInput();
+}
+
+// Función para remover una imagen que ya estaba guardada en MariaDB
+window.removeExistingCampaignImage = function(index) {
+  existingCampaignImages.splice(index, 1);
+  renderModifyImagesPreview(); // Volver a dibujar y actualizar inputs ocultos
+};
+
+// Función para remover una imagen nueva seleccionada
+window.removeSelectedModifyFile = function(index) {
+  selectedModifyCampaignFiles.splice(index, 1);
+  renderModifyImagesPreview();
+};
+
+// Remueve una imagen seleccionada para modificar
+window.removeSelectedModifyFile = function(index) {
+  selectedModifyCampaignFiles.splice(index, 1);
+  renderModifyImagesPreview();
+};
+
+// Sincroniza el input de archivos oculto
+function syncModifyFileInput() {
+  const input = document.getElementById("modify-campaign-images-input");
+  if (!input) return;
+
+  const dataTransfer = new DataTransfer();
+  selectedModifyCampaignFiles.forEach(file => {
+    dataTransfer.items.add(file);
+  });
+  input.files = dataTransfer.files;
+}
 
 // ==========================================
 // 8. DELETE CAMPAIGN CONFIRM DIALOG
@@ -1412,8 +1553,7 @@ function openPostulationDetailsView(postulationId) {
   
   if (mDesc) {
     mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${post.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${post.details}</p>
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${post.desc}</p>
       <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${post.location}</p>
       <p><strong>Período:</strong> ${post.startDate} al ${post.endDate}</p>
     `;
@@ -1922,8 +2062,7 @@ function openReceivedCampaignDetailsView(invitationId) {
   
   if (mDesc) {
     mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${inv.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${inv.details}</p>
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.desc}</p>
       <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.location}</p>
       <p><strong>Período:</strong> ${inv.startDate} al ${inv.endDate}</p>
     `;
@@ -1975,8 +2114,7 @@ function openSentCampaignDetailsView(invitationId) {
   
   if (mDesc) {
     mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${inv.campaignDesc}</p>
-      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${inv.campaignDetails}</p>
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.campaignDesc}</p>
       <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.campaignLocation}</p>
       <p><strong>Período:</strong> ${inv.campaignStartDate} al ${inv.campaignEndDate}</p>
     `;
@@ -2201,8 +2339,7 @@ function openVolunteeringDetailsView(volunteeringId) {
   
   if (mDesc) {
     mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${item.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${item.details}</p>
+      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${item.desc}</p>
       <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${item.location}</p>
       <p><strong>Período:</strong> ${item.startDate} al ${item.endDate}</p>
     `;
@@ -2320,4 +2457,235 @@ function syncFileInput() {
     dataTransfer.items.add(file);
   });
   input.files = dataTransfer.files; // Asigna la nueva lista limpia de archivos
+}
+
+
+// ==========================================
+// MENSAJES DE ERROR O ÉXITO EN CREAR Y MODIFICAR CAMPAÑA
+// ==========================================
+
+/* Función para generar mensajes dentro de los modales */
+function renderModalMessage(messageBoxId, message, isSuccess) {
+  const messageBox = document.getElementById(messageBoxId);
+  if (!messageBox) return;
+
+  messageBox.innerHTML = '';
+
+  const alert = document.createElement('div');
+  alert.setAttribute('role', 'alert');
+  alert.style.marginBottom = '20px';
+  alert.style.padding = '14px';
+  alert.style.borderRadius = '10px';
+  alert.style.fontSize = '13px';
+  alert.style.lineHeight = '1.4';
+  alert.style.fontWeight = '500';
+  alert.style.border = '1px solid';
+  
+  // Colores
+  alert.style.backgroundColor = isSuccess ? 'rgba(220, 252, 231, 0.95)' : 'rgba(254, 226, 226, 0.95)';
+  alert.style.color = isSuccess ? '#166534' : '#b91c1c';
+  alert.style.borderColor = isSuccess ? '#86efac' : '#fca5a5';
+  
+  // Diseño de mensaje con icono de Lucide
+  alert.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <i data-lucide="${isSuccess ? 'check-circle' : 'alert-circle'}" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+      <span>${message}</span>
+    </div>
+  `;
+
+  messageBox.appendChild(alert);
+
+  // Re-inicializar iconos de Lucide para que cargue el nuevo icono del alert
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+/* --------- Configuración de validaciones y envío AJAX para Crear y Modificar Campañas --------- */
+function setupCampaignFormValidations() {
+  
+  // --- 1. FORMULARIO DE CREACIÓN (AJAX) ---
+  const createForm = document.getElementById("create-camp-form");
+  if (createForm) {
+    createForm.addEventListener("submit", async (event) => {
+      event.preventDefault(); // Detener el envío tradicional obligatorio
+
+      const title = document.getElementById("create-title").value.trim();
+      const desc = document.getElementById("create-desc").value.trim();
+      const location = document.getElementById("create-location").value.trim();
+      const startDateVal = document.getElementById("create-start-date").value;
+      const endDateVal = document.getElementById("create-end-date").value;
+      
+      const type = document.querySelector('input[name="tipo_campania"]:checked')?.value;
+      const additionalInfoInput = document.getElementById("create-additional");
+      const additionalInfo = additionalInfoInput ? additionalInfoInput.value.trim() : "";
+
+      // A. Validación de campos obligatorios en el cliente (Agregado !details)
+      if (!title || !desc || !location || !startDateVal || !endDateVal) {
+        renderModalMessage("create-camp-message-box", "Por favor, completa todos los campos obligatorios.", false);
+        return;
+      }
+
+      // B. Validación de campo adicional
+      if (type === "convocatoria" && !additionalInfo) {
+        renderModalMessage("create-camp-message-box", "Por favor, ingresa la información adicional requerida para la convocatoria.", false);
+        return;
+      }
+
+      // C. Validación de causas
+      if (tempCampaignCauses.length === 0) {
+        renderModalMessage("create-camp-message-box", "Debes seleccionar al menos una causa para la campaña.", false);
+        return;
+      }
+
+      // D. Validación de Fechas
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const start = new Date(startDateVal + "T00:00:00");
+      const end = new Date(endDateVal + "T00:00:00");
+
+      if (start < today) {
+        renderModalMessage("create-camp-message-box", "La fecha de inicio no puede ser anterior a la fecha actual.", false);
+        return;
+      }
+      if (end < today) {
+        renderModalMessage("create-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha actual.", false);
+        return;
+      }
+      if (end < start) {
+        renderModalMessage("create-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha de inicio.", false);
+        return;
+      }
+
+      // --- PASÓ VALIDACIONES CLIENTE: ENVÍO POR FETCH ---
+      const submitBtn = createForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creando...';
+      }
+
+      const formData = new FormData(createForm);
+
+      try {
+        const response = await fetch(createForm.action, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Error en el servidor');
+
+        const data = await response.json(); // Recibe la respuesta de PHP
+
+        if (data.success) {
+          closeModal("modal-create-campaign");
+          createForm.reset();
+          // Activa el toast flotante con la respuesta del servidor
+          if (typeof showToast !== "undefined") {
+            showToast("¡Campaña creada!", data.message, true);
+          }
+          // Espera 1.5 segundos para que el usuario pueda ver el mensaje antes de recargar
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          // Error devuelto por PHP: Lo pintamos dentro del modal
+          renderModalMessage("create-camp-message-box", data.message, false);
+        }
+      } catch (error) {
+        renderModalMessage("create-camp-message-box", "No se pudo conectar con el servidor. Intenta de nuevo.", false);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
+  }
+
+  // --- 2. FORMULARIO DE MODIFICACIÓN (AJAX) ---
+  const modifyForm = document.getElementById("modify-camp-form");
+  if (modifyForm) {
+    modifyForm.addEventListener("submit", async (event) => {
+      event.preventDefault(); // Detener el envío tradicional obligatorio
+
+      const title = document.getElementById("modify-title").value.trim();
+      const desc = document.getElementById("modify-desc").value.trim();
+      const location = document.getElementById("modify-location").value.trim();
+      const startDateVal = document.getElementById("modify-start-date").value;
+      const endDateVal = document.getElementById("modify-end-date").value;
+      
+      const type = document.getElementById("modify-type-convocatoria").checked ? "convocatoria" : "informativa";
+      const additionalInfoInput = document.getElementById("modify-additional");
+      const additionalInfo = additionalInfoInput ? additionalInfoInput.value.trim() : "";
+
+      // Validación de campos obligatorios en el cliente
+      if (!title || !desc || !location || !startDateVal || !endDateVal) {
+        renderModalMessage("modify-camp-message-box", "Por favor, completa todos los campos obligatorios.", false);
+        return;
+      }
+
+      if (type === "convocatoria" && !additionalInfo) {
+        renderModalMessage("modify-camp-message-box", "Por favor, ingresa la información adicional requerida para la convocatoria.", false);
+        return;
+      }
+
+      // Validación de Fechas
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const start = new Date(startDateVal + "T00:00:00");
+      const end = new Date(endDateVal + "T00:00:00");
+
+      if (end < start) {
+        renderModalMessage("modify-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha de inicio.", false);
+        return;
+      }
+      if (end < today) {
+        renderModalMessage("modify-camp-message-box", "La fecha de finalización no puede ser anterior a la fecha actual.", false);
+        return;
+      }
+
+      // --- PASÓ VALIDACIONES CLIENTE: ENVÍO POR FETCH ---
+      const submitBtn = modifyForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+      }
+
+      const formData = new FormData(modifyForm);
+
+      try {
+        const response = await fetch(modifyForm.action, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Error en el servidor');
+
+        const data = await response.json(); // Recibe la respuesta de PHP
+
+        if (data.success) {
+          closeModal("modal-modify-campaign");
+          modifyForm.reset();
+          // Activa el toast flotante con la respuesta del servidor
+          if (typeof showToast !== "undefined") {
+            showToast("¡Cambios guardados!", data.message, true);
+          }
+          // Espera 1.5 segundos para que el usuario pueda ver el mensaje antes de recargar
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        }
+      } catch (error) {
+        renderModalMessage("modify-camp-message-box", "No se pudo conectar con el servidor. Intenta de nuevo.", false);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
+  }
 }

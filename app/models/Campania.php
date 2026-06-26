@@ -96,26 +96,67 @@ class Campania {
         return $resultado ? (int)$resultado['id'] : false;
     }
 
-    public function agregarCausaACampania(int $idCampania, int $idCausa) : bool {
-        // Asocia una causa a una Campaña
-        $consulta = "INSERT INTO campanias_causas (campania_id, causa_id) VALUES (:campania_id, :causa_id);";
+    public function obtenerCausasDeCampania ( int $idCampania ) : array {
+        $consulta = "SELECT c.causa FROM campanias_causas cc
+                        JOIN causas c ON c.id = cc.causa_id
+                        WHERE cc.campania_id = :camp_id;";
 
         $this->bd->consulta($consulta);
-        $this->bd->asignar(":campania_id", $idCampania);
-        $this->bd->asignar(":causa_id", $idCausa);
-
-        return $this->bd->ejecutar();
+        $this->bd->asignar(":camp_id", $idCampania);
+        $this->bd->ejecutar();
+        
+        $resultados = $this->bd->resultados();
+        return array_column($resultados, 'causa');
     }
 
-    public function agregarArchivoCampania(int $idCampania, string $referencia, ?string $tipo = null) : bool {
-        $consulta = "INSERT INTO archivos (campania_id, referencia, tipo) VALUES (:campania_id, :referencia, :tipo);";
-
-        $this->bd->consulta($consulta);
-        $this->bd->asignar(":campania_id", $idCampania);
-        $this->bd->asignar(":referencia", $referencia);
-        $this->bd->asignar(":tipo", $tipo);
+    public function obtenerArchivosDeCampania(int $idCampania) : array {
+        $consulta = "SELECT referencia FROM archivos 
+                        WHERE campania_id = :camp_id AND tipo = 'imagen';";
         
-        return $this->bd->ejecutar();
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":camp_id", $idCampania);
+        $this->bd->ejecutar();
+        
+        $resultados = $this->bd->resultados();
+        return array_column($resultados, 'referencia');
+    }
+
+    public function obtenerCampaniasDeUsuario(int $idUsuario) : array {
+        $consulta = "SELECT c.*, t.tipo as 'nombre_tipo'
+                     FROM campanias c
+                     JOIN tipos_campanias t ON t.id = c.tipo_id
+                     WHERE c.usuario_id = :usu_id
+                     ORDER BY c.id DESC;";
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":usu_id", $idUsuario);
+        $this->bd->ejecutar();
+        
+        $campaniasDb = $this->bd->resultados();
+        $campaniasMapeadas = [];
+        
+        foreach ($campaniasDb as $camp) {
+            $idCamp = (int)$camp['id'];
+            $causes = $this->obtenerCausasDeCampania($idCamp);
+            $images = $this->obtenerArchivosDeCampania($idCamp);
+            
+            // Array mapeado para la lectura de perfil_voluntario_logueado.js
+            $campaniasMapeadas[] = [
+                'id' => $idCamp,
+                'title' => $camp['titulo'],
+                'desc' => $camp['descripcion'], 
+                'category' => !empty($causes) ? $causes[0] : '', // Categoría principal
+                'causes' => $causes, // Listado completo de causas
+                'type' => strtolower($camp['nombre_tipo']) === 'convocatoria' ? 'convocatoria' : 'informativa',
+                'startDate' => $camp['fecha_inicio'],
+                'endDate' => $camp['fecha_finalizacion'],
+                'location' => $camp['ubicacion'],
+                'details' => $camp['descripcion'],
+                'additionalInfo' => $camp['info_adicional'],
+                'images' => $images
+            ];
+        }
+        
+        return $campaniasMapeadas;
     }
 
 
@@ -140,6 +181,29 @@ class Campania {
         return $this->bd->ejecutar();
     }
 
+    public function agregarCausaACampania(int $idCampania, int $idCausa) : bool {
+        // Asocia una causa a una Campaña
+        $consulta = "INSERT INTO campanias_causas (campania_id, causa_id) VALUES (:campania_id, :causa_id);";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":campania_id", $idCampania);
+        $this->bd->asignar(":causa_id", $idCausa);
+
+        return $this->bd->ejecutar();
+    }
+
+    public function agregarArchivoCampania(int $idCampania, string $referencia, ?string $tipo = null) : bool {
+        $consulta = "INSERT INTO archivos (campania_id, referencia, tipo) VALUES (:campania_id, :referencia, :tipo);";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":campania_id", $idCampania);
+        $this->bd->asignar(":referencia", $referencia);
+        $this->bd->asignar(":tipo", $tipo);
+        
+        return $this->bd->ejecutar();
+    }
+
+
 
     /* ------------------------ ACTUALIZAR DATOS ------------------------ */
     public function actualizarDatosCampania (int $idCampania, array $datos) :bool {
@@ -149,33 +213,90 @@ class Campania {
             return true;
         }
         $campos = [];
+        $parametrosABindear = [];
         
-        if(isset($datos['titulo']))
+        // array_key_exists para acepteptar valores NULL
+        if (array_key_exists('titulo', $datos)) {
             $campos[] = "titulo = :titulo";
-        if(isset($datos['descripcion']))
+            $parametrosABindear['titulo'] = $datos['titulo'];
+        }
+        if (array_key_exists('descripcion', $datos)) {
             $campos[] = "descripcion = :descripcion";
-        if(isset($datos['fecha_finalizacion']))
+            $parametrosABindear['descripcion'] = $datos['descripcion'];
+        }
+        if (array_key_exists('fecha_finalizacion', $datos)) {
             $campos[] = "fecha_finalizacion = :fecha_finalizacion";
-        if(isset($datos['fecha_inicio']))
+            $parametrosABindear['fecha_finalizacion'] = $datos['fecha_finalizacion'];
+        }
+        if (array_key_exists('fecha_inicio', $datos)) {
             $campos[] = "fecha_inicio = :fecha_inicio";
-        if(isset($datos['ubicacion']))
+            $parametrosABindear['fecha_inicio'] = $datos['fecha_inicio'];
+        }
+        if (array_key_exists('ubicacion', $datos)) {
             $campos[] = "ubicacion = :ubicacion";
-        if(isset($datos['info_adicional']))
+            $parametrosABindear['ubicacion'] = $datos['ubicacion'];
+        }
+        if (array_key_exists('info_adicional', $datos)) {
             $campos[] = "info_adicional = :info_adicional";
+            $parametrosABindear['info_adicional'] = $datos['info_adicional'];
+        }
+        if (empty($campos)) {
+            return true;
+        }
 
         $consulta = "UPDATE campanias SET " . implode(', ', $campos) . " WHERE id = :campania_id";
         $this->bd->consulta($consulta);
-
         $this->bd->asignar(":campania_id", $idCampania);
-        foreach ($datos as $campo => $valor){
+        
+        foreach ($parametrosABindear as $campo => $valor) {
             $this->bd->asignar(":$campo", $valor);
         }
 
         return $this->bd->ejecutar();
     }
 
+    public function sincronizarImagenesExistentes ( int $idCampania, array $imagenesExistentes ) :void {
+        $consulta = "SELECT referencia FROM archivos 
+                            WHERE campania_id = :camp_id AND tipo = 'imagen';";
+        
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":camp_id", $idCampania);
+        
+        $this->bd->ejecutar();
+        $imagenesBD = $this->bd->resultados();  // Se retorna un array de arrays
+
+        foreach ($imagenesBD as $imagen) {
+            $rutaBD = $imagen['referencia']; 
+            
+            if (!in_array($rutaBD, $imagenesExistentes)) {
+                // Se borra el archivo en la carpeta 'archivos'
+                /* Como el entry point del sitio es public/index.php, la ruta relativa 'archivos/...' es directa. */
+                if (file_exists($rutaBD)) {
+                    unlink($rutaBD); // Elimina físicamente el archivo
+                }
+                
+                $consultaBorrar = "DELETE FROM archivos WHERE campania_id = :camp_id AND referencia = :ref;";
+                $this->bd->consulta($consultaBorrar);
+                $this->bd->asignar(":camp_id", $idCampania);
+                $this->bd->asignar(":ref", $rutaBD);
+
+                $this->bd->ejecutar();
+            }
+        }
+    }
+
 
     /* ------------------------ ELIMINAR ------------------------ */
+    public function eliminarCausasDeCampania ( int $idCampania ) :void {
+        $consulta = "DELETE FROM campanias_causas WHERE campania_id = :id";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id", $idCampania);
+
+        $this->bd->ejecutar();
+    }
+
+    
 
 }
 

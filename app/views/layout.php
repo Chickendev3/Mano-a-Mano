@@ -33,8 +33,16 @@
     </script>
     
     <!-- Carga de JS Global-->
-    <script src="<?= BASE_URL ?>js/main.js"></script>
+    <script src="<?= BASE_URL ?>js/main.js"></script>    
 
+</head>
+
+<?php require_once '../app/views/componentes/header.php'; ?>
+
+<body>
+
+    <?php require_once '../app/views/' . $rutaVista . '.php'; ?> 
+    
     <!-- Carga de JS Dinámicos-->
     <?php if (isset($jsPropio) && !empty($jsPropio)){
             if (!is_array($jsPropio)) 
@@ -46,22 +54,16 @@
         <script src="<?= BASE_URL ?>js/<?php echo htmlspecialchars($js); ?>"></script>
     <?php }} ?>
 
-</head>
-
-<?php
-    require_once '../app/views/componentes/header.php'; 
-?>
-
-<body>
-
-    <?php require_once '../app/views/' . $rutaVista . '.php'; ?> 
-    
+    <!-- Contenedor Global para Notificaciones Flotantes (Toasts) -->
+    <div class="toast" id="global-toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-icon"></div>
+        <div class="toast-content">
+            <h4 id="toast-title"></h4>
+            <p id="toast-message"></p>
+        </div>
+    </div>
 </body>
 
-
-
-<?php
-    require_once '../app/views/componentes/footer.php';
-?>
+<?php require_once '../app/views/componentes/footer.php'; ?>
 
 </html>

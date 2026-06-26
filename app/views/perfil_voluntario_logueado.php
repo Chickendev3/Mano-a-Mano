@@ -367,7 +367,7 @@
 </main>
 
 <!-- ==========================================
-     MODALS SECTION
+     SECCIONES DE VISTAS DE MODAL
      ========================================== -->
 
 <!-- 1. CAMPAIGN DETAILS VIEW MODAL (SHARED) -->
@@ -383,16 +383,19 @@
     <h3 class="modal-title" id="create-camp-title" style="margin-bottom: 24px;">Crear nueva campaña</h3>
     
     <script>
+      // Forzar variables globales para el frontend desde MariaDB
       window.availableCampaignCauses = <?= json_encode($causas ?? []); ?>;
+      window.campaigns = <?= json_encode($campaniasUsuario ?? []); ?>;
     </script>
     <form action="<?= BASE_URL ?>crear-campania" method="POST" enctype="multipart/form-data" class="campaign-modal-form" id="create-camp-form">
+      
       <!-- Campaign Type -->
       <div class="edit-row">
         <label>Elija el tipo de campaña:</label>
         <div class="radio-group-type">
           <label class="radio-label">
             <input type="radio" name="tipo_campania" value="convocatoria" checked onchange="toggleCreateAddInfoField()">
-            <span>Campaña Convocativa</span>
+            <span>Campaña Convocatoria</span>
           </label>
           <label class="radio-label">
             <input type="radio" name="tipo_campania" value="informativa" onchange="toggleCreateAddInfoField()">
@@ -445,12 +448,6 @@
         </div>
       </div>
 
-      <!-- Important Information / Detailed content -->
-      <!-- <div class="edit-row">
-        <label for="create-details">Información importante (Detalle de la campaña)</label>
-        <textarea id="create-details" class="edit-input" rows="4" placeholder="Ingrese las actividades a realizar, horarios específicos y detalles del proyecto" required></textarea>
-      </div> -->
-
       <!-- Additional Info (Conditional for Convocatoria) -->
       <div class="edit-row" id="create-additional-info-group">
         <label for="create-additional">Información adicional (Solo visible para postulantes aceptados)</label>
@@ -477,6 +474,8 @@
         </div>
       </div>
 
+      <div id="create-camp-message-box"></div>  
+
       <div class="modal-footer-actions" style="margin-top: 16px;">
         <button type="button" class="btn btn-ghost" onclick="closeModal('modal-create-campaign')">Cancelar</button>
         <button type="submit" class="btn btn-primary">Crear campaña</button>
@@ -495,19 +494,21 @@
     
     <h3 class="modal-title" id="modify-camp-title" style="margin-bottom: 24px;">Modificar campaña</h3>
     
-    <form class="campaign-modal-form" id="modify-camp-form" onsubmit="event.preventDefault(); handleModifyCampaignSubmit();">
+    <form action="<?= BASE_URL ?>modificar-campania" method="POST" enctype="multipart/form-data" class="campaign-modal-form" id="modify-camp-form">  
       
+      <input type="hidden" name="id_campania" id="modify-campaign-id-input"> <!-- Envía el ID de la campaña que estamos modificando -->
+
       <!-- Campaign Type -->
       <div class="edit-row">
-        <label>Elija el tipo de campaña:</label>
+        <label>Tipo de Campaña: </label>  
         <div class="radio-group-type">
           <label class="radio-label">
-            <input type="radio" name="modify-camp-type" value="convocatoria" id="modify-type-convocatoria" onchange="toggleModifyAddInfoField()">
-            <span>Campaña con postulaciones</span>
+            <input type="radio" name="tipo_campania" value="convocatoria" id="modify-type-convocatoria" disabled>
+            <span>Campaña Convocatoria</span>
           </label>
           <label class="radio-label">
-            <input type="radio" name="modify-camp-type" value="informativa" id="modify-type-informativa" onchange="toggleModifyAddInfoField()">
-            <span>Campaña informativa (sin postulaciones)</span>
+            <input type="radio" name="tipo_campania" value="informativa" id="modify-type-informativa" disabled>
+            <span>Campaña Informativa</span>
           </label>
         </div>
       </div>
@@ -515,74 +516,75 @@
       <!-- Campaign Title -->
       <div class="edit-row">
         <label for="modify-title">Nombre de la campaña</label>
-        <input type="text" id="modify-title" class="edit-input" required>
+        <input type="text" name="titulo_campania" id="modify-title" class="edit-input" required>
       </div>
 
       <!-- Campaign Short Description -->
       <div class="edit-row">
-        <label for="modify-desc">Breve descripción</label>
-        <textarea id="modify-desc" class="edit-input" rows="2" required></textarea>
+        <label for="modify-desc">Descripción</label>
+        <textarea name="descripcion_campania" id="modify-desc" class="edit-input" rows="2" required></textarea>
       </div>
 
-      <!-- Category Tags Selection -->
-      <div class="form-group-row">
-        <div class="edit-row">
-          <label for="modify-category">Categoría principal</label>
-          <select id="modify-category" class="edit-input" required>
-            <option value="medio-ambiente">Medio Ambiente</option>
-            <option value="educacion">Educación</option>
-            <option value="accion-social">Acción Social</option>
-            <option value="salud">Salud</option>
-            <option value="cultura">Cultura</option>
-          </select>
+      <!-- Causas de la Campaña (Etiquetas con buscador para Modificar) -->
+      <div class="edit-row" style="margin-bottom: 16px; width: 100%;">
+        <label>Causas de la Campaña (Selección con buscador)</label>
+        <div class="edit-tags-container" id="modify-campaign-causes-list">
+          <!-- Se completa dinámicamente con JS -->
         </div>
-        <div class="edit-row">
-          <label for="modify-location">Ubicación</label>
-          <input type="text" id="modify-location" class="edit-input" required>
+        <div class="tag-search-wrapper">
+          <input type="text" id="modify-campaign-cause-search-input" class="edit-input" placeholder="Buscar causas (ej: Educación, Medio Ambiente, Salud...)">
+          <ul class="tag-suggestions-list" id="modify-campaign-cause-suggestions">
+            <!-- Sugerencias dinámicas de JS -->
+          </ul>
         </div>
+      </div>
+
+      <div class="edit-row">
+        <label for="modify-location">Ubicación</label>
+        <input type="text" name="ubicacion" id="modify-location" class="edit-input" required>
       </div>
 
       <!-- Dates -->
       <div class="form-group-row">
         <div class="edit-row">
           <label for="modify-start-date">Fecha de inicio</label>
-          <input type="date" id="modify-start-date" class="edit-input" required>
+          <input type="date" name="fecha_inicio" id="modify-start-date" class="edit-input" required>
         </div>
         <div class="edit-row">
           <label for="modify-end-date">Fecha de finalización</label>
-          <input type="date" id="modify-end-date" class="edit-input" required>
+          <input type="date" name="fecha_fin" id="modify-end-date" class="edit-input" required>
         </div>
       </div>
 
-      <!-- Important Information / Detailed content -->
-      <div class="edit-row">
-        <label for="modify-details">Información importante (Detalle de la campaña)</label>
-        <textarea id="modify-details" class="edit-input" rows="4" required></textarea>
-      </div>
-
-      <!-- Additional Info (Conditional for Convocatoria) -->
+      <!-- MOSTRAR NADA MÁS SI LA CAMPAÑA ES CONVOCATORIA -->
       <div class="edit-row" id="modify-additional-info-group">
         <label for="modify-additional">Información adicional (Solo visible para postulantes aceptados)</label>
-        <textarea id="modify-additional" class="edit-input" rows="3"></textarea>
+        <textarea name="info_adicional" id="modify-additional" class="edit-input" rows="3"></textarea>
       </div>
 
-      <!-- Images (Mockup simulation) -->
+      <!-- Imágenes de la campaña (Real para Modificar) -->
       <div class="edit-row">
-        <label>Imágenes de la campaña (Opcional)</label>
-        <div class="image-upload-simulation" onclick="simulateModifyCampaignImageUpload()">
+        <label>Imágenes de la campaña (Máximo 3)</label>
+        <div class="image-upload-simulation" onclick="document.getElementById('modify-campaign-images-input').click()">
           <div class="image-upload-simulation-content">
             <i data-lucide="image-plus"></i>
-            <span>+ Agregar imágenes (Simulado)</span>
+            <span>Seleccionar imágenes</span>
           </div>
         </div>
+        
+        <!-- Input oculto de archivos -->
+        <input type="file" name="imagenes[]" id="modify-campaign-images-input" multiple accept="image/*" style="display: none;" onchange="handleModifyFileSelect(event)">
+        
         <div class="uploaded-images-grid" id="modify-images-preview-grid">
-          <!-- Dynamically populated mock image previews -->
+          <!-- Se completa dinámicamente con JS -->
         </div>
       </div>
 
+      <!-- Caja de mensajes de error/éxito -->
+      <div id="modify-camp-message-box"></div>
+      
       <div class="modal-footer-actions" style="margin-top: 16px;">
-        <button type="button" class="btn btn-ghost" onclick="closeModal('modal-modify-campaign')">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
       </div>
       
     </form>

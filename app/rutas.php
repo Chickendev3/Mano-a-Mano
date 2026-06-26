@@ -23,7 +23,8 @@ $rutas = [
     /* Perfiles */
     'perfil' => ['controlador' => 'perfilCtrl', 'metodo' => 'index'],
     /* 'perfil/LoggedIn/Voluntario' => [] */
-    'crear-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'crearCampania']
+    'crear-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'crearCampania'],
+    'modificar-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'modificarCampania']
 
 ];
 ?>
