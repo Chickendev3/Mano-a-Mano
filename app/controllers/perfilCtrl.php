@@ -291,5 +291,60 @@ class perfilCtrl extends Controlador {
         }
     }
     
+    public function editarPerfilVoluntario () :void {
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json');
+
+            $nombre = trim($_POST['nombre'] ?? '');
+            $apellido = trim($_POST['apellido'] ?? ''); 
+            $descripcion = trim($_POST['descripcion'] ?? '');
+                $descripcion = ($descripcion !== '') ? htmlspecialchars($descripcion, ENT_QUOTES, 'UTF-8') : null;
+            $ubicacion = trim($_POST['ubicacion'] ?? '');
+                $ubicacion = ($ubicacion !== '') ? $ubicacion : null;
+            $disponibilidad = trim($_POST['disponibilidad_horaria'] ?? '');
+                $disponibilidad = ($disponibilidad !== '') ? $disponibilidad : null;
+            $email = trim($_POST['email'] ?? '');
+            $telefono = trim($_POST['telefono'] ?? '');
+                $telefono = ($telefono !== '') ? $telefono : null;
+            $telefonoEmergencia = trim($_POST['telefono_emergencia'] ?? '');
+                $telefonoEmergencia = ($telefonoEmergencia !== '') ? $telefonoEmergencia : null;
+            $oficios = $_POST['oficios'] ?? [];
+
+            if (empty($nombre) || empty($apellido) || empty($email) || empty($telefono)) {
+                echo json_encode(['success' => false, 'message' => 'El nombre, apellido, email y teléfono son campos requeridos.']);
+                return;
+            }
+
+            $idUsuario = $_SESSION['id_usuario'];
+            $modeloVol = $this->cargarModelo('Voluntario');
+
+            // 1. Guardar la información básica (usuarios y voluntarios)
+            $actualizado = $modeloVol->actualizarDatosVoluntario($idUsuario, [
+                'nombre' => $nombre,
+                'apellido' => $apellido,
+                'descripcion' => $descripcion,
+                'ubicacion' => $ubicacion,
+                'disponibilidad_horaria' => $disponibilidad,
+                'email' => $email,
+                'telefono' => $telefono,
+                'telefono_emergencia' => $telefonoEmergencia
+            ]);
+
+            // 2. Guardar los oficios seleccionados
+            $oficiosActualizados = $modeloVol->actualizarOficiosVoluntario($idUsuario, $oficios);
+
+            if ($actualizado && $oficiosActualizados) {
+                // Actualizar los datos de sesión para que el header cambie dinámicamente al instante
+                $_SESSION['nombre_usuario'] = $nombre;
+                $_SESSION['apellido_usuario'] = $apellido;
+
+                echo json_encode(['success' => true, 'message' => 'Perfil actualizado con éxito.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al guardar los datos del perfil.']);
+            }
+            return;
+        }
+    }
 }
 ?>

@@ -56,7 +56,7 @@ class Voluntario extends Usuario{
     }
 
     public function obtenerVoluntarioPorID ( int $idUsuario ) :array {
-        $consulta = "SELECT u.id as 'id', CONCAT(u.nombre, ' ', v.apellido) as 'nombre completo', u.email, u.descripcion, u.telefono, u.ubicacion, v.telefono_emergencia, v.disponibilidad_horaria, u.img_perfil 
+        $consulta = "SELECT u.id as 'id', u.nombre, v.apellido, CONCAT(u.nombre, ' ', v.apellido) as 'nombre completo', u.email, u.descripcion, u.telefono, u.ubicacion, v.telefono_emergencia, v.disponibilidad_horaria, u.img_perfil 
                         FROM usuarios u JOIN voluntarios v ON u.id = v.usuario_id
                         WHERE v.usuario_id = :id";
     
@@ -170,14 +170,14 @@ class Voluntario extends Usuario{
         }
         $campos = [];
         
-        if(isset($datosVoluntario['apellido']))
+        if(array_key_exists('apellido', $datosVoluntario))
             $campos[] = "apellido = :apellido";
-        if(isset($datosVoluntario['telefono_emergencia']))
+        if(array_key_exists('telefono_emergencia', $datosVoluntario))
             $campos[] = "telefono_emergencia = :telefono_emergencia";
-        if(isset($datosVoluntario['disponibilidad_horaria']))
+        if(array_key_exists('disponibilidad_horaria', $datosVoluntario))
             $campos[] = "disponibilidad_horaria = :disponibilidad_horaria";
         
-        $sql = "UPDATE voluntarios SET " . implode(', ', $campos) . " WHERE id_usuario = :id_usuario";
+        $sql = "UPDATE voluntarios SET " . implode(', ', $campos) . " WHERE usuario_id = :id_usuario";
         $this->bd->consulta($sql);
 
         $this->bd->asignar(":id_usuario", $idUsuario);
@@ -186,6 +186,44 @@ class Voluntario extends Usuario{
         }
         
         return $this->bd->ejecutar();
+    }
+
+    public function actualizarOficiosVoluntario(int $idUsuario, array $oficios) : bool {
+        $idVol = $this->obtenerIDVoluntario($idUsuario);
+
+        if (!$idVol) {
+            return false;
+        }
+        $idVoluntario = (int)$idVol['id'];
+
+        // Se eliminan relaciones anteriores
+        $sqlDelete = "DELETE FROM voluntarios_oficios WHERE voluntario_id = :id_voluntario";
+        $this->bd->consulta($sqlDelete);
+        $this->bd->asignar(":id_voluntario", $idVoluntario);
+        $this->bd->ejecutar();
+
+        if (empty($oficios)) {
+            return true;
+        }
+
+        // Se insertan las nuevas relaciones asociando los IDs de los oficios
+        foreach ($oficios as $nombreOficio) {
+            $sqlOficio = "SELECT id FROM oficios WHERE oficio = :nombre_oficio";
+            $this->bd->consulta($sqlOficio);
+            $this->bd->asignar(":nombre_oficio", $nombreOficio);
+            $this->bd->ejecutar();
+            $res = $this->bd->resultado();
+            
+            if ($res) {
+                $idOficio = (int)$res['id'];
+                $sqlInsert = "INSERT INTO voluntarios_oficios (voluntario_id, oficio_id) VALUES (:id_vol, :id_oficio)";
+                $this->bd->consulta($sqlInsert);
+                $this->bd->asignar(":id_vol", $idVoluntario);
+                $this->bd->asignar(":id_oficio", $idOficio);
+                $this->bd->ejecutar();
+            }
+        }
+        return true;
     }
 
     /* -------------------- ELIMINAR -------------------- */

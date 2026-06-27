@@ -16,6 +16,8 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
 <script>
   window.initialUserProfile = {
     name: <?= json_encode($usuario['nombre completo'] ?? '') ?>,
+    nombre: <?= json_encode($usuario['nombre'] ?? '') ?>,
+    apellido: <?= json_encode($usuario['apellido'] ?? '') ?>,
     desc: <?= json_encode($usuario['descripcion'] ?? '') ?>,
     location: <?= json_encode($usuario['ubicacion'] ?? '') ?>,
     availability: <?= json_encode($usuario['disponibilidad_horaria'] ?? '') ?>,
@@ -54,27 +56,19 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
         <div id="profile-view-state">
           <h1 class="profile-name" id="view-profile-name"> <?php echo htmlspecialchars($usuario['nombre completo'] ?? ''); ?> </h1>
           
-          <?php if (!empty($usuario['descripcion'])): ?>
           <p class="profile-desc-text" id="view-profile-desc">
-            <?php echo htmlspecialchars($usuario['descripcion']); ?>
+            <?php echo !empty($usuario['descripcion']) ? htmlspecialchars($usuario['descripcion']) : 'Sin biografía cargada...'; ?>
           </p>
-          <?php else: ?>
-          <i class="profile-desc-text">Sin biografía cargada...</i>
-          <?php endif; ?>
 
           <div class="profile-meta-row">
-            <?php if (!empty($usuario['ubicacion'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="map-pin"></i>
-              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion']); ?></span>
+              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
             </div>
-            <?php endif; ?>
-            <?php if (!empty($usuario['disponibilidad_horaria'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="clock"></i>
-              <span id="view-profile-availability"><?php echo htmlspecialchars($usuario['disponibilidad_horaria']); ?></span>
+              <span id="view-profile-availability"><?php echo htmlspecialchars($usuario['disponibilidad_horaria'] ?? 'No especificada'); ?></span>
             </div>
-            <?php endif; ?>
           </div>
 
           <!-- Información Privada (Solo visible para el propio voluntario) -->
@@ -142,28 +136,32 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
         </div>
 
         <!-- FORMULARIO DE EDICIÓN DEL PERFIL (Oculto por defecto) -->
-        <div class="profile-info-edit-form" id="profile-edit-state" style="display: none;">
+        <form class="profile-info-edit-form" id="profile-edit-state" style="display: none;" onsubmit="event.preventDefault();">
           <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary);">Información Pública</h3>
           
           <div class="form-group-row" style="margin-bottom: 12px;">
             <div class="edit-row">
-              <label for="edit-name">Nombre y Apellido</label>
-              <input type="text" id="edit-name" class="edit-input">
+              <label for="edit-name">Nombre</label>
+              <input type="text" name="nombre" id="edit-name" class="edit-input">
             </div>
             <div class="edit-row">
-              <label for="edit-location">Ubicación</label>
-              <input type="text" id="edit-location" class="edit-input">
+              <label for="edit-lastname">Apellido</label>
+              <input type="text" name="apellido" id="edit-lastname" class="edit-input">
             </div>
           </div>
 
+          <div class="edit-row">
+              <label for="edit-location">Ubicación</label>
+              <input type="text" name="ubicacion" placeholder="Provincia, Localidad, Ciudad" id="edit-location" class="edit-input">
+            </div>
           <div class="edit-row" style="margin-bottom: 12px;">
             <label for="edit-desc">Descripción</label>
-            <textarea id="edit-desc" class="edit-input" rows="3"></textarea>
+            <textarea name="descripcion" placeholder="Escriba su biografía" id="edit-desc" class="edit-input" rows="3"></textarea>
           </div>
 
           <div class="edit-row" style="margin-bottom: 12px;">
             <label for="edit-availability">Horario de Disponibilidad</label>
-            <input type="text" id="edit-availability" class="edit-input" placeholder="Ej: Lunes a Viernes de 9:00 a 13:00 o Sábados todo el día">
+            <input type="text" name="disponibilidad_horaria" id="edit-availability" class="edit-input" placeholder="Ej: Lunes a Viernes de 9:00 a 13:00 o Sábados todo el día">
           </div>
 
           <div class="edit-row" style="margin-bottom: 16px;">
@@ -172,7 +170,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
               <!-- Se completa dinámicamente con JS -->
             </div>
             <div class="tag-search-wrapper">
-              <input type="text" id="tag-search-input" class="edit-input" placeholder="Buscar oficios (ej: Cocinero, Profesor, Electricista...)">
+              <input type="text" name="oficios[]" id="tag-search-input" class="edit-input" placeholder="Buscar oficios (ej: Cocinero, Profesor, Electricista...)">
               <ul class="tag-suggestions-list" id="tag-suggestions">
                 <!-- Se completa dinámicamente con JS -->
               </ul>
@@ -183,17 +181,17 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
 
           <div class="edit-row" style="margin-bottom: 12px;">
             <label for="edit-email">Email</label>
-            <input type="email" id="edit-email" class="edit-input">
+            <input type="email" name="email" id="edit-email" class="edit-input">
           </div>
 
           <div class="form-group-row" style="margin-bottom: 16px;">
             <div class="edit-row">
               <label for="edit-phone1">Teléfono Principal</label>
-              <input type="text" id="edit-phone1" class="edit-input">
+              <input type="text" name="telefono" id="edit-phone1" class="edit-input">
             </div>
             <div class="edit-row">
               <label for="edit-phone2">Teléfono Secundario</label>
-              <input type="text" id="edit-phone2" class="edit-input">
+              <input type="text" name="telefono_emergencia" id="edit-phone2" class="edit-input">
             </div>
           </div>
 
@@ -201,7 +199,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             <button class="btn btn-primary" id="save-profile-btn">Guardar</button>
             <button class="btn btn-ghost" id="cancel-profile-btn">Cancelar</button>
           </div>
-        </div>
+        </form>
         
       </div>
     </div>

@@ -12,6 +12,8 @@
 // =========================================================================
 // Ubicación: public/js/perfil_voluntario_logueado.js (Líneas 13-23)
 let userProfile = {
+  nombre: (window.initialUserProfile && window.initialUserProfile.nombre) || "",
+  apellido: (window.initialUserProfile && window.initialUserProfile.apellido) || "",
   name: (window.initialUserProfile && window.initialUserProfile.name) || "",
   desc: (window.initialUserProfile && window.initialUserProfile.desc !== null && window.initialUserProfile.desc !== undefined) ? window.initialUserProfile.desc : "",
   location: (window.initialUserProfile && window.initialUserProfile.location !== null && window.initialUserProfile.location !== undefined) ? window.initialUserProfile.location : "",
@@ -214,7 +216,6 @@ window.addEventListener("DOMContentLoaded", () => {
 // INICIALIZACIÓN ESPECÍFICA DEL VOLUNTARIO
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  renderProfileData();
   setupProfileEditEvents();
   setupTabs();
   setupPostulationsGrid();
@@ -248,12 +249,12 @@ function renderProfileData() {
   }
 
   if (viewName) viewName.textContent = userProfile.name;
-  if (viewDesc) viewDesc.textContent = userProfile.desc;
-  if (viewLocation) viewLocation.textContent = userProfile.location;
-  if (viewAvailability) viewAvailability.textContent = userProfile.availability;
-  if (viewEmail) viewEmail.textContent = userProfile.email;
-  if (viewPhone1) viewPhone1.textContent = userProfile.phone1;
-  if (viewPhone2) viewPhone2.textContent = userProfile.phone2;
+  if (viewDesc) viewDesc.textContent = userProfile.desc || "Sin biografía cargada...";
+  if (viewLocation) viewLocation.textContent = userProfile.location || "No especificada";
+  if (viewAvailability) viewAvailability.textContent = userProfile.availability || "No especificada";
+  if (viewEmail) viewEmail.textContent = userProfile.email || "";
+  if (viewPhone1) viewPhone1.textContent = userProfile.phone1 || "";
+  if (viewPhone2) viewPhone2.textContent = userProfile.phone2 || "No asignado";
 
   // Buscar el contenedor del renglón completo de oficios y el div de las insignias
   const viewSkillsRow = document.getElementById("view-skills-row");
@@ -294,6 +295,7 @@ function setupProfileEditEvents() {
   const viewState = document.getElementById("profile-view-state");
 
   const editName = document.getElementById("edit-name");
+  const editLastName = document.getElementById("edit-lastname"); // Nuevo selector
   const editDesc = document.getElementById("edit-desc");
   const editLocation = document.getElementById("edit-location");
   const editAvailability = document.getElementById("edit-availability");
@@ -304,7 +306,8 @@ function setupProfileEditEvents() {
 
   if (editBtn) {
     editBtn.addEventListener("click", () => {
-      editName.value = userProfile.name;
+      editName.value = userProfile.nombre;
+      editLastName.value = userProfile.apellido;
       editDesc.value = userProfile.desc;
       editLocation.value = userProfile.location;
       editAvailability.value = userProfile.availability;
@@ -329,26 +332,54 @@ function setupProfileEditEvents() {
   }
 
   if (saveBtn) {
-    saveBtn.addEventListener("click", () => {
-      userProfile.name = editName.value.trim() || "";
-      userProfile.desc = editDesc.value.trim() || "Sin descripción.";
-      userProfile.location = editLocation.value.trim() || "No especificada";
-      userProfile.availability = editAvailability.value.trim() || "No especificada";
-      userProfile.email = editEmail.value.trim() || "voluntario@ejemplo.com";
-      userProfile.phone1 = editPhone1.value.trim() || "";
-      userProfile.phone2 = editPhone2.value.trim() || "";
-      userProfile.skills = [...tempSkills];
+  saveBtn.addEventListener("click", () => {
+    // Actualizar estado local
+    userProfile.nombre = editName.value.trim();
+    userProfile.apellido = editLastName.value.trim();
+    userProfile.name = `${userProfile.nombre} ${userProfile.apellido}`.trim();
+    userProfile.desc = editDesc.value.trim();
+    userProfile.location = editLocation.value.trim();
+    userProfile.availability = editAvailability.value.trim();
+    userProfile.email = editEmail.value.trim();
+    userProfile.phone1 = editPhone1.value.trim();
+    userProfile.phone2 = editPhone2.value.trim();
+    userProfile.skills = [...tempSkills];
 
-      renderProfileData();
+    const formElement = document.getElementById("profile-edit-state");
+    const formData = new FormData(formElement); // ¡Recoge todos los campos con "name" automáticamente!
+    
+    userProfile.skills.forEach(skill => {
+      formData.append("oficios[]", skill);
+    });
 
-      viewState.style.display = "block";
-      editState.style.display = "none";
-
+    // Petición AJAX al servidor
+    fetch(`${BASE_URL}editar-perfil-voluntario`, {
+      method: "POST",
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        renderProfileData();
+        viewState.style.display = "block";
+        editState.style.display = "none";
+        if (typeof showToast !== "undefined") {
+          showToast("Perfil actualizado", "Los cambios se guardaron correctamente.", true);
+        }
+      } else {
+        if (typeof showToast !== "undefined") {
+          showToast("Error", data.message || "No se pudieron guardar los cambios.", false);
+        }
+      }
+    })
+    .catch(error => {
+      console.error("Error al guardar:", error);
       if (typeof showToast !== "undefined") {
-        showToast("Perfil actualizado", "Los datos personales se guardaron correctamente.", true);
+        showToast("Error de conexión", "No se pudo comunicar con el servidor.", false);
       }
     });
-  }
+  });
+}
 
   if (avatarInput) {
     avatarInput.addEventListener("change", (e) => {

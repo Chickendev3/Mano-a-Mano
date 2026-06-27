@@ -90,17 +90,17 @@ class Usuario {
     protected function actualizarDatosUsuario( int $id, array $datos ) :bool {
         $campos = [];
         
-        if(isset($datos['nombre']))
+        if(array_key_exists('nombre', $datos))
             $campos[] = "nombre = :nombre";
-        if(isset($datos['email']))
+        if(array_key_exists('email', $datos))
             $campos[] = "email = :email";
-        if(isset($datos['descripcion']))
+        if(array_key_exists('descripcion', $datos))
             $campos[] = "descripcion = :descripcion";
-        if(isset($datos['telefono']))
+        if(array_key_exists('telefono', $datos))
             $campos[] = "telefono = :telefono";
-        if(isset($datos['ubicacion']))
+        if(array_key_exists('ubicacion', $datos))
             $campos[] = "ubicacion = :ubicacion";
-        if(isset($datos['img_perfil']))
+        if(array_key_exists('img_perfil', $datos))
             $campos[] = "img_perfil = :img_perfil";
         if (empty($campos)) {
             return true;

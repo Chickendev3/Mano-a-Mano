@@ -48,7 +48,7 @@ class BaseDatos {
     public function asignar(string|int $param, mixed $valor) :void {   
         
         if(is_null($valor)) {
-            $this->stmt->bindValue($param, PDO::PARAM_NULL);
+            $this->stmt->bindValue($param, null, PDO::PARAM_NULL);
 
         }else{
             switch(gettype($valor)){                
