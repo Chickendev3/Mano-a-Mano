@@ -130,3 +130,34 @@ window.openCampaignDetails = function(campaignId) {
     lucide.createIcons();
   }
 };
+
+
+// Lógica de pestañas de conmutación
+const filterButtons = document.querySelectorAll('.filter-btn');
+const sections = {
+  campaigns: document.getElementById('campaigns-section'),
+  organizations: document.getElementById('organizations-section'),
+  volunteers: document.getElementById('volunteers-section')
+};
+
+filterButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Remover clase activa
+    filterButtons.forEach(b => b.classList.remove('active'));
+    // Añadir clase activa al presionado
+    btn.classList.add('active');
+
+    const target = btn.getAttribute('data-target');
+    
+    // Mostrar y ocultar secciones correspondientes
+    Object.keys(sections).forEach(key => {
+      if (sections[key]) {
+        if (key === target) {
+          sections[key].style.display = 'block';
+        } else {
+          sections[key].style.display = 'none';
+        }
+      }
+    });
+  });
+});

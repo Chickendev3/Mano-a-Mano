@@ -16,7 +16,7 @@ class Campania {
     */
 
     /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
-    public function obtenerTodasCampanias() :array {
+    public function obtenerCampanias() :array {
         /* Actualizalizar el estado de la campaña en caso de fecha de finalización vencida */
 
         $consulta = "SELECT c.id, c.usuario_id, u.nombre, u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
