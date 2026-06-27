@@ -16,24 +16,64 @@ class Campania {
     */
 
     /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
-    public function obtenerCampanias() :array {
+    public function obtenerCampanias ( array $filtros = [] ) :array {
         /* Actualizalizar el estado de la campaña en caso de fecha de finalización vencida */
 
-        $consulta = "SELECT c.id, c.usuario_id, u.nombre, u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+        $condicionesOrgs = [];
+        $condicionesVol = [];
+        $parametros = [];
+
+        if (!empty($filtros['q'])) {
+            $condicionesOrgs[] = "(c.titulo LIKE :q_org OR c.descripcion LIKE :q_org OR u.nombre LIKE :q_org)";
+            $condicionesVol[] = "(c.titulo LIKE :q_vol OR c.descripcion LIKE :q_vol OR CONCAT(u.nombre, ' ', v.apellido) LIKE :q_vol)";
+            $parametros[':q_org'] = '%' . $filtros['q'] . '%';
+            $parametros[':q_vol'] = '%' . $filtros['q'] . '%';
+        }
+        if (!empty($filtros['category'])) {
+            $condicionesOrgs[] = "c.id IN (SELECT cc.campania_id FROM campanias_causas cc JOIN causas ca ON cc.causa_id = ca.id WHERE ca.causa = :category)";
+            $condicionesVol[] = "c.id IN (SELECT cc.campania_id FROM campanias_causas cc JOIN causas ca ON cc.causa_id = ca.id WHERE ca.causa = :category)";
+            $parametros[':category'] = $filtros['category'];
+        }
+        if (!empty($filtros['location'])) {
+            $condicionesOrgs[] = "(c.ubicacion LIKE :location OR u.ubicacion LIKE :location)";
+            $condicionesVol[] = "(c.ubicacion LIKE :location OR u.ubicacion LIKE :location)";
+            $parametros[':location'] = '%' . $filtros['location'] . '%';
+        }
+
+        $whereOrgs = !empty($condicionesOrgs) ? " AND " . implode(" AND ", $condicionesOrgs) : "";
+        $whereVol = !empty($condicionesVol) ? " AND " . implode(" AND ", $condicionesVol) : "";
+        
+        $consultaOrgs = "SELECT c.id, c.usuario_id, u.nombre, u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
                         FROM campanias c 
                             JOIN usuarios u ON c.usuario_id = u.id
                             JOIN tipos_campanias t ON t.id = c.tipo_id
-                            JOIN organizaciones o ON u.id = o.usuario_id;";
-        $this->bd->consulta($consulta);
+                            JOIN organizaciones o ON u.id = o.usuario_id
+                        WHERE 1=1 " . $whereOrgs;
+        
+        $consultaVol = "SELECT c.id, c.usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre', u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+                        FROM campanias c 
+                            JOIN usuarios u ON c.usuario_id = u.id
+                            JOIN tipos_campanias t ON t.id = c.tipo_id
+                            JOIN voluntarios v ON u.id = v.usuario_id
+                        WHERE 1=1 " . $whereVol;
+        
+        // Consulta Organizaciones
+        $this->bd->consulta($consultaOrgs);
+        foreach ($parametros as $key => $val) {
+            if (strpos($consultaOrgs, $key) !== false) {
+                $this->bd->asignar($key, $val);
+            }
+        }
         $this->bd->ejecutar();
         $campaniasOrgs = $this->bd->resultados();
-
-        $consulta = "SELECT c.id, c.usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre', u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
-                        FROM campanias c 
-                            JOIN usuarios u ON c.usuario_id = u.id
-                            JOIN tipos_campanias t ON t.id = c.tipo_id
-                            JOIN voluntarios v ON u.id = v.usuario_id;";
-        $this->bd->consulta($consulta);
+        
+        // Consulta Voluntarios
+        $this->bd->consulta($consultaVol);
+        foreach ($parametros as $key => $val) {
+            if (strpos($consultaVol, $key) !== false) {
+                $this->bd->asignar($key, $val);
+            }
+        }
         $this->bd->ejecutar();
         $campaniasVol = $this->bd->resultados();
 
@@ -47,8 +87,9 @@ class Campania {
             
             $campaniasMapeadas[] = [
                 'id' => $idCamp,
-                'usuario_nombre' => $camp['nombre'],
+                'nombre' => $camp['nombre'],
                 'usuario_id' => (int)$camp['usuario_id'],
+                'usuario_nombre' => $camp['nombre'],
                 'usuario_img_perfil' => $camp['img_perfil'],
                 'tipo' => strtolower($camp['tipo']) === 'convocatoria' ? 'convocatoria' : 'informativa',
                 'titulo' => $camp['titulo'],

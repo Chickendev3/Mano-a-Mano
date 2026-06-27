@@ -249,7 +249,7 @@ function openCampaignDetailsView(campaignId) {
   const mCreatorLink = document.getElementById("m-camp-creator-link");
   if (mCreatorLink) {
     if (camp.usuario_id) {
-      mCreatorLink.href = `${BASE_URL}perfil.php?id=${camp.usuario_id}`;         // Esto es lo que se corrigeee
+      mCreatorLink.href = `${BASE_URL}perfil.php?id=${camp.usuario_id}`;         // Esto es lo que se cambia despuésss
       mCreatorLink.style.display = "flex";
       
       const mCreatorName = document.getElementById("m-camp-creator-name");

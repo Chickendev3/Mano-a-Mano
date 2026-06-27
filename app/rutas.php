@@ -13,7 +13,8 @@ $rutas = [
     'registro/organizacion' => ['controlador' => 'registroCtrl', 'metodo' => 'cargarFormOrganizacion'],
 
     /* Conectar */
-    'conectar' => ['controlador' => 'conectarCtrl', 'metodo' => 'index'],  
+    'conectar' => ['controlador' => 'conectarCtrl', 'metodo' => 'index'],
+    'busqueda' => ['controlador' => 'conectarCtrl', 'metodo' => 'busqueda'],
 
     /* Contacto */
     'contacto' => ['controlador' => 'contactoCtrl', 'metodo' => 'index'],

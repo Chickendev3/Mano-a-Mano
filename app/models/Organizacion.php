@@ -14,13 +14,34 @@ class Organizacion extends Usuario {
     */
 
     /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
-    public function obtenerOrganizaciones() :array {
+    public function obtenerOrganizaciones ( array $filtros = [] ) :array {
+        $condiciones = [];
+        $parametros = [];
+
+        if (!empty($filtros['q'])) {
+            $condiciones[] = "(u.nombre LIKE :q OR u.descripcion LIKE :q)";
+            $parametros[':q'] = '%' . $filtros['q'] . '%';
+        }
+        if (!empty($filtros['category'])) {
+            $condiciones[] = "u.id IN (SELECT oc.organizacion_id FROM organizaciones_causas oc JOIN causas c ON oc.causa_id = c.id WHERE c.causa = :category)";
+            $parametros[':category'] = $filtros['category'];
+        }
+        if (!empty($filtros['location'])) {
+            $condiciones[] = "u.ubicacion LIKE :location";
+            $parametros[':location'] = '%' . $filtros['location'] . '%';
+        }
+        $where = !empty($condiciones) ? " AND " . implode(" AND ", $condiciones) : "";
+        
         $consulta = "SELECT u.id as 'id', u.nombre as 'nombre', u.email, u.telefono, u.ubicacion, u.img_perfil 
-                        FROM usuarios u JOIN organizaciones o ON u.id = o.usuario_id;";
+                        FROM usuarios u JOIN organizaciones o ON u.id = o.usuario_id
+                        WHERE 1=1 " . $where;
     
         $this->bd->consulta($consulta);
+        foreach ($parametros as $key => $val) {
+            $this->bd->asignar($key, $val);
+        }
         $this->bd->ejecutar();
-
+        
         return $this->bd->resultados();
     }
 
