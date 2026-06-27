@@ -89,63 +89,6 @@
   height: 14px;
 }
 
-/* BADGES AND STATS (Reusable for volunteer) */
-.profile-badges-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.badge-row-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-.badge-row-item i {
-  width: 18px;
-  height: 18px;
-}
-
-.badge-icon-gold {
-  color: #F59E0B; /* Gold */
-}
-
-.badge-icon-blue {
-  color: var(--color-primary);
-}
-
-.badge-icon-tag {
-  color: var(--color-secondary);
-}
-
-.skills-list-row {
-  align-items: flex-start;
-}
-
-.skills-list-row i {
-  margin-top: 4px;
-}
-
-.skills-badges {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.skill-badge-text {
-  padding: 4px 12px;
-  background-color: var(--color-secondary-light);
-  color: var(--color-secondary);
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 600;
-}
-
 /* INTERNAL NAVIGATION TABS */
 .profile-tabs-sec {
   padding-bottom: 80px;

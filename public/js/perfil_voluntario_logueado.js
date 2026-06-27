@@ -8,25 +8,22 @@
  */
 
 // =========================================================================
-// VARIABLES DE ESTADO Y SIMULACIÓN (MOCK DATA)
+// VARIABLES DE ESTADO Y SIMULACIÓN (MOCK DATA) EN PROCESO DE REEMPLAZARSE POR DATOS TRAIDOS DE BD
 // =========================================================================
+// Ubicación: public/js/perfil_voluntario_logueado.js (Líneas 13-23)
 let userProfile = {
-  name: "Voluntario de Prueba",
-  desc: "Apasionado por la educación y el trabajo social. Busco colaborar en proyectos comunitarios que generen un impacto positivo en la niñez y el medio ambiente.",
-  location: "Buenos Aires, Argentina",
-  availability: "Lunes a Viernes de 14:00 a 18:00",
-  email: "voluntario@gmail.com",
-  phone1: "+54 11 5555-5678",
-  phone2: "+54 11 9999-1234",
-  avatar: "", 
-  skills: ["Cocinero", "Profesor"]
+  name: (window.initialUserProfile && window.initialUserProfile.name) || "",
+  desc: (window.initialUserProfile && window.initialUserProfile.desc !== null && window.initialUserProfile.desc !== undefined) ? window.initialUserProfile.desc : "",
+  location: (window.initialUserProfile && window.initialUserProfile.location !== null && window.initialUserProfile.location !== undefined) ? window.initialUserProfile.location : "",
+  availability: (window.initialUserProfile && window.initialUserProfile.availability !== null && window.initialUserProfile.availability !== undefined) ? window.initialUserProfile.availability : "",
+  email: (window.initialUserProfile && window.initialUserProfile.email) || "",
+  phone1: (window.initialUserProfile && window.initialUserProfile.phone1 !== null && window.initialUserProfile.phone1 !== undefined) ? window.initialUserProfile.phone1 : "",
+  phone2: (window.initialUserProfile && window.initialUserProfile.phone2 !== null && window.initialUserProfile.phone2 !== undefined) ? window.initialUserProfile.phone2 : "",
+  avatar: (window.initialUserProfile && window.initialUserProfile.avatar !== null && window.initialUserProfile.avatar !== undefined) ? window.initialUserProfile.avatar : "", 
+  skills: (window.initialUserProfile && window.initialUserProfile.skills) || [],
 };
+const availableSkills = window.availableSkills || [];
 
-const availableSkills = [
-  "Cocinero", "Profesor", "Carpintero", "Electricista", "Plomero", 
-  "Pintor", "Jardinero", "Albañil", "Costurero", "Peluquero", 
-  "Conductor", "Cuidador", "Tallerista", "Logística", "Apoyo Escolar"
-];
 
 let tempSkills = [];                     // Oficios temporales en edición de perfil
 let currentPostulationsPage = 1;
@@ -238,7 +235,6 @@ function renderProfileData() {
   const viewEmail = document.getElementById("view-profile-email");
   const viewPhone1 = document.getElementById("view-profile-phone1");
   const viewPhone2 = document.getElementById("view-profile-phone2");
-  const viewSkills = document.getElementById("view-skills-badges");
 
   if (userProfile.avatar) {
     if (avatarView) {
@@ -259,14 +255,26 @@ function renderProfileData() {
   if (viewPhone1) viewPhone1.textContent = userProfile.phone1;
   if (viewPhone2) viewPhone2.textContent = userProfile.phone2;
 
+  // Buscar el contenedor del renglón completo de oficios y el div de las insignias
+  const viewSkillsRow = document.getElementById("view-skills-row");
+  const viewSkills = document.getElementById("view-skills-badges");
+
   if (viewSkills) {
     viewSkills.innerHTML = "";
-    userProfile.skills.forEach(skill => {
-      const span = document.createElement("span");
-      span.className = "skill-badge-text";
-      span.textContent = skill;
-      viewSkills.appendChild(span);
-    });
+    // Validar si el voluntario tiene oficios cargados
+    if (userProfile.skills && userProfile.skills.length > 0) {
+      userProfile.skills.forEach(skill => {
+        const span = document.createElement("span");
+        span.className = "skill-badge-text";
+        span.textContent = skill;
+        viewSkills.appendChild(span);
+      });
+      // Si tiene oficios, mostramos el renglón con el icono lucide bookmark
+      if (viewSkillsRow) viewSkillsRow.style.display = "flex";
+    } else {
+      // Si no tiene oficios, ocultamos todo el renglón
+      if (viewSkillsRow) viewSkillsRow.style.display = "none";
+    }
   }
 
   const navDropdownSpan = document.querySelector(".nav-dropdown-toggle span");
@@ -322,11 +330,11 @@ function setupProfileEditEvents() {
 
   if (saveBtn) {
     saveBtn.addEventListener("click", () => {
-      userProfile.name = editName.value.trim() || "Voluntario de Prueba";
+      userProfile.name = editName.value.trim() || "";
       userProfile.desc = editDesc.value.trim() || "Sin descripción.";
       userProfile.location = editLocation.value.trim() || "No especificada";
       userProfile.availability = editAvailability.value.trim() || "No especificada";
-      userProfile.email = editEmail.value.trim() || "voluntario@gmail.com";
+      userProfile.email = editEmail.value.trim() || "voluntario@ejemplo.com";
       userProfile.phone1 = editPhone1.value.trim() || "";
       userProfile.phone2 = editPhone2.value.trim() || "";
       userProfile.skills = [...tempSkills];

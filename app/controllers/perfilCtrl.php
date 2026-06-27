@@ -11,6 +11,16 @@ class perfilCtrl extends Controlador {
         if ($_SESSION['usuario_rol'] == 'voluntario') {
             $modeloRol = $this->cargarModelo('Voluntario');
             $infoUsuario = $modeloRol->obtenerVoluntarioPorID($_SESSION['id_usuario']);
+            $insignias = $modeloRol->obtenerInsignias($_SESSION['id_usuario']);
+            $oficiosVol = $modeloRol->obtenerOficiosVoluntario($_SESSION['id_usuario']);
+            $listaOficiosVol = array_map(function($item) {
+                return $item['oficio'];
+            }, $oficiosVol);
+
+            $todosOficios = $modeloRol->obtenerOficios();
+            $listaOficios = array_map(function($item) {
+                return $item['oficio'];
+            }, $todosOficios);
 
             $css = ['perfil_voluntario_logueado.css'];
             $js = ['perfil_comun_logueado.js', 'perfil_voluntario_logueado.js'];
@@ -33,13 +43,12 @@ class perfilCtrl extends Controlador {
         /* Obteniendo Datos de Usuarios (ambos)*/
         $modeloCampania = $this->cargarModelo('Campania');
         $campaniasUsuario = $modeloCampania->obtenerCampaniasDeUsuario($_SESSION['id_usuario']);
-        // Traer etiquetas del usuario.
 
         /* Voluntarios Particular */
-        // Traer insignias por voluntariado fijo.
         // Traer valor del contador de asistencias.
 
         /* Organizaciones Particular */
+        // Traer las causas por Organización
         
 
 
@@ -47,7 +56,11 @@ class perfilCtrl extends Controlador {
 				  'jsPropio' => $js,
                   'usuario' => $infoUsuario,
                   'causas' => $causasMapeadas,
-                  'campaniasUsuario' => $campaniasUsuario ?? []
+                  'campaniasUsuario' => $campaniasUsuario ?? [],
+
+                  'insignias' => $insignias ?? [],
+                  'oficios_voluntario' => $listaOficiosVol ?? [],
+                  'oficios' => $listaOficios ?? []
         ];
         
         if ($_SESSION['usuario_rol'] == 'voluntario') {

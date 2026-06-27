@@ -24,7 +24,7 @@
         <div class="nav-dropdown" id="nav-user-dropdown">
           <button class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Menú de usuario">
             <i data-lucide="user"></i>
-            <span>Mi cuenta</span>
+            <span><?= htmlspecialchars($_SESSION['nombre_usuario'] . ($_SESSION['usuario_rol'] === 'voluntario' && isset($_SESSION['apellido_usuario']) ? ' ' . $_SESSION['apellido_usuario'] : '')) ?></span>
             <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 2px;"></i>
           </button>
           <div class="nav-dropdown-menu" role="menu">

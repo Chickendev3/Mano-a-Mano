@@ -4,10 +4,31 @@
 
 /** @var array $causas */
 /** @var array $campaniasUsuario */
+/** @var array $insignias */
+/** @var array $usuario */
 
 /* Carga de componentes comunes (Campañas e Invitaciones) */
 include_once '../app/views/componentes/perfil_comun_logueado.php';
 ?>
+<!-- =========================================================================
+     VARIABLES GLOBALES DE JS PARA LA CARGA DE LOS DATOS DEL PERFIL
+     ========================================================================= -->
+<script>
+  window.initialUserProfile = {
+    name: <?= json_encode($usuario['nombre completo'] ?? '') ?>,
+    desc: <?= json_encode($usuario['descripcion'] ?? '') ?>,
+    location: <?= json_encode($usuario['ubicacion'] ?? '') ?>,
+    availability: <?= json_encode($usuario['disponibilidad_horaria'] ?? '') ?>,
+    email: <?= json_encode($usuario['email'] ?? '') ?>,
+    phone1: <?= json_encode($usuario['telefono'] ?? '') ?>,
+    phone2: <?= json_encode($usuario['telefono_emergencia'] ?? '') ?>,
+    avatar: <?= json_encode(!empty($usuario['img_perfil']) ? BASE_URL . $usuario['img_perfil'] : '') ?>,
+    skills: <?= json_encode($oficios_voluntario ?? []) ?>,
+  };
+
+  window.availableSkills = <?= json_encode($oficios ?? []) ?>
+</script>
+
 <main class="profile-view-container">
   
   <!-- CABECERA DEL PERFIL DE VOLUNTARIO -->
@@ -31,21 +52,27 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
         
         <!-- ESTADO LECTURA (Visible por defecto) -->
         <div id="profile-view-state">
-          <h1 class="profile-name"> <?php echo htmlspecialchars($usuario['nombre completo'] ?? ''); ?> </h1>
+          <h1 class="profile-name" id="view-profile-name"> <?php echo htmlspecialchars($usuario['nombre completo'] ?? ''); ?> </h1>
           
-          <p class="profile-desc-text">
-            <?php echo htmlspecialchars($usuario['descripcion'] ?? 'Sin descripción.'); ?>
+          <?php if (!empty($usuario['descripcion'])): ?>
+          <p class="profile-desc-text" id="view-profile-desc">
+            <?php echo htmlspecialchars($usuario['descripcion']); ?>
           </p>
+          <?php else: ?>
+          <i class="profile-desc-text">Sin biografía cargada...</i>
+          <?php endif; ?>
 
           <div class="profile-meta-row">
+            <?php if (!empty($usuario['ubicacion'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="map-pin"></i>
-              <span><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
+              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion']); ?></span>
             </div>
+            <?php endif; ?>
             <?php if (!empty($usuario['disponibilidad_horaria'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="clock"></i>
-              <span><?php echo htmlspecialchars($usuario['disponibilidad_horaria']); ?></span>
+              <span id="view-profile-availability"><?php echo htmlspecialchars($usuario['disponibilidad_horaria']); ?></span>
             </div>
             <?php endif; ?>
           </div>
@@ -53,21 +80,21 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
           <!-- Información Privada (Solo visible para el propio voluntario) -->
           <div class="private-info-section" style="margin-top: 16px; padding: 16px; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.12); border-radius: var(--radius-md);">
             <h4 style="font-size: 13px; font-weight: 700; color: var(--color-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-              <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Información Privada (Brindada al aceptar postulaciones)
+              <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Información Privada (Visible sólo al aceptar postulaciones)
             </h4>
             <div class="profile-meta-row" style="margin-top: 0; gap: 12px 24px;">
               <div class="profile-meta-item">
                 <i data-lucide="mail"></i>
-                <span> <?php echo htmlspecialchars($usuario['email'] ?? ''); ?> </span>
+                <span id="view-profile-email"> <?php echo htmlspecialchars($usuario['email'] ?? ''); ?> </span>
               </div>
               <div class="profile-meta-item">
                 <i data-lucide="phone"></i>
-                <span>Tel. Principal: <strong> <?php echo htmlspecialchars($usuario['telefono'] ?? ''); ?> </strong></span>
+                <span>Tel. Principal: <strong id="view-profile-phone1"> <?php echo htmlspecialchars($usuario['telefono'] ?? ''); ?> </strong></span>
               </div>
               <div class="profile-meta-item">
                 <i data-lucide="phone-call"></i>
                 <span>Tel. Secundario: 
-                  <strong>
+                  <strong id="view-profile-phone2">
                   <?php if (!empty($usuario['telefono_emergencia'])):
                     echo htmlspecialchars($usuario['telefono_emergencia']);
                   else:
@@ -79,24 +106,32 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             </div>
           </div>
 
-          <!-- Insignias y Estadísticas del Voluntario (Estático) -->
+          <!-- Insignias y Estadísticas del Voluntario -->
           <div class="profile-badges-container" style="margin-top: 20px;">
-            <div class="badge-row-item">
-              <i data-lucide="award" class="badge-icon-gold"></i>
-              <span>Insignia de Voluntariado Fijo en organización: Techo Verde</span>
-            </div>
-            <div class="badge-row-item">
-              <i data-lucide="award" class="badge-icon-gold"></i>
-              <span>Insignia de Voluntariado Fijo en organización: Mentes Brillantes</span>
-            </div>
+            <?php if (!empty($insignias)): ?>
+              <?php foreach ($insignias as $ins): ?>
+                <div class="badge-row-item">
+                  <i data-lucide="award" class="badge-icon-gold"></i>
+                  <span>Voluntario Fijo en Organización: <?php echo htmlspecialchars($ins); ?></span>
+                </div>
+              <?php endforeach; ?>
+            <?php endif; ?>
+            
+            <!-- Pendiente de DESARROLLO: Contador de Asistencias -->
             <div class="badge-row-item">
               <i data-lucide="check-square" class="badge-icon-blue"></i>
               <span>Asistencia a voluntariado: +7</span>
             </div>
-            <div class="badge-row-item skills-list-row">
-              <i data-lucide="bookmark" class="badge-icon-tag"></i>
-              <div class="skills-badges" id="view-skills-badges">
-                <!-- Se completa dinámicamente con JS -->
+
+            <!-- Oficios -->
+            <div class="badge-row-item skills-list-row" id="view-skills-row" style="align-items: flex-start; <?= empty($oficios_voluntario) ? 'display: none;' : '' ?>">
+              <i data-lucide="bookmark" class="badge-icon-tag" style="margin-top: 4px;"></i>
+              <div class="skills-badges" id="view-skills-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <?php if (!empty($oficios_voluntario)): ?>
+                  <?php foreach ($oficios_voluntario as $oficio): ?>
+                    <span class="skill-badge-text"><?php echo htmlspecialchars($oficio); ?></span>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </div>
             </div>
           </div>

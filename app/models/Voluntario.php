@@ -67,7 +67,7 @@ class Voluntario extends Usuario{
         return $this->bd->resultado();
     }
 
-    public function obtenerIDVoluntario ( int $idUsuario ) :array {
+    public function obtenerIDVoluntario ( int $idUsuario ) :array|bool {
         $consulta = "SELECT v.id 
                         FROM voluntarios v JOIN usuarios u ON u.id = v.usuario_id
                         WHERE u.id = :id_usuario";
@@ -95,6 +95,44 @@ class Voluntario extends Usuario{
 
     } */
 
+    public function obtenerInsignias ( int $idUsuario ) : array {
+        $idVol = $this->obtenerIDVoluntario( $idUsuario );
+
+        if ($idVol == false){
+            return [];     // Falló o no hay voluntario con ese ID
+        }
+
+        $consulta = "SELECT u.nombre FROM `voluntarios_fijos` vf 
+                        JOIN voluntarios v ON vf.voluntario_id = v.id
+                        JOIN organizaciones o ON vf.organizacion_id = o.id
+                        JOIN usuarios u ON o.usuario_id = u.id
+                        WHERE vf.activo = true AND v.id = :id_vol;";
+    
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_vol", (int) $idVol['id']);
+        $this->bd->ejecutar();
+
+        return $this->bd->resultados();
+    }
+    
+    public function obtenerOficiosVoluntario (int $idUsuario) :array {
+        $idVol = $this->obtenerIDVoluntario( $idUsuario );
+
+        if (!$idVol){
+            return [];     // Falló o no hay voluntario con ese ID
+        }
+
+        $consulta = "SELECT of.oficio FROM `voluntarios_oficios` vo 
+                        JOIN voluntarios v ON vo.voluntario_id = v.id
+                        JOIN oficios of ON vo.oficio_id = of.id
+                        WHERE v.id = :id_vol;";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_vol", (int) $idVol['id']);
+        $this->bd->ejecutar();
+
+        return $this->bd->resultados();
+    }
 
     /* -------------------- INSERTAR DATOS -------------------- */
     public function nuevoVoluntario( string $nombre, string $apellido, string $email, string $clave, string $telefono, ?string $telefonoEmergencia = null, ?string $ubicacion = null ) :bool {
