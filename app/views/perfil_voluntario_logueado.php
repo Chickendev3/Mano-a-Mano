@@ -156,7 +156,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             </div>
           <div class="edit-row" style="margin-bottom: 12px;">
             <label for="edit-desc">Descripción</label>
-            <textarea name="descripcion" placeholder="Escriba su biografía" id="edit-desc" class="edit-input" rows="3"></textarea>
+            <textarea name="descripcion" placeholder="Escriba lo que quiere que otros sepan de usted." id="edit-desc" class="edit-input" rows="3"></textarea>
           </div>
 
           <div class="edit-row" style="margin-bottom: 12px;">

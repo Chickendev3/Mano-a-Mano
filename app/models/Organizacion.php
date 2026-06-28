@@ -110,6 +110,52 @@ class Organizacion extends Usuario {
         return true;
     }
 
+    public function obtenerCausasOrganizacion(int $idUsuario) :array {
+        $consulta = "SELECT c.causa 
+                        FROM organizaciones_causas oc
+                        JOIN causas c ON c.id = oc.causa_id
+                        JOIN organizaciones o ON o.id = oc.organizacion_id
+                        WHERE o.usuario_id = :id_usuario;";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_usuario", $idUsuario);
+        $this->bd->ejecutar();
+
+        return $this->bd->resultados();
+    }
+
+    public function actualizarCausasOrganizacion(int $idUsuario, array $causas) :void {
+        $org = $this->obtenerIDOrganizacion($idUsuario);
+        if (!$org) return;
+        $idOrg = $org['id'];
+
+        $consultaDelete = "DELETE FROM organizaciones_causas WHERE organizacion_id = :id_org";
+
+        $this->bd->consulta($consultaDelete);
+        $this->bd->asignar(":id_org", $idOrg);
+        $this->bd->ejecutar();
+
+        foreach ($causas as $nombreCausa) {
+            $consultaCausa = "SELECT id FROM causas WHERE causa = :nombre_causa";
+
+            $this->bd->consulta($consultaCausa);
+            $this->bd->asignar(":nombre_causa", $nombreCausa);
+            $this->bd->ejecutar();
+            
+            $causaDb = $this->bd->resultado();
+            if ($causaDb) {
+                $idCausa = $causaDb['id'];
+                
+                $consultaInsert = "INSERT INTO organizaciones_causas (organizacion_id, causa_id) VALUES (:id_org, :id_causa)";
+
+                $this->bd->consulta($consultaInsert);
+                $this->bd->asignar(":id_org", $idOrg);
+                $this->bd->asignar(":id_causa", $idCausa);
+                $this->bd->ejecutar();
+            }
+        }
+    }
+
     /* -------------------- ELIMINAR -------------------- */
 
 

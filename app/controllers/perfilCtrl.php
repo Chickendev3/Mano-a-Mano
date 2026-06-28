@@ -29,8 +29,17 @@ class perfilCtrl extends Controlador {
             $modeloRol = $this->cargarModelo('Organizacion');
             $infoUsuario = $modeloRol->obtenerOrganizacionPorID($_SESSION['id_usuario']);
 
-            $css = ['perfil_organizacion_vista.css'];
-            $js = ['perfil_organizacion_vista.js'];
+            $todosOficios = [];
+            $listaOficios = [];
+            $listaOficiosVol = [];
+
+            $causasOrg = $modeloRol->obtenerCausasOrganizacion($_SESSION['id_usuario']);
+            $listaCausasOrg = array_map(function($item) {
+                return $item['causa'];
+            }, $causasOrg);
+
+            $css = ['perfil_organizacion_logueado.css'];
+            $js = ['perfil_comun_logueado.js', 'perfil_organizacion_logueado.js'];
         }
         
         /* Campañas y Causas */
@@ -48,7 +57,6 @@ class perfilCtrl extends Controlador {
         // Traer valor del contador de asistencias.
 
         /* Organizaciones Particular */
-        // Traer las causas por Organización
         
 
 
@@ -60,15 +68,15 @@ class perfilCtrl extends Controlador {
 
                   'insignias' => $insignias ?? [],
                   'oficios_voluntario' => $listaOficiosVol ?? [],
-                  'oficios' => $listaOficios ?? []
+                  'oficios' => $listaOficios ?? [],
+                  'causas_organizacion' => $listaCausasOrg ?? []
         ];
         
         if ($_SESSION['usuario_rol'] == 'voluntario') {
             $this->cargarVista('perfil_voluntario_logueado', $datos, 'Mano a Mano - Perfil');
         }
         elseif ($_SESSION['usuario_rol'] == 'organizacion') {
-            $datos = [];
-            $this->cargarVista('perfil_pendiente', $datos, 'Mano a Mano - Perfil');		/* OJO QUE ACÁ VA EL PERFIL PROPIO DE LA ORGANIZACIÓN  */
+            $this->cargarVista('perfil_organizacion_logueado', $datos, 'Mano a Mano - Perfil');
         }
     }
 
@@ -460,6 +468,45 @@ class perfilCtrl extends Controlador {
             }
             return;
         }    
+    }
+
+    public function editarPerfilOrganizacion () :void {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json');
+
+            $nombre = trim($_POST['nombre'] ?? '');
+            $descripcion = trim($_POST['descripcion'] ?? '');
+                $descripcion = ($descripcion !== '') ? htmlspecialchars($descripcion, ENT_QUOTES, 'UTF-8') : null;
+            $ubicacion = trim($_POST['ubicacion'] ?? '');
+                $ubicacion = ($ubicacion !== '') ? $ubicacion : null;
+            $email = trim($_POST['email'] ?? '');
+            $causas = $_POST['causas'] ?? [];
+
+            if (empty($nombre) || empty($email)) {
+                echo json_encode(['success' => false, 'message' => 'El nombre y el email son campos requeridos.']);
+                return;
+            }
+
+            $idUsuario = $_SESSION['id_usuario'];
+            $modeloOrg = $this->cargarModelo('Organizacion');
+
+            $actualizado = $modeloOrg->actualizarDatosOrganizacion($idUsuario, [
+                'nombre' => $nombre,
+                'descripcion' => $descripcion,
+                'ubicacion' => $ubicacion,
+                'email' => $email
+            ]);
+
+            $modeloOrg->actualizarCausasOrganizacion($idUsuario, $causas);
+
+            if ($actualizado) {
+                $_SESSION['nombre_usuario'] = $nombre;
+                echo json_encode(['success' => true, 'message' => 'Perfil de organización actualizado con éxito.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al guardar los datos del perfil.']);
+            }
+            return;
+        }
     }
 }
 ?>

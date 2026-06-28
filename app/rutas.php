@@ -25,6 +25,7 @@ $rutas = [
     'perfil' => ['controlador' => 'perfilCtrl', 'metodo' => 'index'],
     'perfil-actualizar-img' => ['controlador' => 'perfilCtrl', 'metodo' => 'actualizarImgPerfil'],
     'editar-perfil-voluntario' => ['controlador' => 'perfilCtrl', 'metodo' => 'editarPerfilVoluntario'],
+    'editar-perfil-organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'editarPerfilOrganizacion'],
     'crear-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'crearCampania'],
     'modificar-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'modificarCampania'],
     'eliminar-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarCampania']

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-06-2026 a las 01:59:51
+-- Tiempo de generación: 28-06-2026 a las 15:51:19
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -33,6 +33,13 @@ CREATE TABLE `archivos` (
   `referencia` varchar(200) NOT NULL,
   `tipo` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `archivos`
+--
+
+INSERT INTO `archivos` (`id`, `campania_id`, `referencia`, `tipo`) VALUES
+(1, 1, 'img/campaign_park.png', 'imagen');
 
 -- --------------------------------------------------------
 
@@ -64,6 +71,17 @@ CREATE TABLE `campanias` (
   `fecha_inicio` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `campanias`
+--
+
+INSERT INTO `campanias` (`id`, `usuario_id`, `tipo_id`, `titulo`, `descripcion`, `fecha_creacion`, `fecha_finalizacion`, `info_adicional`, `ubicacion`, `fecha_inicio`) VALUES
+(1, 6, 2, 'Reforestación del Parque Urquiza', 'Buscamos voluntarios de todas las edades para plantar árboles nativos y ayudar a recuperar el pulmón verde de la costa.', '2026-06-26 12:03:54', '2026-07-15', 'Punto de encuentro: Entrada principal del parque. Traer ropa cómoda, pala de mano (opcional) y botella de agua.', 'Rosario, Santa Fe', '2026-07-01'),
+(2, 6, 1, 'Colecta de Donaciones', 'Acercá alimento no perecedero, las ropa o juguetes que no uses, limpios y en buen estado a nuestros centros de recolección. \r\n\r\nNosotros los distribuiremos. ', '2026-06-26 12:14:33', '2026-07-10', '', 'Buenos Aires, Moron, Haedo', '2026-06-27'),
+(3, 6, 1, 'Merendero', 'Acercate a ayudar al merendero. Necesitamos alimentos no perecederos para mantener los servicios del merendero.', '2026-06-26 12:30:16', '2026-07-05', '', 'Buenos Aires, Moron, Castelar', '2026-06-29'),
+(4, 6, 2, 'Ayuda Humanitaria', 'Ayudanos a llevar ayuda humanitaria a Venezuela.', '2026-06-26 12:33:30', '2026-07-05', 'Nos reuniremos en el edificio tal, a la altura 1234, a las 15hs del miércoles.', 'Buenos Aires, Moron, Haedo', '2026-06-29'),
+(5, 12, 1, 'Colecta de Alimentos No Perecederos', 'Acercate a nuestros puntos de encuentro para llevar alimentos no perecederos a los merenderos y centros más necesitados.', '2026-06-26 14:56:45', '2026-07-05', '', 'CABA, Caballito', '2026-06-29');
+
 -- --------------------------------------------------------
 
 --
@@ -74,6 +92,21 @@ CREATE TABLE `campanias_causas` (
   `campania_id` int(11) NOT NULL,
   `causa_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `campanias_causas`
+--
+
+INSERT INTO `campanias_causas` (`campania_id`, `causa_id`) VALUES
+(1, 9),
+(1, 11),
+(2, 4),
+(2, 5),
+(2, 8),
+(3, 5),
+(4, 15),
+(5, 4),
+(5, 5);
 
 -- --------------------------------------------------------
 
@@ -135,6 +168,21 @@ CREATE TABLE `correos` (
   `fecha_envio` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `correos`
+--
+
+INSERT INTO `correos` (`id`, `nombre`, `email`, `apellido`, `asunto`, `cuerpo`, `fecha_envio`) VALUES
+(1, 'Roma', 'romaramirez@gmail.com', 'Ramirez', 'Prueba de Correo', 'Esta es la primera prueba de envío de correos :)', '2026-06-14 02:56:27'),
+(2, 'Roma', 'romaramirez@gmail.com', 'Ramirez', 'Prueba de Correo 2', 'Esta es la segunda prueba de envío de correoossss', '2026-06-14 03:02:19'),
+(3, 'Roma', 'romaramirez@gmail.com', 'Ramirez', 'Prueba de Correo 3', 'Esta es le tercera prueba de correo :)', '2026-06-14 03:08:12'),
+(4, 'Roma', 'romaramirez@gmail.com', 'Ramirez', 'Prueba de Correo 4', 'Cuarta prueba de correo :))', '2026-06-14 03:15:11'),
+(5, 'Pilar', 'pilaralvarez080@gmail.com', 'Alvarez', 'Prueba de Correo 5', 'Quinta prueba de correo. ¿Será la última por hoy?', '2026-06-14 03:20:01'),
+(6, 'Pilar', 'pilar@manoamano.com', 'Alvarez', 'Prueba de Correo 6', 'Esta es la sexta prueba de correo.. \r\n.\r\n.\r\n.\r\n.. ¿ahora si? ¿Será?', '2026-06-14 03:24:44'),
+(7, 'Pilar', 'pilar@manoamano.com', 'Alvarez', 'Prueba de Correo 12', 'Prueba de correo 12..', '2026-06-17 22:10:43'),
+(8, 'Pilar', 'pilar@manoamano.com', 'Alvarez', 'Prueba de Correo 13', 'prueba 13 para ver el mensaje..', '2026-06-17 22:15:21'),
+(9, 'Pilar', 'pilar@manoamano.com', 'Alvarez', 'Prueba de Correo 13', 'Prueba 13? ', '2026-06-17 22:19:47'),
+(10, 'Pilar', 'pilar@manoamano.com', 'Alvarez', 'Prueba de Correo 15', 'Prueba 15 para ver el mensajito temporal.', '2026-06-17 22:22:47');
 
 -- --------------------------------------------------------
 
@@ -286,9 +334,10 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nombre`, `email`, `clave`, `descripcion`, `telefono`, `ubicacion`, `img_perfil`) VALUES
-(6, 'Pilar', 'pilar@manoamano.com', '$2y$10$YZ4Q5RgkgYsmK5y.IUlqk.H7fdfDDPizIywwPKX1J2nhrZqBHB4h.', NULL, '11-6666-9999', 'Buenos Aires, Moron, Castelar', NULL),
+(6, 'Pilar', 'pilar@manoamano.com', '$2y$10$YZ4Q5RgkgYsmK5y.IUlqk.H7fdfDDPizIywwPKX1J2nhrZqBHB4h.', 'Estudiante de Programación', '11-6666-9999', 'Buenos Aires, Moron, Haedo', 'archivos/avatar_6a4071a78a7fe8.13374548.webp'),
 (10, 'Sonrisas', 'sonrisas@org.com', '$2y$10$FDFcqeLxPoORrteLDq8rz.Nq56DxdDoys3QHThYww7.F237WDIGAO', NULL, '11-0000-8888', 'Buenos Aires, Moron, Castelar', NULL),
-(11, '4Patas', '4patas@org.com', '$2y$10$kn2AS4fQCHfWizkp8flK3.AZI9bNeKYiBaEfqsTnxxOoKBBneunvK', NULL, '11-2222-5555', 'Buenos Aires, Merlo, Padua', NULL);
+(11, '4Patas', '4patas@org.com', '$2y$10$kn2AS4fQCHfWizkp8flK3.AZI9bNeKYiBaEfqsTnxxOoKBBneunvK', NULL, '11-2222-5555', 'Buenos Aires, Merlo, Padua', NULL),
+(12, 'Roma', 'romagutierrez@gmail.com', '$2y$10$Fe6m22o9tlbWq7Xmtae4v.L7Rexj3O29r8XSqKwYJ7XMGWesbe4yu', 'Profesora de Educación Física.', '011-8888-0000', NULL, 'archivos/avatar_6a4072172918c6.66545761.jpg');
 
 -- --------------------------------------------------------
 
@@ -301,7 +350,7 @@ CREATE TABLE `voluntarios` (
   `usuario_id` int(11) NOT NULL,
   `apellido` varchar(50) NOT NULL,
   `telefono_emergencia` varchar(15) DEFAULT NULL,
-  `disponibilidad_horaria` varchar(30) DEFAULT NULL
+  `disponibilidad_horaria` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -309,7 +358,8 @@ CREATE TABLE `voluntarios` (
 --
 
 INSERT INTO `voluntarios` (`id`, `usuario_id`, `apellido`, `telefono_emergencia`, `disponibilidad_horaria`) VALUES
-(1, 6, 'Alvarez', '0', NULL);
+(1, 6, 'Alvarez', NULL, NULL),
+(2, 12, 'Gutierrez', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -333,6 +383,16 @@ CREATE TABLE `voluntarios_oficios` (
   `voluntario_id` int(11) NOT NULL,
   `oficio_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `voluntarios_oficios`
+--
+
+INSERT INTO `voluntarios_oficios` (`voluntario_id`, `oficio_id`) VALUES
+(1, 15),
+(2, 3),
+(2, 8),
+(2, 12);
 
 --
 -- Índices para tablas volcadas
@@ -473,13 +533,13 @@ ALTER TABLE `voluntarios_oficios`
 -- AUTO_INCREMENT de la tabla `archivos`
 --
 ALTER TABLE `archivos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `campanias`
 --
 ALTER TABLE `campanias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `causas`
@@ -539,13 +599,13 @@ ALTER TABLE `tipos_campanias`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `voluntarios`
 --
 ALTER TABLE `voluntarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas
