@@ -146,7 +146,7 @@ function renderCampaigns() {
     const article = document.createElement("article");
     article.className = cardClass;
     article.addEventListener("click", () => openCampaignDetailsView(camp.id));
-    article.innerHTML = `
+        article.innerHTML = `
       <div class="alt-card-img-col">
         <div class="alt-card-img-placeholder">
           ${imgHTML}
@@ -161,9 +161,7 @@ function renderCampaigns() {
         </div>
         <p class="alt-card-desc">${camp.desc}</p>
         
-        <div class="camp-card-actions" style="margin-top: auto;">
-          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Más información</button>
-          
+        <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; gap: 8px;">
           <button class="camp-action-btn edit" title="Modificar campaña" onclick="event.stopPropagation(); openModifyCampaignModal(${camp.id});">
             <i data-lucide="edit-2" style="width:18px; height:18px;"></i>
           </button>

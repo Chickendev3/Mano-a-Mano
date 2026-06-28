@@ -337,5 +337,6 @@
 
 <?php 
 include '../app/views/componentes/perfil_comun_logueado.php'; 
+renderModalDetalleCampania();
 renderModalesComunesPerfil($causas, $campaniasUsuario);
 ?>
