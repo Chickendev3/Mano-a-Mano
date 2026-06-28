@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-06-2026 a las 15:51:19
+-- Tiempo de generación: 28-06-2026 a las 17:11:05
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -39,7 +39,8 @@ CREATE TABLE `archivos` (
 --
 
 INSERT INTO `archivos` (`id`, `campania_id`, `referencia`, `tipo`) VALUES
-(1, 1, 'img/campaign_park.png', 'imagen');
+(1, 1, 'img/campaign_park.png', 'imagen'),
+(2, 2, 'archivos/camp_6a4129666bba36.67559744.webp', 'imagen');
 
 -- --------------------------------------------------------
 
@@ -78,7 +79,6 @@ CREATE TABLE `campanias` (
 INSERT INTO `campanias` (`id`, `usuario_id`, `tipo_id`, `titulo`, `descripcion`, `fecha_creacion`, `fecha_finalizacion`, `info_adicional`, `ubicacion`, `fecha_inicio`) VALUES
 (1, 6, 2, 'Reforestación del Parque Urquiza', 'Buscamos voluntarios de todas las edades para plantar árboles nativos y ayudar a recuperar el pulmón verde de la costa.', '2026-06-26 12:03:54', '2026-07-15', 'Punto de encuentro: Entrada principal del parque. Traer ropa cómoda, pala de mano (opcional) y botella de agua.', 'Rosario, Santa Fe', '2026-07-01'),
 (2, 6, 1, 'Colecta de Donaciones', 'Acercá alimento no perecedero, las ropa o juguetes que no uses, limpios y en buen estado a nuestros centros de recolección. \r\n\r\nNosotros los distribuiremos. ', '2026-06-26 12:14:33', '2026-07-10', '', 'Buenos Aires, Moron, Haedo', '2026-06-27'),
-(3, 6, 1, 'Merendero', 'Acercate a ayudar al merendero. Necesitamos alimentos no perecederos para mantener los servicios del merendero.', '2026-06-26 12:30:16', '2026-07-05', '', 'Buenos Aires, Moron, Castelar', '2026-06-29'),
 (4, 6, 2, 'Ayuda Humanitaria', 'Ayudanos a llevar ayuda humanitaria a Venezuela.', '2026-06-26 12:33:30', '2026-07-05', 'Nos reuniremos en el edificio tal, a la altura 1234, a las 15hs del miércoles.', 'Buenos Aires, Moron, Haedo', '2026-06-29'),
 (5, 12, 1, 'Colecta de Alimentos No Perecederos', 'Acercate a nuestros puntos de encuentro para llevar alimentos no perecederos a los merenderos y centros más necesitados.', '2026-06-26 14:56:45', '2026-07-05', '', 'CABA, Caballito', '2026-06-29');
 
@@ -103,7 +103,6 @@ INSERT INTO `campanias_causas` (`campania_id`, `causa_id`) VALUES
 (2, 4),
 (2, 5),
 (2, 8),
-(3, 5),
 (4, 15),
 (5, 4),
 (5, 5);
@@ -267,7 +266,9 @@ CREATE TABLE `organizaciones` (
 
 INSERT INTO `organizaciones` (`id`, `usuario_id`) VALUES
 (1, 10),
-(2, 11);
+(2, 11),
+(3, 13),
+(4, 14);
 
 -- --------------------------------------------------------
 
@@ -337,7 +338,9 @@ INSERT INTO `usuarios` (`id`, `nombre`, `email`, `clave`, `descripcion`, `telefo
 (6, 'Pilar', 'pilar@manoamano.com', '$2y$10$YZ4Q5RgkgYsmK5y.IUlqk.H7fdfDDPizIywwPKX1J2nhrZqBHB4h.', 'Estudiante de Programación', '11-6666-9999', 'Buenos Aires, Moron, Haedo', 'archivos/avatar_6a4071a78a7fe8.13374548.webp'),
 (10, 'Sonrisas', 'sonrisas@org.com', '$2y$10$FDFcqeLxPoORrteLDq8rz.Nq56DxdDoys3QHThYww7.F237WDIGAO', NULL, '11-0000-8888', 'Buenos Aires, Moron, Castelar', NULL),
 (11, '4Patas', '4patas@org.com', '$2y$10$kn2AS4fQCHfWizkp8flK3.AZI9bNeKYiBaEfqsTnxxOoKBBneunvK', NULL, '11-2222-5555', 'Buenos Aires, Merlo, Padua', NULL),
-(12, 'Roma', 'romagutierrez@gmail.com', '$2y$10$Fe6m22o9tlbWq7Xmtae4v.L7Rexj3O29r8XSqKwYJ7XMGWesbe4yu', 'Profesora de Educación Física.', '011-8888-0000', NULL, 'archivos/avatar_6a4072172918c6.66545761.jpg');
+(12, 'Roma', 'romagutierrez@gmail.com', '$2y$10$Fe6m22o9tlbWq7Xmtae4v.L7Rexj3O29r8XSqKwYJ7XMGWesbe4yu', 'Profesora de Educación Física.', '011-8888-0000', NULL, 'archivos/avatar_6a4072172918c6.66545761.jpg'),
+(13, 'Banco de Alimentos', 'bancodealimentos@org.ar', '$2y$10$PovgSJOvFLxxK9KUbMrkKeqqz4ulBqB3QM.n8YKdpTAcbbP9X.F4q', NULL, '011-1515-1515', 'Puente Alto 2200', NULL),
+(14, 'Ambiente & Medio', 'ambienteymedio@org.ar', '$2y$10$snXYtG9CGwn2eTbXizHbveAWFt2RgGVOtR1ZTpuSjbcpEga5aolrC', NULL, '011-4848-4848', 'Primavera 1144', NULL);
 
 -- --------------------------------------------------------
 
@@ -533,7 +536,7 @@ ALTER TABLE `voluntarios_oficios`
 -- AUTO_INCREMENT de la tabla `archivos`
 --
 ALTER TABLE `archivos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `campanias`
@@ -581,7 +584,7 @@ ALTER TABLE `oficios`
 -- AUTO_INCREMENT de la tabla `organizaciones`
 --
 ALTER TABLE `organizaciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `postulaciones`
@@ -599,7 +602,7 @@ ALTER TABLE `tipos_campanias`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `voluntarios`

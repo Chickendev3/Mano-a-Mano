@@ -4,6 +4,8 @@
  * Mano a Mano MVC
  */
 /** @var array $causas_organizacion */
+/** @var array $causas */
+/** @var array $campaniasUsuario */
 ?>
 <main class="profile-view-container">
   
@@ -48,13 +50,10 @@
           <!-- Causes / Tags -->
           <div class="profile-tags-wrapper" style="margin-top: 16px;">
             <div class="badge-row-item skills-list-row" id="view-skills-row" style="align-items: flex-start; <?= empty($causas_organizacion) ? 'display: none;' : '' ?>">
-              <i data-lucide="bookmark" class="badge-icon-tag" style="margin-top: 4px;"></i>
-              <div class="skills-badges" id="view-skills-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <?php if (!empty($causas_organizacion)): ?>
-                  <?php foreach ($causas_organizacion as $causa): ?>
-                    <span class="skill-badge-text"><?php echo htmlspecialchars($causa); ?></span>
-                  <?php endforeach; ?>
-                <?php endif; ?>
+             <div class="profile-tags" id="view-causes-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
+               <?php foreach ($causas_organizacion as $causa): ?>
+                <span class="tag-badge"><?php echo htmlspecialchars($causa); ?></span>
+               <?php endforeach; ?>
               </div>
             </div>
           </div>
@@ -336,4 +335,7 @@
   window.campaigns = <?= json_encode($campaniasUsuario ?? []) ?>;
 </script>
 
-<?php include '../app/views/componentes/perfil_comun_logueado.php'; ?>
+<?php 
+include '../app/views/componentes/perfil_comun_logueado.php'; 
+renderModalesComunesPerfil($causas, $campaniasUsuario);
+?>

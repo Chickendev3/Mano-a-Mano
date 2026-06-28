@@ -61,19 +61,18 @@ function renderProfileData() {
   if (viewLocation) viewLocation.textContent = orgProfile.location;
   if (viewEmail) viewEmail.textContent = orgProfile.email;
 
-    // Causes Badges (Read-Only)
-  if (viewCauses) {
-    viewCauses.innerHTML = "";
-    orgProfile.causes.forEach(cause => {
-      const span = document.createElement("span");
-      
-      // Cambiar la clase de 'tag-badge' a 'skill-badge-text'
-      span.className = "skill-badge-text";
-      span.innerHTML = `<i data-lucide="tag"></i> ${cause}`;
-      
-      viewCauses.appendChild(span);
-    });
-  }
+     // Causes Badges (Read-Only)
+   if (viewCauses) {
+     viewCauses.innerHTML = "";
+     orgProfile.causes.forEach(cause => {
+       const span = document.createElement("span");
+       
+      span.className = "tag-badge";
+       span.innerHTML = `<i data-lucide="tag"></i> ${cause}`;
+       
+       viewCauses.appendChild(span);
+     });
+   }
 
   // Update navbar if logged in
   const navDropdownSpan = document.querySelector(".nav-dropdown-toggle span");
