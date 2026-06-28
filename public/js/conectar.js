@@ -121,7 +121,9 @@ window.openCampaignDetails = function(campaignId) {
 
   if (mPostulateBtn) {
     // Si la campaña es convocatoria, mostramos el botón de postulación
-    mPostulateBtn.style.display = camp.tipo === "convocatoria" ? "inline-flex" : "none";
+    const isOwner = camp.usuario_id == SESSION_USER_ID;
+    const isOrg = SESSION_USER_ROL === "organizacion";
+    mPostulateBtn.style.display = (camp.tipo === "convocatoria" && !isOwner && !isOrg) ? "inline-flex" : "none";
   }
 
   openModal("modal-profile-camp-detail");

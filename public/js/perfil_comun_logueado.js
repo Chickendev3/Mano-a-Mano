@@ -329,7 +329,9 @@ function openCampaignDetailsView(campaignId) {
   if (devStateCard) devStateCard.style.display = "none";
 
   if (mPostulateBtn) {
-    mPostulateBtn.style.display = camp.type === "convocatoria" ? "inline-flex" : "none";
+    const isOwner = camp.usuario_id == SESSION_USER_ID;
+    const isOrg = SESSION_USER_ROL === "organizacion";
+    mPostulateBtn.style.display = (camp.type === "convocatoria" && !isOwner && !isOrg) ? "inline-flex" : "none";
   }
 
   openModal("modal-profile-camp-detail");

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-06-2026 a las 17:11:05
+-- Tiempo de generación: 28-06-2026 a las 21:26:05
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -40,7 +40,8 @@ CREATE TABLE `archivos` (
 
 INSERT INTO `archivos` (`id`, `campania_id`, `referencia`, `tipo`) VALUES
 (1, 1, 'img/campaign_park.png', 'imagen'),
-(2, 2, 'archivos/camp_6a4129666bba36.67559744.webp', 'imagen');
+(2, 2, 'archivos/camp_6a4129666bba36.67559744.webp', 'imagen'),
+(3, 6, 'archivos/camp_6a4161d60df020.05748233.webp', 'imagen');
 
 -- --------------------------------------------------------
 
@@ -80,7 +81,8 @@ INSERT INTO `campanias` (`id`, `usuario_id`, `tipo_id`, `titulo`, `descripcion`,
 (1, 6, 2, 'Reforestación del Parque Urquiza', 'Buscamos voluntarios de todas las edades para plantar árboles nativos y ayudar a recuperar el pulmón verde de la costa.', '2026-06-26 12:03:54', '2026-07-15', 'Punto de encuentro: Entrada principal del parque. Traer ropa cómoda, pala de mano (opcional) y botella de agua.', 'Rosario, Santa Fe', '2026-07-01'),
 (2, 6, 1, 'Colecta de Donaciones', 'Acercá alimento no perecedero, las ropa o juguetes que no uses, limpios y en buen estado a nuestros centros de recolección. \r\n\r\nNosotros los distribuiremos. ', '2026-06-26 12:14:33', '2026-07-10', '', 'Buenos Aires, Moron, Haedo', '2026-06-27'),
 (4, 6, 2, 'Ayuda Humanitaria', 'Ayudanos a llevar ayuda humanitaria a Venezuela.', '2026-06-26 12:33:30', '2026-07-05', 'Nos reuniremos en el edificio tal, a la altura 1234, a las 15hs del miércoles.', 'Buenos Aires, Moron, Haedo', '2026-06-29'),
-(5, 12, 1, 'Colecta de Alimentos No Perecederos', 'Acercate a nuestros puntos de encuentro para llevar alimentos no perecederos a los merenderos y centros más necesitados.', '2026-06-26 14:56:45', '2026-07-05', '', 'CABA, Caballito', '2026-06-29');
+(5, 12, 1, 'Colecta de Alimentos No Perecederos', 'Acercate a nuestros puntos de encuentro para llevar alimentos no perecederos a los merenderos y centros más necesitados.', '2026-06-26 14:56:45', '2026-07-05', '', 'CABA, Caballito', '2026-06-29'),
+(6, 13, 2, 'Necesitamos Voluntarios para Colecta de Alimentos', 'Necesitamos voluntarios que nos ayuden a organizar y empaquetar los alimentos que nos llegan.  ', '2026-06-28 18:03:02', '2026-06-29', 'Nos reuniremos en la Av. Libertador al 1200. A las 15hs.', 'Buenos Aires, Bahía Blanca', '2026-06-28');
 
 -- --------------------------------------------------------
 
@@ -105,7 +107,9 @@ INSERT INTO `campanias_causas` (`campania_id`, `causa_id`) VALUES
 (2, 8),
 (4, 15),
 (5, 4),
-(5, 5);
+(5, 5),
+(6, 4),
+(6, 5);
 
 -- --------------------------------------------------------
 
@@ -281,6 +285,19 @@ CREATE TABLE `organizaciones_causas` (
   `causa_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `organizaciones_causas`
+--
+
+INSERT INTO `organizaciones_causas` (`organizacion_id`, `causa_id`) VALUES
+(1, 5),
+(1, 8),
+(1, 10),
+(1, 11),
+(2, 6),
+(3, 5),
+(4, 9);
+
 -- --------------------------------------------------------
 
 --
@@ -336,11 +353,11 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id`, `nombre`, `email`, `clave`, `descripcion`, `telefono`, `ubicacion`, `img_perfil`) VALUES
 (6, 'Pilar', 'pilar@manoamano.com', '$2y$10$YZ4Q5RgkgYsmK5y.IUlqk.H7fdfDDPizIywwPKX1J2nhrZqBHB4h.', 'Estudiante de Programación', '11-6666-9999', 'Buenos Aires, Moron, Haedo', 'archivos/avatar_6a4071a78a7fe8.13374548.webp'),
-(10, 'Sonrisas', 'sonrisas@org.com', '$2y$10$FDFcqeLxPoORrteLDq8rz.Nq56DxdDoys3QHThYww7.F237WDIGAO', NULL, '11-0000-8888', 'Buenos Aires, Moron, Castelar', NULL),
-(11, '4Patas', '4patas@org.com', '$2y$10$kn2AS4fQCHfWizkp8flK3.AZI9bNeKYiBaEfqsTnxxOoKBBneunvK', NULL, '11-2222-5555', 'Buenos Aires, Merlo, Padua', NULL),
+(10, 'Sonrisas', 'sonrisas@org.com', '$2y$10$FDFcqeLxPoORrteLDq8rz.Nq56DxdDoys3QHThYww7.F237WDIGAO', 'Somos una ONG sin fines de lucro que promueve los derechos de los niños y niñas; en especial el derecho a jugar y a la educación. Sin inclinaciones políticas o religiosas, nuestro compromiso ante la sociedad es devolver a los niños y niñas con derechos vulnerados la posibilidad de volver a sonreír y aprender jugando.', '11-0000-8888', 'Buenos Aires, Moron, Castelar', 'archivos/avatar_6a4154afec5392.98342941.webp'),
+(11, '4Patas', '4patas@org.com', '$2y$10$kn2AS4fQCHfWizkp8flK3.AZI9bNeKYiBaEfqsTnxxOoKBBneunvK', 'Proyecto 4 Patas (P4P) es una organización sin fines de lucro abocada a difundir, proteger y promover los derechos de los animales.\r\n\r\nPropiciamos una actitud de respeto hacia todas las especies tomando como eje la premisa ética de que son seres sintientes y no “cosas” para ser utilizadas por el ser humano. Rechazamos todo tipo de explotación animal incluyendo su uso como vestimenta, comida, entretenimiento y experimentación.', '11-2222-5555', 'Buenos Aires, Merlo, Padua', 'archivos/avatar_6a41571a8b1393.51151272.webp'),
 (12, 'Roma', 'romagutierrez@gmail.com', '$2y$10$Fe6m22o9tlbWq7Xmtae4v.L7Rexj3O29r8XSqKwYJ7XMGWesbe4yu', 'Profesora de Educación Física.', '011-8888-0000', NULL, 'archivos/avatar_6a4072172918c6.66545761.jpg'),
-(13, 'Banco de Alimentos', 'bancodealimentos@org.ar', '$2y$10$PovgSJOvFLxxK9KUbMrkKeqqz4ulBqB3QM.n8YKdpTAcbbP9X.F4q', NULL, '011-1515-1515', 'Puente Alto 2200', NULL),
-(14, 'Ambiente & Medio', 'ambienteymedio@org.ar', '$2y$10$snXYtG9CGwn2eTbXizHbveAWFt2RgGVOtR1ZTpuSjbcpEga5aolrC', NULL, '011-4848-4848', 'Primavera 1144', NULL);
+(13, 'Banco de Alimentos', 'bancodealimentos@org.ar', '$2y$10$PovgSJOvFLxxK9KUbMrkKeqqz4ulBqB3QM.n8YKdpTAcbbP9X.F4q', 'Trabajamos para reducir el hambre, mejorar la nutrición y evitar el desperdicio de alimentos. Recibimos grandes donaciones de alimentos y productos y los distribuimos entre comedores y otras organizaciones sociales que dan de comer a personas que lo necesitan.', '011-1515-1515', 'Puente Alto 2200', 'archivos/avatar_6a415781d7de11.38745139.webp'),
+(14, 'Ambiente & Medio', 'ambienteymedio@org.ar', '$2y$10$snXYtG9CGwn2eTbXizHbveAWFt2RgGVOtR1ZTpuSjbcpEga5aolrC', 'En Fundación Ambiente y Medio, nos proponemos despertar a la sociedad hacia la ciudadanía ambiental. Ponemos el foco en el que identificamos como el principal problema ambiental del país: la basura, que está a la vista de todos con más de 5000 basurales a cielo abierto que deben erradicarse.\r\n\r\nGanador del premio Martín Fierro 2017, 2018, 2021 y 2023 como mejor programa cultural/educativo.', '011-4848-4848', 'Primavera 1144', 'archivos/avatar_6a415651ca4989.45581786.webp');
 
 -- --------------------------------------------------------
 
@@ -536,13 +553,13 @@ ALTER TABLE `voluntarios_oficios`
 -- AUTO_INCREMENT de la tabla `archivos`
 --
 ALTER TABLE `archivos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `campanias`
 --
 ALTER TABLE `campanias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `causas`

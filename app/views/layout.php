@@ -30,6 +30,8 @@
     <!-- Definición de BASE_URL para JavaScript -->
     <script>
         const BASE_URL = '<?= BASE_URL ?>';
+        const SESSION_USER_ID = <?= json_encode($_SESSION['id_usuario'] ?? null) ?>;
+        const SESSION_USER_ROL = <?= json_encode($_SESSION['usuario_rol'] ?? null) ?>;
     </script>
     
     <!-- Carga de JS Global-->
