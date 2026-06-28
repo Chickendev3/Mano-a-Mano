@@ -189,7 +189,6 @@ class perfilCtrl extends Controlador {
         return true;
     }
 
-
     public function modificarCampania() : void {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -344,6 +343,59 @@ class perfilCtrl extends Controlador {
                 echo json_encode(['success' => false, 'message' => 'Error al guardar los datos del perfil.']);
             }
             return;
+        }
+    }
+
+    public function actualizarImgPerfil() : void {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json');
+            
+            $idUsuario = $_SESSION['id_usuario'];
+
+            // Se verifica que se haya enviado el archivo
+            if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+                $archivo = $_FILES['foto_perfil'];
+                $dirDestino = 'archivos/'; // public/archivos/
+                
+                if (!file_exists($dirDestino)) {
+                    mkdir($dirDestino, 0777, true);
+                }
+
+                $nombreOriginal = basename($archivo['name']);
+                $extension = pathinfo($nombreOriginal, PATHINFO_EXTENSION);
+                
+                // Se generamos un nombre único para evitar colisiones
+                $nuevoNombre = uniqid('avatar_', true) . '.' . $extension;
+                $rutaRelativa = 'archivos/' . $nuevoNombre;
+                $rutaCompleta = $dirDestino . $nuevoNombre;
+
+                // Obtener y borrar la imagen de perfil anterior si existe
+                $modeloUsuario = $this->cargarModelo('Usuario');
+                $fotoAnterior = $modeloUsuario->obtenerFotoPerfil($idUsuario);
+                if (!empty($fotoAnterior) && strpos($fotoAnterior, 'archivos/') === 0 && file_exists($fotoAnterior)) {
+                    unlink($fotoAnterior);
+                }
+
+                // Se mueve el archivo temporal a la carpeta destino
+                if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
+                    // Actualización en BD
+                    $actualizado = $modeloUsuario->actualizarFotoPerfil($idUsuario, $rutaRelativa);
+
+                    if ($actualizado) {
+                        // Actualización en información de sesión
+                        $_SESSION['img_perfil'] = $rutaRelativa;
+                        
+                        echo json_encode(['success' => true, 'ruta' => $rutaRelativa]);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'No se pudo actualizar la base de datos']);
+                    }
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error al mover el archivo']);
+                }
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Archivo no recibido o con errores']);
+            }
         }
     }
 }

@@ -32,7 +32,17 @@ class Usuario {
     /* abstract public function obtenerUsuarios() :array;
 
     abstract public function obtenerUsuarioporID( int $id ) :array; */
+    
+    public function obtenerFotoPerfil(int $idUsuario) : ?string {
+        $consulta = "SELECT img_perfil FROM usuarios WHERE id = :id";
 
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id", $idUsuario);
+        $this->bd->ejecutar();
+        
+        $resultado = $this->bd->resultado();
+        return $resultado ? $resultado['img_perfil'] : null;
+    }
 
     /* -------------------- INSERTAR DATOS -------------------- */
     protected function nuevoUsuario( string $nombre, string $email, string $clave, string $telefono, ?string $ubicacion = null ) :bool {
@@ -119,7 +129,19 @@ class Usuario {
         return $this->bd->ejecutar();
     }
 
+    public function actualizarFotoPerfil(int $idUsuario, string $rutaFoto) : bool {
+        $consulta = "UPDATE usuarios SET img_perfil = :ruta WHERE id = :id";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":ruta", $rutaFoto);
+        $this->bd->asignar(":id", $idUsuario);
+        
+        return $this->bd->ejecutar();
+    }
+
     /* -------------------- ELIMINAR -------------------- */
+
+    
 
 }
 

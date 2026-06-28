@@ -39,8 +39,8 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
       <!-- Izquierda: Foto de Perfil (Editable) -->
       <div class="profile-avatar-wrapper">
         <div class="profile-avatar-circle editable" id="profile-avatar-clickable" onclick="document.getElementById('edit-avatar-input').click()">
-          <img id="avatar-img-view" src="" alt="Avatar voluntario" style="display: none;">
-          <i data-lucide="image" class="avatar-placeholder-icon" id="avatar-icon-placeholder"></i>
+          <img id="avatar-img-view" src="<?= !empty($usuario['img_perfil']) ? BASE_URL . $usuario['img_perfil'] : '' ?>" alt="Avatar voluntario" style="<?= !empty($usuario['img_perfil']) ? 'display: block;' : 'display: none;' ?>">
+          <i data-lucide="image" class="avatar-placeholder-icon" id="avatar-icon-placeholder" style="<?= !empty($usuario['img_perfil']) ? 'display: none;' : 'display: block;' ?>"></i>
           <div class="avatar-edit-overlay">
             <i data-lucide="camera"></i>
             <span>Cambiar foto</span>

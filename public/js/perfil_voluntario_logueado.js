@@ -287,6 +287,48 @@ function renderProfileData() {
 // =========================================================================
 // 2. GESTIÓN DE EDICIÓN DEL PERFIL DE VOLUNTARIO
 // =========================================================================
+// Listener para el input deL archivo de la imagen de Perfil
+const avatarInput = document.getElementById('edit-avatar-input');
+if (avatarInput) {
+  avatarInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      const file = this.files[0];
+      
+      // Se empaque el archivo en un FormData
+      const formData = new FormData();
+      formData.append('foto_perfil', file);
+
+      // Se envia el archivo de forma asíncrona al controlador
+      fetch(`${BASE_URL}perfil-actualizar-img`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Si el servidor guardó la imagen con éxito, se actualiza la vista
+          const imgView = document.getElementById('avatar-img-view');
+          const placeholder = document.getElementById('avatar-icon-placeholder');
+          
+          if (imgView) {
+            imgView.src = BASE_URL + data.ruta;
+            imgView.style.display = 'block';
+          }
+          if (placeholder) {
+            placeholder.style.display = 'none';
+          }
+          
+          // Se actualiza la variable de estado local del perfil
+          userProfile.avatar = data.ruta;
+        } else {
+          alert('Error al subir la imagen: ' + data.message);
+        }
+      })
+      .catch(err => console.error('Error en la petición:', err));
+    }
+  });
+}
+
 function setupProfileEditEvents() {
   const editBtn = document.getElementById("edit-profile-btn");
   const cancelBtn = document.getElementById("cancel-profile-btn");
