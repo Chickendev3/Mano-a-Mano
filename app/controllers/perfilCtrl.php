@@ -222,9 +222,20 @@ class perfilCtrl extends Controlador {
                                   'message' => 'La fecha de finalización no puede ser anterior a la fecha de inicio.']);
                 return;
             }
-            if (strtotime($fechaInicio) < strtotime(date('Y-m-d'))) {
+            
+            // Se identifica la fecha de creación original de la campaña
+            $modeloCampania = $this->cargarModelo('Campania');
+            $campaniaActual = $modeloCampania->obtenerCampaniaPorID($idCampania);
+
+            if (!$campaniaActual) {
+                echo json_encode(['success' => false, 'message' => 'La campaña seleccionada no existe.']);
+                return;
+            }
+
+            $fechaCreacion = date('Y-m-d', strtotime($campaniaActual['fecha_creacion']));
+            if (strtotime($fechaInicio) < strtotime($fechaCreacion)) {
                 echo json_encode(['success' => false, 
-                                  'message' => 'La fecha de inicio no puede ser anterior a la fecha actual.']);
+                                  'message' => 'La fecha de inicio no puede ser anterior a la fecha de creación de la campaña (' . date('d-m-Y', strtotime($fechaCreacion)) . ').']);
                 return;
             }
 
@@ -237,7 +248,6 @@ class perfilCtrl extends Controlador {
                 'info_adicional' => $infoAdicional
             ];
 
-            $modeloCampania = $this->cargarModelo('Campania');
             $actualizado = $modeloCampania->actualizarDatosCampania($idCampania, $datosNuevos);
 
             if ($actualizado) {
@@ -397,6 +407,59 @@ class perfilCtrl extends Controlador {
                 echo json_encode(['success' => false, 'message' => 'Archivo no recibido o con errores']);
             }
         }
+    }
+
+    public function eliminarCampania () : void {
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            header('Content-Type: application/json');
+
+            $idCampania = (int)($_POST['id_campania'] ?? 0);
+            if ($idCampania <= 0) {
+                echo json_encode(['success' => false, 'message' => 'ID de campaña no válido.']);
+                return;
+            }
+
+            $modeloCampania = $this->cargarModelo('Campania');
+            $campania = $modeloCampania->obtenerCampaniaPorID($idCampania);
+            
+            if (!$campania) {
+                echo json_encode(['success' => false, 'message' => 'La campaña no existe.']);
+                return;
+            }
+
+            // Obtener el tipo real por tipo_id
+            $tipo = $modeloCampania->obtenerTipoPorID((int)$campania['tipo_id']);
+            $mensaje = 'La campaña se eliminó correctamente.';
+
+            if ($tipo === 'Convocatoria') {
+                $modeloPostulacion = $this->cargarModelo('Postulacion');
+                $postulaciones = $modeloPostulacion->obtenerPostulacionesPorCampania($idCampania);
+                $cantPostulantes = count($postulaciones);
+                if ($cantPostulantes > 0) {
+                    $mensaje = "Campaña de convocatoria eliminada. Se cancelaron las {$cantPostulantes} postulaciones activas asociadas.";
+                }
+            }
+
+            // Eliminación de archivos de imágenes del servidor
+            $imagenes = $modeloCampania->obtenerImgenesPorCampania($idCampania);
+            foreach ($imagenes as $img) {
+                $rutaFisica = $img['referencia'];
+                if (!empty($rutaFisica) && strpos($rutaFisica, 'archivos/') === 0 && file_exists($rutaFisica)) {
+                    unlink($rutaFisica);
+                }
+            }
+
+            // Se elimina de la base de datos (borra relacionales por CASCADE previamente definido en la BD)
+            $eliminado = $modeloCampania->eliminarCampania($idCampania);
+
+            if ($eliminado) {
+                echo json_encode(['success' => true, 'message' => $mensaje]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al eliminar la campaña de la base de datos.']);
+            }
+            return;
+        }    
     }
 }
 ?>

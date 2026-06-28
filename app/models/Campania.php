@@ -141,6 +141,17 @@ class Campania {
 
         return $this->bd->resultado()['id_tipo'];
     }
+    public function obtenerTipoPorID ( int $idTipo ) :string {
+        $consulta = "SELECT tipo FROM tipos_campanias 
+                        WHERE id = :id_tipo;";
+    
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_tipo", $idTipo);
+        $this->bd->ejecutar();
+
+        return $this->bd->resultado()['tipo'];
+    }
+    
 
     public function obtenerCausas () :array {
         $consulta = "SELECT causa FROM `causas`;";
@@ -382,6 +393,15 @@ class Campania {
         $this->bd->asignar(":id", $idCampania);
 
         $this->bd->ejecutar();
+    }
+
+    public function eliminarCampania ( int $idCampania ) :bool {
+        $consulta = "DELETE FROM campanias WHERE id = :id";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id", $idCampania);
+
+        return $this->bd->ejecutar();
     }
 
     

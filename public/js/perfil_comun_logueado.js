@@ -767,21 +767,43 @@ window.openCancelInvitationConfirmModal = function(id) {
 };
 
 function setupCommonConfirmEvents() {
-  // Confirmar eliminación de campaña (Enlace con PHP en próximas fases)
+  // Confirmar eliminación de campaña (Ya enlazado con PHP)
   const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
   if (confirmDeleteBtn) {
     confirmDeleteBtn.addEventListener("click", () => {
       if (currentDeleteCampaignId) {
-        // Por ahora lo removemos localmente
-        campaigns = campaigns.filter(c => c.id !== currentDeleteCampaignId);
-        closeModal("modal-delete-confirm");
-        currentDeleteCampaignId = null;
-        currentPage = 1;
-        renderCampaigns();
+        const formData = new FormData();
+        formData.append('id_campania', currentDeleteCampaignId);
 
-        if (typeof showToast !== "undefined") {
-          showToast("Campaña eliminada", "La campaña se eliminó correctamente de tu perfil.", true);
-        }
+        fetch(`${BASE_URL}eliminar-campania`, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Eliminar localmente del listado y renderizar
+            campaigns = campaigns.filter(c => c.id !== currentDeleteCampaignId);
+            closeModal("modal-delete-confirm");
+            currentDeleteCampaignId = null;
+            currentPage = 1;
+            renderCampaigns();
+
+            if (typeof showToast !== "undefined") {
+              showToast("Campaña eliminada", data.message, true);
+            }
+          } else {
+            if (typeof showToast !== "undefined") {
+              showToast("Error", data.message || "No se pudo eliminar la campaña.", false);
+            }
+          }
+        })
+        .catch(err => {
+          console.error("Error al eliminar la campaña:", err);
+          if (typeof showToast !== "undefined") {
+            showToast("Error de conexión", "No se pudo comunicar con el servidor.", false);
+          }
+        });
       }
     });
   }
