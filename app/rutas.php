@@ -28,7 +28,8 @@ $rutas = [
     'editar-perfil-organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'editarPerfilOrganizacion'],
     'crear-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'crearCampania'],
     'modificar-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'modificarCampania'],
-    'eliminar-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarCampania']
+    'eliminar-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarCampania'],
+    'postular-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'postularCampania']
 
 ];
 ?>

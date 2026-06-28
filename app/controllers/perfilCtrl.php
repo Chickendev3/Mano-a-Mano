@@ -508,5 +508,57 @@ class perfilCtrl extends Controlador {
             return;
         }
     }
+
+    public function postularCampania() {
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json');
+
+        // Validaciones
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Debes iniciar sesión para postularte.']);
+            return;
+        }
+        if ($_SESSION['usuario_rol'] !== 'voluntario') {
+            echo json_encode(['success' => false, 'message' => 'Solo los voluntarios pueden postularse a campañas.']);
+            return;
+        }
+        $idCampania = filter_input(INPUT_POST, 'id_campania', FILTER_VALIDATE_INT);
+        if (!$idCampania) {
+            echo json_encode(['success' => false, 'message' => 'ID de campaña no válido.']);
+            return;
+        }
+
+        $idUsuario = $_SESSION['id_usuario'];
+
+        $modeloVoluntario = $this->cargarModelo('Voluntario');
+        $vol = $modeloVoluntario->obtenerIDVoluntario($idUsuario);
+        if (!$vol) {
+            echo json_encode(['success' => false, 'message' => 'No se encontró el voluntario correspondiente.']);
+            return;
+        }
+        $idVoluntario = $vol['id'];
+
+        $modeloPostulacion = $this->cargarModelo('Postulacion');
+        
+        // Evita duplicados: se verifica si ya existe una postulación
+        $existe = $modeloPostulacion->obtenerIdPostulacion($idCampania, $idVoluntario);
+        if ($existe) {
+            echo json_encode(['success' => false, 'message' => 'Ya te has postulado a esta campaña.']);
+            return;
+        }
+
+        // Se Rrgistrar la postulación
+        $exito = $modeloPostulacion->nuevaPostulacion($idCampania, $idVoluntario);
+
+        if ($exito) {
+            echo json_encode(['success' => true, 'message' => '¡Te has postulado con éxito a la campaña!']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al registrar la postulación.']);
+        }
+    }
 }
 ?>

@@ -60,7 +60,7 @@ class Postulacion {
         return $this->bd->resultados();
     }
 
-    public function obtenerIdPostulacion (int $idCampania, int $idVoluntario) :array {
+    public function obtenerIdPostulacion (int $idCampania, int $idVoluntario) :array|bool {
         $consulta = "SELECT id FROM postulaciones 
                         WHERE voluntario_id = :id_vol AND campania_id = :id_camp;";
         
@@ -76,7 +76,7 @@ class Postulacion {
     /* ------------------------ INSERTAR DATOS ------------------------ */
     public function nuevaPostulacion (int $idCampania, int $idVoluntario) :bool {
         $consulta = "INSERT INTO postulaciones(`voluntario_id`, `campania_id`, `estado_id`) 
-                        VALUES (:id_campania, :id_voluntario, 3);";
+                        VALUES (:id_voluntario, :id_campania, 3);";
 
         $this->bd->consulta($consulta);
         $this->bd->asignar(":id_campania", $idCampania);

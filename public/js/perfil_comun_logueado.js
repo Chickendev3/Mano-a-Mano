@@ -46,6 +46,42 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCampaignCausesEvents();
   setupCampaignFormValidations();
   setupCommonConfirmEvents();
+
+  // Configurar el click en el botón de postularme
+  const postulateBtn = document.getElementById("m-camp-postulate-btn");
+  if (postulateBtn) {
+    postulateBtn.addEventListener("click", () => {
+      if (!currentViewedCampaignId) return;
+
+      postulateBtn.disabled = true;
+      
+      const formData = new FormData();
+      formData.append("id_campania", currentViewedCampaignId);
+
+      fetch(`${BASE_URL}postular-campania`, {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        postulateBtn.disabled = false;
+        if (data.success) {
+          if (typeof showToast !== "undefined") {
+            showToast("Postulación exitosa", data.message, true);
+          }
+          closeModal("modal-profile-camp-detail");
+        } else {
+          if (typeof showToast !== "undefined") {
+            showToast("No se pudo postular", data.message, false);
+          }
+        }
+      })
+      .catch(err => {
+        postulateBtn.disabled = false;
+        console.error("Error al postularse:", err);
+      });
+    });
+  }
 });
 
 // =========================================================================
@@ -230,9 +266,14 @@ function renderPagination(totalPages) {
 // =========================================================================
 // MODAL DE DETALLE DE CAMPAÑA (COMPARTIDO)
 // =========================================================================
+// Variable para trackear la campaña visualizada en el modal
+let currentViewedCampaignId = null;
+
 function openCampaignDetailsView(campaignId) {
   const camp = campaigns.find(c => c.id === campaignId);
   if (!camp) return;
+
+  currentViewedCampaignId = campaignId;
 
   const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");

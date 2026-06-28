@@ -1,20 +1,128 @@
 // CONECTAR PAGE - Lógica de Búsqueda e Interactividad
+let currentViewedCampaignId = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.getElementById('search-input');
+  const keywordInput = document.getElementById('keyword-search-input');
+  const locationInput = document.getElementById('location-search-input');
   const categorySelect = document.getElementById('category-select');
-  const locationSelect = document.getElementById('location-select');
-  
-  const searchBtn = document.querySelector('.btn.btn-primary');
+  const searchBtn = document.getElementById('search-action-btn');
+  const filterButtons = document.querySelectorAll('.filter-btn');
+
+  const sections = {
+    campaigns: document.getElementById('campaigns-section'),
+    organizations: document.getElementById('organizations-section'),
+    volunteers: document.getElementById('volunteers-section')
+  };
+
+  // Función para poblar dinámicamente el select de causas u oficios
+  function updateCategorySelect(tab, selectedValue = '') {
+    if (!categorySelect) return;
+    categorySelect.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    
+    let list = [];
+    if (tab === 'volunteers') {
+      defaultOption.textContent = 'Todos los oficios';
+      list = window.oficiosList || [];
+    } else {
+      defaultOption.textContent = 'Todas las causas';
+      list = window.causesList || [];
+    }
+    categorySelect.appendChild(defaultOption);
+
+    list.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item;
+      opt.textContent = item;
+      if (item === selectedValue) {
+        opt.selected = true;
+      }
+      categorySelect.appendChild(opt);
+    });
+  }
+
+  // Inicializar estado según los filtros de la URL al cargar
+  const activeTab = window.currentFilters.tab || 'campaigns';
+  updateCategorySelect(activeTab, window.currentFilters.category);
+
+  // Mostrar la sección correcta al cargar
+  Object.keys(sections).forEach(key => {
+    if (sections[key]) {
+      sections[key].style.display = (key === activeTab) ? 'block' : 'none';
+    }
+  });
+
+  // Manejo de botones de filtro (Tabs)
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const target = btn.getAttribute('data-target');
+      
+      // Actualizar select de categorías en caliente al cambiar de pestaña
+      updateCategorySelect(target);
+
+      Object.keys(sections).forEach(key => {
+        if (sections[key]) {
+          sections[key].style.display = (key === target) ? 'block' : 'none';
+        }
+      });
+    });
+  });
+
+  // Redirección de búsqueda al presionar "Buscar"
   if (searchBtn) {
     searchBtn.addEventListener('click', () => {
-      const q = searchInput ? searchInput.value : '';
-      const cat = categorySelect ? categorySelect.value : '';
-      const loc = locationSelect ? locationSelect.value : '';
-      
-      console.log('Filtros seleccionados:', { q, cat, loc });
-      if (typeof showToast !== 'undefined') {
-        showToast('Buscando...', 'Filtrando base de datos...', true);
-      }
+      const currentTab = document.querySelector('.filter-btn.active')?.getAttribute('data-target') || 'campaigns';
+      const q = keywordInput ? keywordInput.value.trim() : '';
+      const location = locationInput ? locationInput.value.trim() : '';
+      const category = categorySelect ? categorySelect.value : '';
+
+      const params = new URLSearchParams();
+      params.set('tab', currentTab);
+      if (q) params.set('q', q);
+      if (location) params.set('location', location);
+      if (category) params.set('category', category);
+
+      window.location.href = `${BASE_URL}conectar?${params.toString()}`;
+    });
+  }
+
+  // BOTÓN DE POSTULACIÓN
+  const postulateBtn = document.getElementById("m-camp-postulate-btn");
+  if (postulateBtn) {
+    postulateBtn.addEventListener("click", () => {
+      if (!currentViewedCampaignId) return;
+
+      postulateBtn.disabled = true;
+      const formData = new FormData();
+      formData.append("id_campania", currentViewedCampaignId);
+
+      fetch(`${BASE_URL}postular-campania`, {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        postulateBtn.disabled = false;
+        if (data.success) {
+          if (typeof showToast !== "undefined") {
+            showToast("Postulación exitosa", data.message, true);
+          }
+          closeModal("modal-profile-camp-detail");
+        } else {
+          if (typeof showToast !== "undefined") {
+            showToast("No se pudo postular", data.message, false);
+          }
+        }
+      })
+      .catch(err => {
+        postulateBtn.disabled = false;
+        console.error("Error al postularse:", err);
+      });
     });
   }
 });
@@ -25,6 +133,8 @@ window.openCampaignDetails = function(campaignId) {
   const campaignsList = window.campaigns || [];
   const camp = campaignsList.find(c => c.id === campaignId);
   if (!camp) return;
+
+  currentViewedCampaignId = campaignId;
 
   const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");
@@ -56,11 +166,22 @@ window.openCampaignDetails = function(campaignId) {
       mTags.appendChild(span);
     });
 
+    // Tipo de campaña
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "tag-badge";
+    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+    typeSpan.style.color = "var(--color-primary)";
+    typeSpan.style.fontWeight = "600";
+    const typeLabel = camp.tipo === "convocatoria" ? "Convocatoria" : "Informativa";
+    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
+    mTags.appendChild(typeSpan);
+  }
+
   // Lógica de inyección del Creador
   const mCreatorLink = document.getElementById("m-camp-creator-link");
   if (mCreatorLink) {
     if (camp.usuario_id) {
-      mCreatorLink.href = `${BASE_URL}perfil.php?id=${camp.usuario_id}`;                 // Esto se cambia después!!!
+      mCreatorLink.href = `${BASE_URL}perfil.php?id=${camp.usuario_id}`;
       mCreatorLink.style.display = "flex";
       
       const mCreatorName = document.getElementById("m-camp-creator-name");
@@ -81,17 +202,6 @@ window.openCampaignDetails = function(campaignId) {
     }
   }
 
-    // Tipo de campaña
-    const typeSpan = document.createElement("span");
-    typeSpan.className = "tag-badge";
-    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
-    typeSpan.style.color = "var(--color-primary)";
-    typeSpan.style.fontWeight = "600";
-    const typeLabel = camp.tipo === "convocatoria" ? "Convocatoria" : "Informativa";
-    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
-    mTags.appendChild(typeSpan);
-  }
-
   // Carga de la Galería de Fotos reales si la campaña tiene
   const gallerySec = document.getElementById("m-camp-gallery-sec");
   const galleryGrid = document.getElementById("m-camp-gallery-grid");
@@ -100,7 +210,7 @@ window.openCampaignDetails = function(campaignId) {
     if (camp.images && camp.images.length > 0) {
       camp.images.forEach(imgUrl => {
         const div = document.createElement("div");
-        div.className = "gallery-placeholder-img"; // Usar clase original
+        div.className = "gallery-placeholder-img";
         div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campaña" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
         galleryGrid.appendChild(div);
       });
@@ -132,127 +242,3 @@ window.openCampaignDetails = function(campaignId) {
     lucide.createIcons();
   }
 };
-
-
-// Lógica de pestañas de conmutación
-const filterButtons = document.querySelectorAll('.filter-btn');
-const sections = {
-  campaigns: document.getElementById('campaigns-section'),
-  organizations: document.getElementById('organizations-section'),
-  volunteers: document.getElementById('volunteers-section')
-};
-
-filterButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Remover clase activa
-    filterButtons.forEach(b => b.classList.remove('active'));
-    // Añadir clase activa al presionado
-    btn.classList.add('active');
-
-    const target = btn.getAttribute('data-target');
-    
-    // Mostrar y ocultar secciones correspondientes
-    Object.keys(sections).forEach(key => {
-      if (sections[key]) {
-        if (key === target) {
-          sections[key].style.display = 'block';
-        } else {
-          sections[key].style.display = 'none';
-        }
-      }
-    });
-  });
-});
-
-
-// CONECTAR PAGE - Lógica de Búsqueda e Interactividad
-document.addEventListener('DOMContentLoaded', () => {
-  const keywordInput = document.getElementById('keyword-search-input');
-  const locationInput = document.getElementById('location-search-input');
-  const categorySelect = document.getElementById('category-select');
-  const searchBtn = document.getElementById('search-action-btn');
-  const filterButtons = document.querySelectorAll('.filter-btn');
-
-  const sections = {
-    campaigns: document.getElementById('campaigns-section'),
-    organizations: document.getElementById('organizations-section'),
-    volunteers: document.getElementById('volunteers-section')
-  };
-
-  // Función para poblar dinámicamente el select
-  function updateCategorySelect(tab, selectedValue = '') {
-    if (!categorySelect) return;
-    categorySelect.innerHTML = '';
-
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    
-    let list = [];
-    if (tab === 'volunteers') {
-      defaultOption.textContent = 'Todos los oficios';
-      list = window.oficiosList || [];
-    } else {
-      defaultOption.textContent = 'Todas las causas';
-      list = window.causesList || [];
-    }
-    categorySelect.appendChild(defaultOption);
-
-    list.forEach(item => {
-      const opt = document.createElement('option');
-      opt.value = item;
-      opt.textContent = item;
-      if (item === selectedValue) {
-        opt.selected = true;
-      }
-      categorySelect.appendChild(opt);
-    });
-  }
-
-  // Inicializar estado según los filtros actuales de la URL
-  const activeTab = window.currentFilters.tab || 'campaigns';
-  updateCategorySelect(activeTab, window.currentFilters.category);
-
-  // Mostrar la sección correcta al cargar
-  Object.keys(sections).forEach(key => {
-    if (sections[key]) {
-      sections[key].style.display = (key === activeTab) ? 'block' : 'none';
-    }
-  });
-
-  // Manejo de botones de filtro (Tabs)
-  filterButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const target = btn.getAttribute('data-target');
-      
-      // Actualizar select de categorías en caliente al cambiar de tab
-      updateCategorySelect(target);
-
-      Object.keys(sections).forEach(key => {
-        if (sections[key]) {
-          sections[key].style.display = (key === target) ? 'block' : 'none';
-        }
-      });
-    });
-  });
-
-  // Redirección de búsqueda al presionar "Buscar"
-  if (searchBtn) {
-    searchBtn.addEventListener('click', () => {
-      const currentTab = document.querySelector('.filter-btn.active')?.getAttribute('data-target') || 'campaigns';
-      const q = keywordInput ? keywordInput.value.trim() : '';
-      const location = locationInput ? locationInput.value.trim() : '';
-      const category = categorySelect ? categorySelect.value : '';
-
-      const params = new URLSearchParams();
-      params.set('tab', currentTab);
-      if (q) params.set('q', q);
-      if (location) params.set('location', location);
-      if (category) params.set('category', category);
-
-      window.location.href = `${BASE_URL}conectar?${params.toString()}`;
-    });
-  }
-});
