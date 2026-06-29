@@ -41,11 +41,16 @@ class Postulacion {
         }
         
         /* Vista desde Voluntario (Lista de sus propias Postulaciones) */
-        $consulta = "SELECT p.id, c.id as campania_id, u.img_perfil as 'imagen_perfil_creador', c.titulo, c.descripcion, e.estado, c.ubicacion, c.fecha_inicio, c.fecha_finalizacion, c.info_adicional 
+        $consulta = "SELECT p.id, c.id as campania_id, c.usuario_id as 'creador_usuario_id', 
+                            CASE WHEN v_c.id IS NOT NULL THEN CONCAT(u.nombre, ' ', v_c.apellido) ELSE u.nombre END as 'creador_nombre', 
+                            u.img_perfil as 'creador_img_perfil',
+                            CASE WHEN v_c.id IS NOT NULL THEN 'voluntario' ELSE 'organizacion' END as 'creador_usuario_rol',
+                            c.titulo, c.descripcion, e.estado, c.ubicacion, c.fecha_inicio, c.fecha_finalizacion, c.info_adicional 
                         FROM postulaciones p JOIN voluntarios v ON p.voluntario_id = v.id
                                             JOIN campanias c ON p.campania_id = c.id
                                             JOIN usuarios u ON c.usuario_id = u.id
                                             JOIN estados e ON p.estado_id = e.id
+                                            LEFT JOIN voluntarios v_c ON c.usuario_id = v_c.usuario_id
                         WHERE v.id = :id_voluntario;";
 
         $this->bd->consulta($consulta);

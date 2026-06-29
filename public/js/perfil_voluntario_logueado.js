@@ -747,6 +747,31 @@ function openPostulationDetailsView(postulationId) {
   const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
   const mSensitive = document.getElementById("m-camp-sensitive-info");
 
+  const mCreatorLink = document.getElementById("m-camp-creator-link");
+  if (mCreatorLink) {
+    if (post.creatorId) {
+      const creatorProfileUrl = post.creatorRole === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
+      mCreatorLink.href = `${BASE_URL}${creatorProfileUrl}?id=${post.creatorId}`;
+      mCreatorLink.style.display = "flex";
+      
+      const mCreatorName = document.getElementById("m-camp-creator-name");
+      if (mCreatorName) {
+        mCreatorName.textContent = post.creatorName || "Creador";
+      }
+      
+      const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
+      if (mCreatorAvatar) {
+        if (post.creatorImg) {
+          mCreatorAvatar.innerHTML = `<img src="${BASE_URL + post.creatorImg}" alt="Logo creador" class="creator-avatar-img">`;
+        } else {
+          mCreatorAvatar.innerHTML = `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
+        }
+      }
+    } else {
+      mCreatorLink.style.display = "none";
+    }
+  }
+
   const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
   if (ownerSection) ownerSection.style.display = "none";
 
@@ -1010,6 +1035,11 @@ function openVolunteeringDetailsView(volunteeringId) {
 
   const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
   if (ownerSection) ownerSection.style.display = "none";
+
+  const mCreatorLink = document.getElementById("m-camp-creator-link");
+  if (mCreatorLink) {
+    mCreatorLink.style.display = "none";
+  }
 
   if (mTitle) mTitle.textContent = item.title;
   if (mDesc) mDesc.textContent = item.desc;

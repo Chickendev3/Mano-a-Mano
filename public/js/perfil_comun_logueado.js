@@ -291,7 +291,8 @@ function openCampaignDetailsView(campaignId) {
   const mCreatorLink = document.getElementById("m-camp-creator-link");
   if (mCreatorLink) {
     if (camp.usuario_id) {
-      mCreatorLink.href = `${BASE_URL}perfil/organizacion?id=${camp.usuario_id}`;         // Ya cambiado
+      const creatorProfileUrl = camp.usuario_rol === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
+      mCreatorLink.href = `${BASE_URL}${creatorProfileUrl}?id=${camp.usuario_id}`;
       mCreatorLink.style.display = "flex";
       
       const mCreatorName = document.getElementById("m-camp-creator-name");

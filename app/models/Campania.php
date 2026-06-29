@@ -43,14 +43,14 @@ class Campania {
         $whereOrgs = !empty($condicionesOrgs) ? " AND " . implode(" AND ", $condicionesOrgs) : "";
         $whereVol = !empty($condicionesVol) ? " AND " . implode(" AND ", $condicionesVol) : "";
         
-        $consultaOrgs = "SELECT c.id, c.usuario_id, u.nombre, u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+        $consultaOrgs = "SELECT c.id, c.usuario_id, u.nombre, u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional, 'organizacion' as 'usuario_rol' 
                         FROM campanias c 
                             JOIN usuarios u ON c.usuario_id = u.id
                             JOIN tipos_campanias t ON t.id = c.tipo_id
                             JOIN organizaciones o ON u.id = o.usuario_id
                         WHERE 1=1 " . $whereOrgs;
         
-        $consultaVol = "SELECT c.id, c.usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre', u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional 
+        $consultaVol = "SELECT c.id, c.usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre', u.img_perfil, t.tipo, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion, c.ubicacion, c.info_adicional, 'voluntario' as 'usuario_rol' 
                         FROM campanias c 
                             JOIN usuarios u ON c.usuario_id = u.id
                             JOIN tipos_campanias t ON t.id = c.tipo_id
@@ -90,6 +90,7 @@ class Campania {
                 'nombre' => $camp['nombre'],
                 'usuario_id' => (int)$camp['usuario_id'],
                 'usuario_nombre' => $camp['nombre'],
+                'usuario_rol' => $camp['usuario_rol'],
                 'usuario_img_perfil' => $camp['img_perfil'],
                 'tipo' => strtolower($camp['tipo']) === 'convocatoria' ? 'convocatoria' : 'informativa',
                 'titulo' => $camp['titulo'],
@@ -242,6 +243,7 @@ class Campania {
                 'desc' => $camp['descripcion'],
                 'usuario_id' => $camp['usuario_id'],
                 'usuario_nombre' => $nombreCompleto,
+                'usuario_rol' => !empty($camp['vol_apellido']) ? 'voluntario' : 'organizacion',
                 'usuario_img_perfil' => $camp['img_perfil'],
                 'category' => !empty($causes) ? $causes[0] : '',
                 'causes' => $causes, // Listado completo de causas

@@ -683,7 +683,12 @@ class perfilCtrl extends Controlador {
                 'location' => $post['ubicacion'],
                 'details' => $post['descripcion'],
                 'additionalInfo' => $post['info_adicional'],
-                'images' => $images
+                'images' => $images,
+                // Datos del creador real de la campaña
+                'creatorId' => (int)$post['creador_usuario_id'],
+                'creatorName' => $post['creador_nombre'],
+                'creatorImg' => $post['creador_img_perfil'],
+                'creatorRole' => $post['creador_usuario_rol'],
             ];
         }
 
