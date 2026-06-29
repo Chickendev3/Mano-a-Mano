@@ -874,6 +874,7 @@ select:focus-visible {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  cursor: pointer;
 }
 
 .alt-card:hover {

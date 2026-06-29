@@ -82,7 +82,7 @@
                     $imgHTML = '<img src="' . BASE_URL . htmlspecialchars($camp['imagenes'][0]) . '" alt="' . htmlspecialchars($camp['titulo']) . '" style="width:100%; height:100%; object-fit:cover;">';
                 }
               ?>
-              <article class="<?= $cardClass ?>">
+              <article class="<?= $cardClass ?>" onclick="openCampaignDetailsModal(<?= $camp['id'] ?>)">
                 <div class="alt-card-img-col">
                   <div class="alt-card-img-placeholder">
                     <?= $imgHTML ?>
@@ -90,8 +90,17 @@
                 </div>
                 <div class="alt-card-content-col">
                   <h3 class="alt-card-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
+                  
+                  <!-- Tags below the title -->
+                  <div class="profile-tags-wrapper" style="margin-top: 4px; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; display: flex;">
+                    <?php if (!empty($camp['tags'])): ?>
+                      <?php foreach ($camp['tags'] as $tag): ?>
+                        <span class="tag-badge" style="padding: 4px 12px; font-size: 11px; height: auto;"><i data-lucide="tag" style="width:10px; height:10px;"></i> <?= htmlspecialchars($tag) ?></span>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </div>
+
                   <p class="alt-card-desc"><?= htmlspecialchars($camp['descripcion'] ?? '') ?></p>
-                  <button class="btn btn-primary btn-info" onclick="openCampaignDetailsModal(<?= $camp['id'] ?>)">+ Más información</button>
                 </div>
               </article>
               <?php endforeach; ?>
@@ -241,6 +250,7 @@
 </div>
 
 <script>
+  window.IS_LOGGED_IN = <?= isset($_SESSION['id_usuario']) ? 'true' : 'false' ?>;
   window.campaignsDetailsData = <?= json_encode($campaniasDetails) ?>;
 </script>
 

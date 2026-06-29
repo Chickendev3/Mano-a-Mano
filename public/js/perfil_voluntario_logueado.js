@@ -747,6 +747,9 @@ function openPostulationDetailsView(postulationId) {
   const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
   const mSensitive = document.getElementById("m-camp-sensitive-info");
 
+  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
+  if (ownerSection) ownerSection.style.display = "none";
+
   if (mTitle) mTitle.textContent = post.title;
   if (mDesc) mDesc.textContent = post.desc;
   
@@ -1004,6 +1007,9 @@ function openVolunteeringDetailsView(volunteeringId) {
   const mBadge = document.getElementById("m-camp-accepted-badge");
   const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
   const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
+  if (ownerSection) ownerSection.style.display = "none";
 
   if (mTitle) mTitle.textContent = item.title;
   if (mDesc) mDesc.textContent = item.desc;
