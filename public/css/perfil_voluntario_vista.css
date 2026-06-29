@@ -2,11 +2,60 @@
    Perfil Voluntario Vista - Stylesheet
    ========================================================================== */
 
-/* Volunteer specific style modifications if any */
+/* Contenedor de Insignias y Estadísticas */
 .profile-badges-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 16px;
   background-color: var(--color-surface-hover);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 24px;
+}
+
+/* Fila de Insignia */
+.badge-row-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.badge-row-item i {
+  width: 18px;
+  height: 18px;
+}
+
+/* Colores de Medallas e Iconos */
+.badge-icon-gold {
+  color: #F59E0B; /* Gold */
+}
+.badge-icon-blue {
+  color: var(--color-primary);
+}
+.badge-icon-tag {
+  color: var(--color-secondary);
+}
+
+/* Oficios y Listados */
+.skills-list-row {
+  align-items: flex-start;
+}
+.skills-list-row i {
+  margin-top: 4px;
+}
+.skills-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.skill-badge-text {
+  padding: 4px 12px;
+  background-color: var(--color-secondary-light);
+  color: var(--color-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
 }

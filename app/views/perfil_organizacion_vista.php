@@ -3,6 +3,7 @@
  * Vista de Perfil de Organización (Público)
  * Mano a Mano MVC
  */
+/** @var array $campaniasDetails */
 ?>
 <main class="profile-view-container">
   

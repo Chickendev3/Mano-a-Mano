@@ -93,12 +93,3 @@
   background-color: var(--color-primary-light) !important;
 }
 
-.volunteer-empty-state {
-  text-align: center;
-  padding: 20px;
-  color: var(--color-text-muted);
-  background-color: var(--color-surface);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  width: 100%;
-}
