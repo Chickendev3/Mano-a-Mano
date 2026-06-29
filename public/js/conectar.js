@@ -239,9 +239,29 @@ window.openCampaignDetails = function(campaignId) {
     }
   }
 
-  // Ocultamos las secciones privadas y de organizaciones asociadas en esta vista general
-  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
-  if (ownerSection) ownerSection.style.display = "none";
+  const assocSec = document.getElementById("m-camp-associations-sec");
+  const assocList = document.getElementById("m-camp-associations-list");
+  if (assocSec && assocList) {
+    assocList.innerHTML = "";
+    if (camp.associations && camp.associations.length > 0) {
+      camp.associations.forEach(org => {
+        const a = document.createElement("a");
+        a.href = `${BASE_URL}perfil/organizacion?id=${org.id}`;
+        a.className = "association-circle";
+        a.title = org.nombre;
+        if (org.img_perfil) {
+          a.innerHTML = `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`;
+        } else {
+          a.innerHTML = `<div class="association-logo-placeholder" style="width:40px; height:40px; border-radius:50%; background-color:var(--color-border); display:flex; align-items:center; justify-content:center; color:var(--color-text-light);"><i data-lucide="building" style="width:16px; height:16px;"></i></div>`;
+        }
+        assocList.appendChild(a);
+      });
+      assocSec.style.display = "block";
+    } else {
+      assocSec.style.display = "none";
+    }
+  }
+
   if (mBadge) mBadge.style.display = "none";
   if (mSensitive) mSensitive.style.display = "none";
 

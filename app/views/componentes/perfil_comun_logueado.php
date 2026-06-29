@@ -405,16 +405,6 @@ function renderModalDetalleCampania() {
         <!-- Inyectado por JS -->
       </div>
       
-      <!-- Selector de simulación de estado (Solo para desarrollo/pruebas) -->
-      <div class="dev-state-selector-card">
-        <span class="dev-label">Simular Estado (Voluntario Logueado):</span>
-        <div class="dev-options">
-          <label><input type="radio" name="dev-state-choice" value="no-login" checked> No registrado</label>
-          <label><input type="radio" name="dev-state-choice" value="registrado-pendiente"> Registrado (Pendiente)</label>
-          <label><input type="radio" name="dev-state-choice" value="registrado-aceptado"> Registrado (Aceptado)</label>
-          <label><input type="radio" name="dev-state-choice" value="registrado-rechazado"> Registrado (Rechazado)</label>
-        </div>
-      </div>
 
       <!-- Información de Coordinación (Desbloqueada cuando el voluntario es ACEPTADO) -->
       <div class="unlocked-info-box" id="m-camp-sensitive-info" style="display: none;">
