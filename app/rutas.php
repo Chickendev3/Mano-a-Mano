@@ -35,6 +35,15 @@ $rutas = [
     'eliminar-postulacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarPostulacion'],
     'obtener-mis-postulaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisPostulaciones'],
 
+    /* Invitaciones y Asociaciones */
+    'obtener-mis-invitaciones-recibidas' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisInvitacionesRecibidas'],
+    'obtener-mis-invitaciones-enviadas' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisInvitacionesEnviadas'],
+    'obtener-mis-convocatorias-activas' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisConvocatoriasActivas'],
+    'crear-invitacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'crearInvitacion'],
+    'responder-invitacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'responderInvitacion'],
+    'cancelar-invitacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'cancelarInvitacion'],
+    'obtener-mis-asociaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisAsociaciones'],
+
     /* Perfiles Públicos */
     'perfil/organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarOrganizacionPublico'],
     'perfil/voluntario' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarVoluntarioPublico']

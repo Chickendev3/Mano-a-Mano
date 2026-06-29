@@ -829,5 +829,228 @@ class perfilCtrl extends Controlador {
 
         $this->cargarVista('perfil_voluntario_vista', $datos, 'Perfil de ' . htmlspecialchars($usuario['nombre']) . ' - Mano a Mano');
     }
+
+    public function obtenerMisInvitacionesRecibidas() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $modeloCampania = $this->cargarModelo('Campania');
+        $rawInvites = $modeloInvitacion->obtenerInvitacionesPorDestinatario($_SESSION['id_usuario']);
+
+        $invitaciones = [];
+        foreach ($rawInvites as $inv) {
+            $causes = $modeloCampania->obtenerCausasDeCampania($inv['campania_id']);
+            $images = $modeloCampania->obtenerArchivosDeCampania($inv['campania_id']);
+
+            $invitaciones[] = [
+                'id' => (int)$inv['id'],
+                'campaignId' => (int)$inv['campania_id'],
+                'title' => $inv['titulo'],
+                'desc' => $inv['descripcion'],
+                'status' => strtolower($inv['estado']) === 'aceptada' || strtolower($inv['estado']) === 'aceptado' ? 'aceptado' : (strtolower($inv['estado']) === 'rechazada' || strtolower($inv['estado']) === 'rechazado' ? 'rechazado' : 'pendiente'),
+                'category' => !empty($causes) ? $causes[0] : 'Solidario',
+                'location' => $inv['ubicacion'],
+                'images' => $images,
+                'emisorId' => (int)$inv['emisor_id'],
+                'emisorName' => $inv['emisor_nombre'],
+                'emisorImg' => $inv['emisor_img_perfil'],
+                'emisorRole' => $inv['emisor_rol']
+            ];
+        }
+
+        echo json_encode(['success' => true, 'data' => $invitaciones]);
+    }
+
+    public function obtenerMisInvitacionesEnviadas() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $modeloCampania = $this->cargarModelo('Campania');
+        $rawInvites = $modeloInvitacion->obtenerInvitacionesPorEmisor($_SESSION['id_usuario']);
+
+        $invitaciones = [];
+        foreach ($rawInvites as $inv) {
+            $causes = $modeloCampania->obtenerCausasDeCampania($inv['campania_id']);
+            $images = $modeloCampania->obtenerArchivosDeCampania($inv['campania_id']);
+
+            $invitaciones[] = [
+                'id' => (int)$inv['id'],
+                'campaignId' => (int)$inv['campania_id'],
+                'title' => $inv['titulo'],
+                'desc' => $inv['descripcion'],
+                'status' => strtolower($inv['estado']) === 'aceptada' || strtolower($inv['estado']) === 'aceptado' ? 'aceptado' : (strtolower($inv['estado']) === 'rechazada' || strtolower($inv['estado']) === 'rechazado' ? 'rechazado' : 'pendiente'),
+                'category' => !empty($causes) ? $causes[0] : 'Solidario',
+                'location' => $inv['ubicacion'],
+                'images' => $images,
+                'destinatarioId' => (int)$inv['destinatario_id'],
+                'destinatarioName' => $inv['destinatario_nombre'],
+                'destinatarioImg' => $inv['destinatario_img_perfil'],
+                'destinatarioRole' => $inv['destinatario_role'] ?? $inv['destinatario_rol']
+            ];
+        }
+
+        echo json_encode(['success' => true, 'data' => $invitaciones]);
+    }
+
+    public function obtenerMisConvocatoriasActivas() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $modeloCampania = $this->cargarModelo('Campania');
+        $todas = $modeloCampania->obtenerCampaniasDeUsuario($_SESSION['id_usuario']);
+        
+        $activas = [];
+        $today = date('Y-m-d');
+        foreach ($todas as $camp) {
+            if ($camp['type'] === 'convocatoria' && $camp['endDate'] >= $today) {
+                $activas[] = [
+                    'id' => $camp['id'],
+                    'title' => $camp['title']
+                ];
+            }
+        }
+
+        echo json_encode(['success' => true, 'data' => $activas]);
+    }
+
+    public function crearInvitacion() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $idCampania = filter_input(INPUT_POST, 'id_campania', FILTER_VALIDATE_INT);
+        $destinatarioId = filter_input(INPUT_POST, 'destinatario_id', FILTER_VALIDATE_INT);
+
+        if (!$idCampania || !$destinatarioId) {
+            echo json_encode(['success' => false, 'message' => 'Parámetros inválidos.']);
+            return;
+        }
+
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $ok = $modeloInvitacion->nuevaInvitacion($idCampania, $_SESSION['id_usuario'], $destinatarioId);
+
+        if ($ok) {
+            echo json_encode(['success' => true, 'message' => 'Invitación enviada con éxito.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Ya existe una invitación pendiente o activa para este usuario en esta campaña.']);
+        }
+    }
+
+    public function responderInvitacion() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $idInvitacion = filter_input(INPUT_POST, 'id_invitacion', FILTER_VALIDATE_INT);
+        $estado = filter_input(INPUT_POST, 'estado', FILTER_DEFAULT);
+
+        if (!$idInvitacion || !in_array(strtoupper($estado), ['ACEPTADO', 'RECHAZADO'])) {
+            echo json_encode(['success' => false, 'message' => 'Parámetros inválidos.']);
+            return;
+        }
+
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $ok = $modeloInvitacion->cambiarEstadoInvitacion($idInvitacion, $estado);
+
+        if ($ok) {
+            echo json_encode(['success' => true, 'message' => 'Invitación respondida.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No se pudo procesar la respuesta.']);
+        }
+    }
+
+    public function cancelarInvitacion() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $idInvitacion = filter_input(INPUT_POST, 'id_invitacion', FILTER_VALIDATE_INT);
+
+        if (!$idInvitacion) {
+            echo json_encode(['success' => false, 'message' => 'Parámetros inválidos.']);
+            return;
+        }
+
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $ok = $modeloInvitacion->cancelarInvitacion($idInvitacion);
+
+        if ($ok) {
+            echo json_encode(['success' => true, 'message' => 'Invitación cancelada.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No se pudo cancelar la invitación.']);
+        }
+    }
+
+    public function obtenerMisAsociaciones() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $modeloCampania = $this->cargarModelo('Campania');
+        $raw = $modeloInvitacion->obtenerAsociacionesPorOrganizacion($_SESSION['id_usuario']);
+
+        $asociaciones = [];
+        foreach ($raw as $assoc) {
+            $esCreador = ($assoc['creator_id'] == $_SESSION['id_usuario']);
+            $causes = $modeloCampania->obtenerCausasDeCampania($assoc['id']);
+            $asociaciones[] = [
+                'id' => (int)$assoc['id'],
+                'title' => $assoc['titulo'],
+                'desc' => $assoc['descripcion'],
+                'category' => !empty($causes) ? $causes[0] : 'Solidario',
+                'startDate' => $assoc['fecha_inicio'],
+                'endDate' => $assoc['endDate'],
+                'location' => $assoc['ubicacion'],
+                'details' => $assoc['descripcion'],
+                'additionalInfo' => $assoc['info_adicional'],
+                'partnerName' => $esCreador ? $assoc['invited_name'] : $assoc['creator_name'],
+                'partnerImg' => $esCreador ? $assoc['invited_img'] : $assoc['creator_img'],
+                'partnerId' => $esCreador ? $assoc['invited_id'] : $assoc['creator_id']
+            ];
+        }
+
+        echo json_encode(['success' => true, 'data' => $asociaciones]);
+    }
 }
 ?>

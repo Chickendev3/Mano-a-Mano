@@ -363,9 +363,29 @@ function openCampaignDetailsView(campaignId) {
     }
   }
 
-  // Organizaciones en asociación (Ocultas por falta de relación en BD)
+  // Organizaciones en asociación
   const assocSec = document.getElementById("m-camp-associations-sec");
-  if (assocSec) assocSec.style.display = "none";
+  const assocList = document.getElementById("m-camp-associations-list");
+  if (assocSec && assocList) {
+    assocList.innerHTML = "";
+    if (camp.associations && camp.associations.length > 0) {
+      camp.associations.forEach(org => {
+        const a = document.createElement("a");
+        a.href = `${BASE_URL}perfil/organizacion?id=${org.id}`;
+        a.className = "association-circle";
+        a.title = org.nombre;
+        if (org.img_perfil) {
+          a.innerHTML = `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`;
+        } else {
+          a.innerHTML = `<div class="association-logo-placeholder" style="width:40px; height:40px; border-radius:50%; background-color:var(--color-border); display:flex; align-items:center; justify-content:center; color:var(--color-text-light);"><i data-lucide="building" style="width:16px; height:16px;"></i></div>`;
+        }
+        assocList.appendChild(a);
+      });
+      assocSec.style.display = "block";
+    } else {
+      assocSec.style.display = "none";
+    }
+  }
 
   if (mBadge) mBadge.style.display = "none";
   if (mSensitive) mSensitive.style.display = "none";
@@ -990,15 +1010,32 @@ function setupCommonConfirmEvents() {
   if (confirmCancelBtn) {
     confirmCancelBtn.addEventListener("click", () => {
       if (currentCancelInvitationId) {
-        sentInvitations = sentInvitations.filter(inv => inv.id !== currentCancelInvitationId);
-        closeModal("modal-cancel-invitation-confirm");
-        currentCancelInvitationId = null;
-        currentSentPage = 1;
-        renderSentInvitations();
+        const formData = new FormData();
+        formData.append("id_invitacion", currentCancelInvitationId);
 
-        if (typeof showToast !== "undefined") {
-          showToast("Invitación cancelada", "La invitación enviada ha sido retirada.", true);
-        }
+        fetch(`${BASE_URL}cancelar-invitacion`, {
+          method: "POST",
+          body: formData
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (res.success) {
+            sentInvitations = sentInvitations.filter(inv => inv.id !== currentCancelInvitationId);
+            closeModal("modal-cancel-invitation-confirm");
+            currentCancelInvitationId = null;
+            currentSentPage = 1;
+            renderSentInvitations();
+
+            if (typeof showToast !== "undefined") {
+              showToast("Invitación cancelada", res.message, true);
+            }
+          } else {
+            if (typeof showToast !== "undefined") {
+              showToast("Error", res.message, false);
+            }
+          }
+        })
+        .catch(err => console.error("Error al cancelar invitación:", err));
       }
     });
   }
@@ -1038,8 +1075,23 @@ function setupInvitationsGrid() {
     });
   }
 
-  renderReceivedInvitations();
-  renderSentInvitations();
+  fetch(`${BASE_URL}obtener-mis-invitaciones-recibidas`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        receivedInvitations = res.data;
+        renderReceivedInvitations();
+      }
+    });
+
+  fetch(`${BASE_URL}obtener-mis-invitaciones-enviadas`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        sentInvitations = res.data;
+        renderSentInvitations();
+      }
+    });
 }
 
 function renderReceivedInvitations() {
@@ -1051,7 +1103,7 @@ function renderReceivedInvitations() {
 
   let filtered = [...receivedInvitations];
   if (filterVal) {
-    filtered = filtered.filter(inv => inv.category === filterVal);
+    filtered = filtered.filter(inv => inv.status === filterVal);
   }
 
   if (sortVal === "reciente") {
@@ -1075,7 +1127,7 @@ function renderReceivedInvitations() {
   if (paginated.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-secondary);">
-        No tienes invitaciones recibidas pendientes.
+        No tienes invitaciones recibidas registradas.
       </div>
     `;
     renderReceivedPagination(0);
@@ -1092,6 +1144,22 @@ function renderReceivedInvitations() {
     article.className = "invite-card";
     article.addEventListener("click", () => openReceivedCampaignDetailsView(inv.id));
 
+    let actionsHTML = "";
+    if (inv.status === "pendiente") {
+      actionsHTML = `
+        <button class="btn btn-primary aceptar-invite-btn" type="button" onclick="event.stopPropagation(); acceptReceivedInvitation(${inv.id});">
+          Aceptar
+        </button>
+        <button class="btn btn-ghost" type="button" onclick="event.stopPropagation(); rejectReceivedInvitation(${inv.id});">
+          Rechazar
+        </button>
+      `;
+    } else if (inv.status === "aceptado") {
+      actionsHTML = `<span class="postulation-status-btn aceptado" style="pointer-events: none; padding: 8px 16px;">Has aceptado</span>`;
+    } else if (inv.status === "rechazado") {
+      actionsHTML = `<span class="postulation-status-btn rechazado" style="pointer-events: none; padding: 8px 16px;">Has rechazado</span>`;
+    }
+
     article.innerHTML = `
       <div class="invite-card-img-col campaign-img">
         ${imgHTML}
@@ -1103,17 +1171,12 @@ function renderReceivedInvitations() {
         <h3 class="alt-card-title">${inv.title}</h3>
         <p class="alt-card-desc">${inv.desc}</p>
         <span style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px; display: block;">
-          <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${inv.location}
+          <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${inv.location || "Sin ubicación"}
         </span>
       </div>
       
       <div class="invite-card-actions-col">
-        <button class="btn btn-primary aceptar-invite-btn" type="button" onclick="event.stopPropagation(); acceptReceivedInvitation(${inv.id});">
-          Aceptar
-        </button>
-        <button class="btn btn-ghost" type="button" onclick="event.stopPropagation(); rejectReceivedInvitation(${inv.id});">
-          Rechazar
-        </button>
+        ${actionsHTML}
       </div>
     `;
     grid.appendChild(article);
@@ -1170,19 +1233,65 @@ function renderReceivedPagination(totalPages) {
 }
 
 window.acceptReceivedInvitation = function(id) {
-  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
-  renderReceivedInvitations();
-  if (typeof showToast !== "undefined") {
-    showToast("Invitación aceptada", "Te has unido a la campaña. Ya está programada en tu voluntariado.", true);
-  }
+  const formData = new FormData();
+  formData.append("id_invitacion", id);
+  formData.append("estado", "ACEPTADO");
+
+  fetch(`${BASE_URL}responder-invitacion`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.success) {
+      if (typeof showToast !== "undefined") {
+        showToast("Invitación aceptada", "Te has unido a la campaña.", true);
+      }
+      fetch(`${BASE_URL}obtener-mis-invitaciones-recibidas`)
+        .then(r => r.json())
+        .then(r => {
+          if (r.success) {
+            receivedInvitations = r.data;
+            renderReceivedInvitations();
+          }
+        });
+    } else {
+      if (typeof showToast !== "undefined") {
+        showToast("Error", res.message, false);
+      }
+    }
+  });
 };
 
 window.rejectReceivedInvitation = function(id) {
-  receivedInvitations = receivedInvitations.filter(inv => inv.id !== id);
-  renderReceivedInvitations();
-  if (typeof showToast !== "undefined") {
-    showToast("Invitación rechazada", "Has rechazado la invitación.", true);
-  }
+  const formData = new FormData();
+  formData.append("id_invitacion", id);
+  formData.append("estado", "RECHAZADO");
+
+  fetch(`${BASE_URL}responder-invitacion`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.success) {
+      if (typeof showToast !== "undefined") {
+        showToast("Invitación rechazada", "Has rechazado la invitación.", true);
+      }
+      fetch(`${BASE_URL}obtener-mis-invitaciones-recibidas`)
+        .then(r => r.json())
+        .then(r => {
+          if (r.success) {
+            receivedInvitations = r.data;
+            renderReceivedInvitations();
+          }
+        });
+    } else {
+      if (typeof showToast !== "undefined") {
+        showToast("Error", res.message, false);
+      }
+    }
+  });
 };
 
 function renderSentInvitations() {
@@ -1223,12 +1332,17 @@ function renderSentInvitations() {
   }
 
   paginated.forEach(inv => {
-    const avatarHTML = inv.avatar 
-      ? `<img src="${BASE_URL + inv.avatar}" alt="${inv.name}">` 
+    const name = inv.destinatarioName;
+    const avatar = inv.destinatarioImg;
+    const role = inv.destinatarioRole;
+    const campaignTitle = inv.title;
+
+    const avatarHTML = avatar 
+      ? `<img src="${BASE_URL + avatar}" alt="${name}">` 
       : `<i data-lucide="user"></i>`;
 
-    const profileUrl = inv.type === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
-    const labelType = inv.type === "voluntario" ? "Voluntario" : "Organización";
+    const profileUrl = role === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
+    const labelType = role === "voluntario" ? "Voluntario" : "Organización";
 
     let statusLabel = "";
     let statusClass = "";
@@ -1252,7 +1366,7 @@ function renderSentInvitations() {
     const article = document.createElement("article");
     article.className = "invite-card";
     article.addEventListener("click", () => {
-      window.location.href = BASE_URL + profileUrl;
+      window.location.href = `${BASE_URL}${profileUrl}?id=${inv.destinatarioId}`;
     });
 
     article.innerHTML = `
@@ -1260,15 +1374,15 @@ function renderSentInvitations() {
         ${avatarHTML}
       </div>
       <div class="invite-card-content-col">
-        <h3 class="alt-card-title" style="margin-bottom: 2px;">${inv.name}</h3>
+        <h3 class="alt-card-title" style="margin-bottom: 2px;">${name}</h3>
         <span style="font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase;">${labelType}</span>
         
         <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
-          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
-            <i data-lucide="user" style="width:12px; height:12px;"></i> Ir al perfil de ${inv.name}
+          <a href="${BASE_URL}${profileUrl}?id=${inv.destinatarioId}" class="invite-meta-link" onclick="event.stopPropagation();">
+            <i data-lucide="user" style="width:12px; height:12px;"></i> Ir al perfil de ${name}
           </a>
           <button type="button" class="invite-meta-link" onclick="event.stopPropagation(); openSentCampaignDetailsView(${inv.id});">
-            <i data-lucide="external-link" style="width:12px; height:12px;"></i> Campaña invitada: <strong>${inv.campaignTitle}</strong>
+            <i data-lucide="external-link" style="width:12px; height:12px;"></i> Campaña invitada: <strong>${campaignTitle}</strong>
           </button>
         </div>
       </div>

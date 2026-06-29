@@ -6,6 +6,8 @@
 /** @var array $causas_organizacion */
 /** @var array $causas */
 /** @var array $campaniasUsuario */
+
+include '../app/views/componentes/perfil_comun_logueado.php'; 
 ?>
 <main class="profile-view-container">
   
@@ -244,72 +246,7 @@
         </div>
 
         <!-- PANE: INVITACIONES -->
-        <div class="profile-pane" id="pane-invitaciones" role="tabpanel">
-          
-          <!-- SECTION 1: INVITACIONES RECIBIDAS -->
-          <div class="invites-section" style="margin-bottom: 40px;">
-            <div class="pane-header-actions">
-              <h2>Invitaciones Recibidas</h2>
-            </div>
-            
-            <div class="tabs-filters-bar">
-              <div class="filter-group">
-                <select class="filter-select" id="filter-received-select" aria-label="Filtrar por">
-                  <option value="">Filtrar por (Todas)</option>
-                  <option value="medio-ambiente">Medio Ambiente</option>
-                  <option value="educacion">Educación</option>
-                  <option value="accion-social">Acción Social</option>
-                  <option value="cultura">Cultura</option>
-                </select>
-                <select class="filter-select" id="sort-received-select" aria-label="Ordenar por">
-                  <option value="">Ordenar por (Por defecto)</option>
-                  <option value="reciente">Mas recientes</option>
-                  <option value="antiguas">Mas antiguas</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="invites-list-container alternating-grid" id="received-invitations-list">
-              <!-- Populated dynamically via JS -->
-            </div>
-
-            <div class="pagination-container" id="received-invitations-pagination">
-              <!-- Populated dynamically via JS -->
-            </div>
-          </div>
-
-          <!-- SECTION 2: TUS INVITACIONES (ENVIADAS) -->
-          <div class="invites-section">
-            <div class="pane-header-actions">
-              <h2>Tus invitaciones</h2>
-            </div>
-
-            <div class="tabs-filters-bar">
-              <div class="filter-group">
-                <select class="filter-select" id="filter-sent-select" aria-label="Filtrar por">
-                  <option value="">Filtrar por (Todas)</option>
-                  <option value="pendiente">Pendientes</option>
-                  <option value="aceptado">Aceptadas</option>
-                  <option value="rechazado">Rechazadas</option>
-                </select>
-                <select class="filter-select" id="sort-sent-select" aria-label="Ordenar por">
-                  <option value="">Ordenar por (Por defecto)</option>
-                  <option value="reciente">Mas recientes</option>
-                  <option value="antiguas">Mas antiguas</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="invites-list-container alternating-grid" id="sent-invitations-list">
-              <!-- Populated dynamically via JS -->
-            </div>
-
-            <div class="pagination-container" id="sent-invitations-pagination">
-              <!-- Populated dynamically via JS -->
-            </div>
-          </div>
-
-        </div>
+        <?php renderPanelInvitaciones($causas); ?>
 
       </div>
 
@@ -336,7 +273,6 @@
 </script>
 
 <?php 
-include '../app/views/componentes/perfil_comun_logueado.php'; 
 renderModalDetalleCampania();
 renderModalesComunesPerfil($causas, $campaniasUsuario);
 ?>

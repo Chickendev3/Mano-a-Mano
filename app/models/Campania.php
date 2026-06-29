@@ -85,6 +85,17 @@ class Campania {
             $causes = $this->obtenerCausasDeCampania($idCamp);
             $images = $this->obtenerArchivosDeCampania($idCamp);
             
+            // Obtener organizaciones asociadas a esta campaña
+            $consultaAssoc = "SELECT u.id, u.nombre, u.img_perfil 
+                              FROM invitaciones i 
+                              JOIN usuarios u ON i.destinatario_id = u.id
+                              JOIN organizaciones o ON u.id = o.usuario_id
+                              WHERE i.campania_id = :camp_id AND i.estado_id = 1;";
+            $this->bd->consulta($consultaAssoc);
+            $this->bd->asignar(":camp_id", $idCamp);
+            $this->bd->ejecutar();
+            $associations = $this->bd->resultados();
+            
             $campaniasMapeadas[] = [
                 'id' => $idCamp,
                 'nombre' => $camp['nombre'],
@@ -102,7 +113,8 @@ class Campania {
                 'category' => !empty($causes) ? $causes[0] : '',
                 'causes' => $causes,
                 'imagen' => !empty($images) ? $images[0] : '',
-                'images' => $images
+                'images' => $images,
+                'associations' => $associations
             ];
         }
         
@@ -231,6 +243,17 @@ class Campania {
             $idCamp = (int)$camp['id'];
             $causes = $this->obtenerCausasDeCampania($idCamp);
             $images = $this->obtenerArchivosDeCampania($idCamp);
+
+            // Obtener organizaciones asociadas a esta campaña
+            $consultaAssoc = "SELECT u.id, u.nombre, u.img_perfil 
+                              FROM invitaciones i 
+                              JOIN usuarios u ON i.destinatario_id = u.id
+                              JOIN organizaciones o ON u.id = o.usuario_id
+                              WHERE i.campania_id = :camp_id AND i.estado_id = 1;";
+            $this->bd->consulta($consultaAssoc);
+            $this->bd->asignar(":camp_id", $idCamp);
+            $this->bd->ejecutar();
+            $associations = $this->bd->resultados();
             $nombreCompleto = $camp['nombre'];
             if (!empty($camp['vol_apellido'])) {
                 $nombreCompleto .= ' ' . $camp['vol_apellido'];
@@ -253,7 +276,8 @@ class Campania {
                 'location' => $camp['ubicacion'],
                 'details' => $camp['descripcion'],
                 'additionalInfo' => $camp['info_adicional'],
-                'images' => $images
+                'images' => $images,
+                'associations' => $associations
             ];
         }
         

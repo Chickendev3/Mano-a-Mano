@@ -33,6 +33,12 @@
             <?php endforeach; ?>
           <?php endif; ?>
         </div>
+
+        <?php if (isset($_SESSION['id_usuario']) && $_SESSION['id_usuario'] != $usuario['id']): ?>
+          <button class="btn btn-primary" id="btn-open-invite-modal" style="background-color: #6366F1; border-color: #6366F1; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px;">
+            <i data-lucide="send" style="width: 16px; height: 16px;"></i> Invitar
+          </button>
+        <?php endif; ?>
       </div>
     </div>
   </section>
@@ -249,8 +255,35 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-invite-user" role="dialog" aria-modal="true" aria-labelledby="invite-modal-title">
+  <div class="modal-box" style="max-width: 450px;">
+    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeModal('modal-invite-user')">
+      <i data-lucide="x"></i>
+    </button>
+    <h3 class="modal-title" id="invite-modal-title" style="margin-bottom: 16px;">Invitar a participar</h3>
+    
+    <div id="invite-modal-content">
+      <p style="margin-bottom: 16px; font-size: 14px; color: var(--color-text-secondary);">
+        Seleccioná una de tus convocatorias activas para invitar a este usuario:
+      </p>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <select id="invite-campaign-select" class="edit-input" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background-color: var(--color-surface); color: var(--color-text-dark);">
+          <!-- Convocatorias cargadas dinámicamente -->
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal('modal-invite-user')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-confirm-invite" style="background-color: #6366F1; border-color: #6366F1;">Confirmar invitación</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   window.IS_LOGGED_IN = <?= isset($_SESSION['id_usuario']) ? 'true' : 'false' ?>;
+  window.VISITED_USER_ID = <?= json_encode($usuario['id']) ?>;
   window.campaignsDetailsData = <?= json_encode($campaniasDetails) ?>;
 </script>
 

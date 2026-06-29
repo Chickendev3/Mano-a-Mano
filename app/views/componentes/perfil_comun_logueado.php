@@ -64,14 +64,12 @@ function renderPanelInvitaciones($causas = []) {
     
     <div class="tabs-filters-bar">
       <div class="filter-group">
-        <!-- Filtro Dinámico de Causas desde MariaDB -->
+        <!-- Filtro por Estado de Invitación -->
         <select class="filter-select" id="filter-received-select" aria-label="Filtrar por">
-          <option value="">Filtrar por (Todas las causas)</option>
-          <?php foreach ($causas as $causa): ?>
-            <option value="<?php echo htmlspecialchars($causa); ?>">
-              <?php echo htmlspecialchars($causa); ?>
-            </option>
-          <?php endforeach; ?>
+          <option value="">Filtrar por (Todas)</option>
+          <option value="pendiente">Pendientes</option>
+          <option value="aceptado">Aceptadas</option>
+          <option value="rechazado">Rechazadas</option>
         </select>
         
         <select class="filter-select" id="sort-received-select" aria-label="Ordenar por">

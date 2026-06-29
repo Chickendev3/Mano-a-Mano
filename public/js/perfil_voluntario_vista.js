@@ -339,3 +339,80 @@ window.renderPagination = function() {
   });
   pagContainer.appendChild(nextBtn);
 };
+
+// INVITATION SYSTEM
+document.addEventListener('DOMContentLoaded', () => {
+  const btnOpenInvite = document.getElementById('btn-open-invite-modal');
+  const btnConfirmInvite = document.getElementById('btn-confirm-invite');
+  const selectCampaign = document.getElementById('invite-campaign-select');
+
+  if (btnOpenInvite) {
+    btnOpenInvite.addEventListener('click', () => {
+      fetch(`${BASE_URL}obtener-mis-convocatorias-activas`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.success) {
+            selectCampaign.innerHTML = "";
+            if (res.data.length === 0) {
+              const opt = document.createElement('option');
+              opt.value = "";
+              opt.textContent = "No tenés convocatorias activas para invitar";
+              selectCampaign.appendChild(opt);
+              btnConfirmInvite.disabled = true;
+              btnConfirmInvite.style.opacity = '0.5';
+            } else {
+              res.data.forEach(camp => {
+                const opt = document.createElement('option');
+                opt.value = camp.id;
+                opt.textContent = camp.title;
+                selectCampaign.appendChild(opt);
+              });
+              btnConfirmInvite.disabled = false;
+              btnConfirmInvite.style.opacity = '1';
+            }
+            openModal('modal-invite-user');
+          } else {
+            if (typeof showToast !== 'undefined') {
+              showToast('Error', res.message || 'Error al cargar tus campañas.', false);
+            }
+          }
+        })
+        .catch(err => console.error("Error al cargar convocatorias activas:", err));
+    });
+  }
+
+  if (btnConfirmInvite) {
+    btnConfirmInvite.addEventListener('click', () => {
+      const campaignId = selectCampaign.value;
+      if (!campaignId) return;
+
+      btnConfirmInvite.disabled = true;
+      const formData = new FormData();
+      formData.append("id_campania", campaignId);
+      formData.append("destinatario_id", VISITED_USER_ID);
+
+      fetch(`${BASE_URL}crear-invitacion`, {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(res => {
+        btnConfirmInvite.disabled = false;
+        if (res.success) {
+          if (typeof showToast !== 'undefined') {
+            showToast('Invitación enviada', res.message, true);
+          }
+          closeModal('modal-invite-user');
+        } else {
+          if (typeof showToast !== 'undefined') {
+            showToast('No se pudo enviar', res.message, false);
+          }
+        }
+      })
+      .catch(err => {
+        btnConfirmInvite.disabled = false;
+        console.error("Error al enviar invitación:", err);
+      });
+    });
+  }
+});
