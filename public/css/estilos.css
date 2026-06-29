@@ -846,3 +846,70 @@ select:focus-visible {
   border-color: rgba(239, 68, 68, 0.3);
   background-color: rgba(239, 68, 68, 0.05);
 }
+
+
+/* Acordeones de Postulación */
+.postulations-accordion {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  transition: all var(--transition-normal);
+}
+.postulations-accordion[open] {
+  border-color: var(--color-primary);
+}
+.postulations-accordion summary {
+  font-weight: 600;
+  font-size: var(--font-sm);
+  color: var(--color-text-dark);
+  cursor: pointer;
+  list-style: none;
+}
+.postulations-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Tarjeta del Postulante */
+.postulant-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  gap: 12px;
+}
+.postulant-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.postulant-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+}
+.postulant-name-link {
+  font-weight: 600;
+  font-size: var(--font-sm);
+  color: var(--color-text-dark);
+  text-decoration: none;
+  transition: color var(--transition-normal);
+}
+.postulant-name-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+.postulant-actions {
+  display: flex;
+  gap: 6px;
+}
+.postulant-actions .btn-sm {
+  padding: 6px 12px;
+  font-size: 11px;
+}

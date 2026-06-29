@@ -16,7 +16,7 @@ class Postulacion {
         $this->actualizarPostulacionesVencidas( $idCampania );
 
         /* Vista desde una Campania (Lista de Postulantes) */
-        $consulta = "SELECT p.id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre_completo', u.img_perfil, u.telefono, e.estado 
+        $consulta = "SELECT p.id, u.id as usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre_completo', u.img_perfil, u.telefono, e.estado 
                         FROM postulaciones p JOIN campanias c ON p.campania_id = c.id
                                             JOIN estados e ON p.estado_id = e.id
                                             JOIN voluntarios v ON p.voluntario_id = v.id
@@ -60,6 +60,22 @@ class Postulacion {
         return $this->bd->resultados();
     }
 
+    /* public function obtenerIdPostulacion (int $idCampania, int $idVoluntario) :array|bool {
+        $consulta = "SELECT p.id, u.id as usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre_completo', u.img_perfil, u.telefono, e.estado 
+                         FROM postulaciones p JOIN campanias c ON p.campania_id = c.id
+                                             JOIN estados e ON p.estado_id = e.id
+                                             JOIN voluntarios v ON p.voluntario_id = v.id
+                                             JOIN usuarios u ON v.usuario_id = u.id 
+                         WHERE c.id = :id_campania ;";
+        
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_camp", $idCampania);
+        $this->bd->asignar(":id_vol", $idVoluntario);
+        $this->bd->ejecutar();
+
+        return $this->bd->resultado();
+    }  */
+
     public function obtenerIdPostulacion (int $idCampania, int $idVoluntario) :array|bool {
         $consulta = "SELECT id FROM postulaciones 
                         WHERE voluntario_id = :id_vol AND campania_id = :id_camp;";
@@ -70,7 +86,25 @@ class Postulacion {
         $this->bd->ejecutar();
 
         return $this->bd->resultado();
-    } 
+    }
+
+    public function obtenerCreadorCampaniaPorPostulacion(int $idPostulacion) :int|bool {
+        $consulta = "SELECT c.usuario_id 
+                        FROM postulaciones p JOIN campanias c ON p.campania_id = c.id
+                        WHERE p.id = :id_postulacion;";
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_postulacion", $idPostulacion);
+        $this->bd->ejecutar();
+        $res = $this->bd->resultado();
+        return $res ? (int)$res['usuario_id'] : false;
+    }
+
+    public function eliminarPostulacion(int $idPostulacion) :bool {
+        $consulta = "DELETE FROM postulaciones WHERE id = :id_postulacion;";
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_postulacion", $idPostulacion);
+        return $this->bd->ejecutar();
+    }
 
 
     /* ------------------------ INSERTAR DATOS ------------------------ */

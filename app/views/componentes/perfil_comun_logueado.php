@@ -445,6 +445,47 @@ function renderModalDetalleCampania() {
       <button class="btn btn-ghost" onclick="closeModal('modal-profile-camp-detail')">Cerrar</button>
       <button class="btn btn-primary" id="m-camp-postulate-btn">Postularme</button>
     </div>
+
+    <!-- Sección de Gestión de Postulaciones (Visible solo para el Creador de la Campaña) -->
+    <div class="modal-owner-postulations-sec" id="m-camp-owner-postulations-sec" style="display: none; margin-top: 24px;">
+      <h4 style="margin-bottom: 16px; font-weight: 600; color: var(--color-text-dark); border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
+        Gestión de Voluntarios
+      </h4>
+      
+      <!-- Desplegable 1: Postulados (Pendientes) -->
+      <details class="postulations-accordion" id="acc-pending">
+        <summary style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span>Voluntarios Postulados</span>
+          <span class="count-badge" id="count-pending" style="background-color: var(--color-border); padding: 2px 8px; border-radius: 12px; font-size: 11px;">0</span>
+        </summary>
+        <div class="accordion-content" id="list-pending" style="padding: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Inyectado por JS -->
+        </div>
+      </details>
+
+      <!-- Desplegable 2: Aceptados -->
+      <details class="postulations-accordion" id="acc-accepted">
+        <summary style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span>Postulantes Aceptados</span>
+          <span class="count-badge" id="count-accepted" style="background-color: var(--color-success-light); color: var(--color-success); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">0</span>
+        </summary>
+        <div class="accordion-content" id="list-accepted" style="padding: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Inyectado por JS -->
+        </div>
+      </details>
+
+      <!-- Desplegable 3: Rechazados -->
+      <details class="postulations-accordion" id="acc-rejected">
+        <summary style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span>Postulantes Rechazados</span>
+          <span class="count-badge" id="count-rejected" style="background-color: rgba(239,68,68,0.15); color: #EF4444; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">0</span>
+        </summary>
+        <div class="accordion-content" id="list-rejected" style="padding: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Inyectado por JS -->
+        </div>
+      </details>
+    </div>
+    
   </div>
 </div>
 <?php

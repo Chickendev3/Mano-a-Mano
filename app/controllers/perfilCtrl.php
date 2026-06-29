@@ -560,5 +560,83 @@ class perfilCtrl extends Controlador {
             echo json_encode(['success' => false, 'message' => 'Error al registrar la postulación.']);
         }
     }
+
+    public function obtenerPostulantes() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $idCampania = filter_input(INPUT_POST, 'id_campania', FILTER_VALIDATE_INT);
+        if (!$idCampania) {
+            echo json_encode(['success' => false, 'message' => 'Campaña no válida.']);
+            return;
+        }
+
+        $modeloCampania = $this->cargarModelo('Campania');
+        $camp = $modeloCampania->obtenerCampaniaPorId($idCampania);
+        if (!$camp || $camp['usuario_id'] != $_SESSION['id_usuario']) {
+            echo json_encode(['success' => false, 'message' => 'No tienes permisos sobre esta campaña.']);
+            return;
+        }
+
+        $modeloPostulacion = $this->cargarModelo('Postulacion');
+        $postulantes = $modeloPostulacion->obtenerPostulacionesPorCampania($idCampania);
+
+        echo json_encode(['success' => true, 'data' => $postulantes]);
+    }
+
+    public function actualizarEstadoPostulacion() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        $idPostulacion = filter_input(INPUT_POST, 'id_postulacion', FILTER_VALIDATE_INT);
+        $estado = filter_input(INPUT_POST, 'estado', FILTER_DEFAULT);
+
+        if (!$idPostulacion || !in_array(strtoupper($estado), ['ACEPTADO', 'RECHAZADO'])) {
+            echo json_encode(['success' => false, 'message' => 'Parámetros no válidos.']);
+            return;
+        }
+
+        $modeloPostulacion = $this->cargarModelo('Postulacion');
+        $creadorId = $modeloPostulacion->obtenerCreadorCampaniaPorPostulacion($idPostulacion);
+        if ($creadorId !== (int)$_SESSION['id_usuario']) {
+            echo json_encode(['success' => false, 'message' => 'Acceso denegado.']);
+            return;
+        }
+
+        $exito = $modeloPostulacion->cambiarEstadoPostulacion($idPostulacion, $estado);
+        echo json_encode(['success' => $exito, 'message' => $exito ? 'Estado actualizado.' : 'Error al guardar.']);
+    }
+
+    public function eliminarPostulacion() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        $idPostulacion = filter_input(INPUT_POST, 'id_postulacion', FILTER_VALIDATE_INT);
+        if (!$idPostulacion) {
+            echo json_encode(['success' => false, 'message' => 'Parámetro no válido.']);
+            return;
+        }
+
+        $modeloPostulacion = $this->cargarModelo('Postulacion');
+        $creadorId = $modeloPostulacion->obtenerCreadorCampaniaPorPostulacion($idPostulacion);
+        if ($creadorId !== (int)$_SESSION['id_usuario']) {
+            echo json_encode(['success' => false, 'message' => 'Acceso denegado.']);
+            return;
+        }
+
+        $exito = $modeloPostulacion->eliminarPostulacion($idPostulacion);
+        echo json_encode(['success' => $exito, 'message' => $exito ? 'Postulación eliminada.' : 'Error al eliminar.']);
+    }
 }
 ?>

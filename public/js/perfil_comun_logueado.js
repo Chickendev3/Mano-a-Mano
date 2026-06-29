@@ -275,6 +275,9 @@ function openCampaignDetailsView(campaignId) {
 
   currentViewedCampaignId = campaignId;
 
+  const isOwner = camp.usuario_id == SESSION_USER_ID;
+  const isOrg = SESSION_USER_ROL === "organizacion";
+
   const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");
   const mTags = document.getElementById("m-camp-tags");
@@ -380,7 +383,126 @@ function openCampaignDetailsView(campaignId) {
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
   }
+
+  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
+  if (ownerSection) {
+    if (isOwner && camp.type === "convocatoria") {
+      ownerSection.style.display = "block";
+      loadCampaignPostulations(campaignId);
+    } else {
+      ownerSection.style.display = "none";
+    }
+  }
 }
+
+function loadCampaignPostulations(campaignId) {
+  const formData = new FormData();
+  formData.append("id_campania", campaignId);
+
+  fetch(`${BASE_URL}obtener-postulantes`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.success) {
+      renderPostulationsList(campaignId, res.data);
+    }
+  });
+}
+
+function renderPostulationsList(campaignId, list) {
+  const pendingList = list.filter(p => p.estado.toLowerCase().includes("pend"));
+  const acceptedList = list.filter(p => p.estado.toLowerCase().includes("acep"));
+  const rejectedList = list.filter(p => p.estado.toLowerCase().includes("rech"));
+
+  document.getElementById("count-pending").textContent = pendingList.length;
+  document.getElementById("count-accepted").textContent = acceptedList.length;
+  document.getElementById("count-rejected").textContent = rejectedList.length;
+
+  renderAccordionCategory("list-pending", pendingList, (item) => `
+    <div class="postulant-actions">
+      <button class="btn btn-primary btn-sm" onclick="changePostulationStatus(${campaignId}, ${item.id}, 'ACEPTADO')">Aceptar</button>
+      <button class="btn btn-ghost btn-sm" style="color: #EF4444;" onclick="changePostulationStatus(${campaignId}, ${item.id}, 'RECHAZADO')">Rechazar</button>
+    </div>
+  `);
+
+  renderAccordionCategory("list-accepted", acceptedList, (item) => `
+    <div class="postulant-actions">
+      <button class="btn btn-ghost btn-sm" style="color: #EF4444;" onclick="deletePostulation(${campaignId}, ${item.id})">Eliminar</button>
+    </div>
+  `);
+
+  renderAccordionCategory("list-rejected", rejectedList, () => "");
+}
+
+function renderAccordionCategory(containerId, list, actionRenderer) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  if (list.length === 0) {
+    container.innerHTML = `<div class="empty-state" style="padding: 10px; font-size: 12px; text-align: center; color: var(--color-text-light);">Sin postulantes en esta sección.</div>`;
+    return;
+  }
+
+  list.forEach(item => {
+    const avatar = item.img_perfil 
+      ? `<img src="${BASE_URL + item.img_perfil}" alt="Avatar" class="postulant-avatar">`
+      : `<div class="postulant-avatar" style="background-color: var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-light);"><i data-lucide="user" style="width: 14px; height: 14px;"></i></div>`;
+
+    const div = document.createElement("div");
+    div.className = "postulant-item";
+    div.innerHTML = `
+      <div class="postulant-left">
+        ${avatar}
+        <a href="${BASE_URL}perfil.php?id=${item.usuario_id}" class="postulant-name-link">${item.nombre_completo}</a>
+      </div>
+      ${actionRenderer(item)}
+    `;
+    container.appendChild(div);
+  });
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+window.changePostulationStatus = function(campaignId, idPostulacion, nuevoEstado) {
+  const formData = new FormData();
+  formData.append("id_postulacion", idPostulacion);
+  formData.append("estado", nuevoEstado);
+
+  fetch(`${BASE_URL}actualizar-estado-postulacion`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showToast("Estado actualizado", data.message, true);
+      loadCampaignPostulations(campaignId);
+    }
+  });
+};
+
+window.deletePostulation = function(campaignId, idPostulacion) {
+  if (!confirm("¿Seguro que deseas eliminar a este postulante?")) return;
+
+  const formData = new FormData();
+  formData.append("id_postulacion", idPostulacion);
+
+  fetch(`${BASE_URL}eliminar-postulacion`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showToast("Postulación eliminada", data.message, true);
+      loadCampaignPostulations(campaignId);
+    }
+  });
+};
 
 // =========================================================================
 // MODAL DE CREACIÓN DE CAMPAÑA
