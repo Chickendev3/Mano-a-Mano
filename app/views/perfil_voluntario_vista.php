@@ -30,12 +30,7 @@
 
         <!-- Insignias and Statistics -->
         <div class="profile-badges-container">
-          <?php if (empty($insignias)): ?>
-            <div class="badge-row-item">
-              <i data-lucide="award" class="badge-icon-gold" style="opacity: 0.3;"></i>
-              <span>Sin insignias de voluntario fijo todavía</span>
-            </div>
-          <?php else: ?>
+          <?php if (!empty($insignias)): ?>
             <?php foreach ($insignias as $badge): ?>
               <div class="badge-row-item">
                 <i data-lucide="award" class="badge-icon-gold"></i>
@@ -43,6 +38,12 @@
               </div>
             <?php endforeach; ?>
           <?php endif; ?>
+
+          <!-- Pendiente de DESARROLLO: Contador de Asistencias -->
+          <div class="badge-row-item">
+            <i data-lucide="check-square" class="badge-icon-blue"></i>
+            <span>Asistencia a voluntariado: +7</span>
+          </div>
 
           <!-- Oficios (Skills) -->
           <div class="badge-row-item skills-list-row">
