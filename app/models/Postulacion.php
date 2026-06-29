@@ -6,11 +6,6 @@ class Postulacion {
         $this->bd = new BaseDatos();
     }
 
-    /* 
-        FALTAN VER LAS LOS DETELEs
-
-    */
-
     /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
     public function obtenerPostulacionesPorCampania ( int $idCampania ) :array {
         $this->actualizarPostulacionesVencidas( $idCampania );
@@ -99,11 +94,15 @@ class Postulacion {
         return $res ? (int)$res['usuario_id'] : false;
     }
 
-    public function eliminarPostulacion(int $idPostulacion) :bool {
-        $consulta = "DELETE FROM postulaciones WHERE id = :id_postulacion;";
+        public function obtenerUsuarioIdDePostulacion(int $idPostulacion) :int|bool {
+        $consulta = "SELECT v.usuario_id 
+                        FROM postulaciones p JOIN voluntarios v ON p.voluntario_id = v.id
+                        WHERE p.id = :id_postulacion;";
         $this->bd->consulta($consulta);
         $this->bd->asignar(":id_postulacion", $idPostulacion);
-        return $this->bd->ejecutar();
+        $this->bd->ejecutar();
+        $res = $this->bd->resultado();
+        return $res ? (int)$res['usuario_id'] : false;
     }
 
 
@@ -153,5 +152,12 @@ class Postulacion {
 
 
     /* ------------------------ ELIMINAR ------------------------ */
+    public function eliminarPostulacion(int $idPostulacion) :bool {
+        $consulta = "DELETE FROM postulaciones WHERE id = :id_postulacion;";
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_postulacion", $idPostulacion);
+        return $this->bd->ejecutar();
+    }
+
 }
 ?>
