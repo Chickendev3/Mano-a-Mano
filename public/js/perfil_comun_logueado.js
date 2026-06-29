@@ -446,17 +446,30 @@ function renderAccordionCategory(containerId, list, actionRenderer) {
     return;
   }
 
+  const isAcceptedSection = containerId === "list-accepted";
+
   list.forEach(item => {
     const avatar = item.img_perfil 
       ? `<img src="${BASE_URL + item.img_perfil}" alt="Avatar" class="postulant-avatar">`
       : `<div class="postulant-avatar" style="background-color: var(--color-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-light);"><i data-lucide="user" style="width: 14px; height: 14px;"></i></div>`;
 
+    // Generar info de contacto sólo para aceptados
+    const contactInfoHTML = isAcceptedSection
+      ? `<div class="postulant-contact-info" style="font-size: 11px; color: var(--color-text-light); margin-top: 2px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          ${item.telefono ? `<span><i data-lucide="phone" style="width:10px; height:10px; display:inline-block; vertical-align:middle; margin-right:2px;"></i>${item.telefono}</span>` : ''}
+          ${item.email ? `<span><i data-lucide="mail" style="width:10px; height:10px; display:inline-block; vertical-align:middle; margin-right:2px;"></i>${item.email}</span>` : ''}
+         </div>`
+      : '';
+
     const div = document.createElement("div");
     div.className = "postulant-item";
     div.innerHTML = `
-      <div class="postulant-left">
+      <div class="postulant-left" style="display: flex; align-items: center; gap: 8px;">
         ${avatar}
-        <a href="${BASE_URL}perfil/voluntario?id=${item.usuario_id}" class="postulant-name-link">${item.nombre_completo}</a>
+        <div style="display: flex; flex-direction: column;">
+          <a href="${BASE_URL}perfil/voluntario?id=${item.usuario_id}" class="postulant-name-link" style="font-weight: 500;">${item.nombre_completo}</a>
+          ${contactInfoHTML}
+        </div>
       </div>
       ${actionRenderer(item)}
     `;

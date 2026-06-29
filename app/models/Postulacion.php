@@ -11,7 +11,7 @@ class Postulacion {
         $this->actualizarPostulacionesVencidas( $idCampania );
 
         /* Vista desde una Campania (Lista de Postulantes) */
-        $consulta = "SELECT p.id, u.id as usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre_completo', u.img_perfil, u.telefono, e.estado 
+        $consulta = "SELECT p.id, u.id as usuario_id, CONCAT(u.nombre, ' ', v.apellido) as 'nombre_completo', u.img_perfil, u.telefono, u.email, e.estado 
                         FROM postulaciones p JOIN campanias c ON p.campania_id = c.id
                                             JOIN estados e ON p.estado_id = e.id
                                             JOIN voluntarios v ON p.voluntario_id = v.id
