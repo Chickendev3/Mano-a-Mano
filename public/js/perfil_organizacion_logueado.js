@@ -953,7 +953,7 @@ function renderReceivedInvitations() {
       ? `<img src="${BASE_URL + imgUrl}" alt="${inv.title}">` 
       : `<i data-lucide="image"></i>`;
 
-    const profileUrl = inv.senderType === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+    const profileUrl = inv.senderType === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
     const senderTypeLabel = inv.senderType === "voluntario" ? "Voluntario" : "Organizacion";
 
     const article = document.createElement("article");
@@ -1092,7 +1092,7 @@ function renderSentInvitations() {
       ? `<img src="${BASE_URL + inv.avatar}" alt="${inv.name}">` 
       : `<i data-lucide="user"></i>`;
 
-    const profileUrl = inv.type === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+    const profileUrl = inv.type === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
     const labelType = inv.type === "voluntario" ? "Voluntario" : "Organizacion";
 
     // Status mapping
@@ -1453,7 +1453,7 @@ function renderAssociations() {
       ? `<img src="${BASE_URL + imgUrl}" alt="${assoc.title}">` 
       : `<i data-lucide="image"></i>`;
 
-    const profileUrl = assoc.ownerType === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+    const profileUrl = assoc.ownerType === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
     const ownerTypeLabel = assoc.ownerType === "voluntario" ? "Voluntario" : "Organizacion";
 
     const article = document.createElement("article");

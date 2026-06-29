@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-06-2026 a las 21:26:05
+-- Tiempo de generación: 29-06-2026 a las 17:18:50
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -311,6 +311,14 @@ CREATE TABLE `postulaciones` (
   `estado_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `postulaciones`
+--
+
+INSERT INTO `postulaciones` (`id`, `voluntario_id`, `campania_id`, `estado_id`) VALUES
+(1, 1, 6, 2),
+(3, 2, 6, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -357,7 +365,8 @@ INSERT INTO `usuarios` (`id`, `nombre`, `email`, `clave`, `descripcion`, `telefo
 (11, '4Patas', '4patas@org.com', '$2y$10$kn2AS4fQCHfWizkp8flK3.AZI9bNeKYiBaEfqsTnxxOoKBBneunvK', 'Proyecto 4 Patas (P4P) es una organización sin fines de lucro abocada a difundir, proteger y promover los derechos de los animales.\r\n\r\nPropiciamos una actitud de respeto hacia todas las especies tomando como eje la premisa ética de que son seres sintientes y no “cosas” para ser utilizadas por el ser humano. Rechazamos todo tipo de explotación animal incluyendo su uso como vestimenta, comida, entretenimiento y experimentación.', '11-2222-5555', 'Buenos Aires, Merlo, Padua', 'archivos/avatar_6a41571a8b1393.51151272.webp'),
 (12, 'Roma', 'romagutierrez@gmail.com', '$2y$10$Fe6m22o9tlbWq7Xmtae4v.L7Rexj3O29r8XSqKwYJ7XMGWesbe4yu', 'Profesora de Educación Física.', '011-8888-0000', NULL, 'archivos/avatar_6a4072172918c6.66545761.jpg'),
 (13, 'Banco de Alimentos', 'bancodealimentos@org.ar', '$2y$10$PovgSJOvFLxxK9KUbMrkKeqqz4ulBqB3QM.n8YKdpTAcbbP9X.F4q', 'Trabajamos para reducir el hambre, mejorar la nutrición y evitar el desperdicio de alimentos. Recibimos grandes donaciones de alimentos y productos y los distribuimos entre comedores y otras organizaciones sociales que dan de comer a personas que lo necesitan.', '011-1515-1515', 'Puente Alto 2200', 'archivos/avatar_6a415781d7de11.38745139.webp'),
-(14, 'Ambiente & Medio', 'ambienteymedio@org.ar', '$2y$10$snXYtG9CGwn2eTbXizHbveAWFt2RgGVOtR1ZTpuSjbcpEga5aolrC', 'En Fundación Ambiente y Medio, nos proponemos despertar a la sociedad hacia la ciudadanía ambiental. Ponemos el foco en el que identificamos como el principal problema ambiental del país: la basura, que está a la vista de todos con más de 5000 basurales a cielo abierto que deben erradicarse.\r\n\r\nGanador del premio Martín Fierro 2017, 2018, 2021 y 2023 como mejor programa cultural/educativo.', '011-4848-4848', 'Primavera 1144', 'archivos/avatar_6a415651ca4989.45581786.webp');
+(14, 'Ambiente & Medio', 'ambienteymedio@org.ar', '$2y$10$snXYtG9CGwn2eTbXizHbveAWFt2RgGVOtR1ZTpuSjbcpEga5aolrC', 'En Fundación Ambiente y Medio, nos proponemos despertar a la sociedad hacia la ciudadanía ambiental. Ponemos el foco en el que identificamos como el principal problema ambiental del país: la basura, que está a la vista de todos con más de 5000 basurales a cielo abierto que deben erradicarse.\r\n\r\nGanador del premio Martín Fierro 2017, 2018, 2021 y 2023 como mejor programa cultural/educativo.', '011-4848-4848', 'Primavera 1144', 'archivos/avatar_6a415651ca4989.45581786.webp'),
+(15, 'Adrian', 'adrianfernandez@gmail.com', '$2y$10$AlbooC4THpHuIjZX1OffJOT7sqw0Ei1OYK/V4Tth3RR82ECY.8ncG', 'Psicólogo cognitivo-conductual y docente. Aficionado a los deportes.', '011 6446-9779', 'CABA, Ciudad Jardín', 'archivos/avatar_6a41b85f42d866.40170191.jpg');
 
 -- --------------------------------------------------------
 
@@ -379,7 +388,8 @@ CREATE TABLE `voluntarios` (
 
 INSERT INTO `voluntarios` (`id`, `usuario_id`, `apellido`, `telefono_emergencia`, `disponibilidad_horaria`) VALUES
 (1, 6, 'Alvarez', NULL, NULL),
-(2, 12, 'Gutierrez', NULL, NULL);
+(2, 12, 'Gutierrez', NULL, NULL),
+(3, 15, 'Fernandez', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -412,7 +422,9 @@ INSERT INTO `voluntarios_oficios` (`voluntario_id`, `oficio_id`) VALUES
 (1, 15),
 (2, 3),
 (2, 8),
-(2, 12);
+(2, 12),
+(3, 2),
+(3, 3);
 
 --
 -- Índices para tablas volcadas
@@ -607,7 +619,7 @@ ALTER TABLE `organizaciones`
 -- AUTO_INCREMENT de la tabla `postulaciones`
 --
 ALTER TABLE `postulaciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `tipos_campanias`
@@ -619,13 +631,13 @@ ALTER TABLE `tipos_campanias`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `voluntarios`
 --
 ALTER TABLE `voluntarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restricciones para tablas volcadas

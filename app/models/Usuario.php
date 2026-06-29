@@ -29,9 +29,18 @@ class Usuario {
     }
 
     /* -------------------- OBTENER DATOS (CONSULTAS) -------------------- */
-    /* abstract public function obtenerUsuarios() :array;
+    /* abstract public function obtenerUsuarios() :array;   */
 
-    abstract public function obtenerUsuarioporID( int $id ) :array; */
+    /* public function obtenerUsuarioporID( int $idUsuario ) :array|bool {
+        $consulta = "SELECT * FROM usuarios WHERE id = :id";
+
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id", $idUsuario);
+        $this->bd->ejecutar();
+        
+        $resultado = $this->bd->resultado();
+        return $resultado;
+    } */
     
     public function obtenerFotoPerfil(int $idUsuario) : ?string {
         $consulta = "SELECT img_perfil FROM usuarios WHERE id = :id";

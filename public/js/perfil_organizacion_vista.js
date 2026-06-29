@@ -90,7 +90,7 @@ function initializeVolunteersCarousel() {
 }
 
 // CAMPAIGN DETAIL DATA
-const campaignsDetailsData = {
+window.campaignsDetailsData = window.campaignsDetailsData || {
   101: {
     title: 'Apoyo Escolar Primario',
     desc: 'Brindamos clases de apoyo para niños de educación primaria (6 a 12 años) los sábados por la mañana en el Comedor Soles. Ayudamos a reforzar contenidos escolares clave, realizar tareas y promover el hábito del estudio mediante dinámicas recreativas.',

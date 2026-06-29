@@ -124,6 +124,22 @@ class Organizacion extends Usuario {
         return $this->bd->resultados();
     }
 
+    public function obtenerMiembrosOrganizacion(int $idOrgUsuario) :array {
+        $idOrgArr = $this->obtenerIDOrganizacion($idOrgUsuario);
+        if (!$idOrgArr) {
+            return [];
+        }
+        $consulta = "SELECT u.id as usuario_id, u.nombre, u.img_perfil 
+                        FROM voluntarios_fijos vf 
+                        JOIN voluntarios v ON vf.voluntario_id = v.id
+                        JOIN usuarios u ON v.usuario_id = u.id
+                        WHERE vf.organizacion_id = :id_org AND vf.activo = true;";
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_org", (int)$idOrgArr['id']);
+        $this->bd->ejecutar();
+        return $this->bd->resultados();
+    }
+
     public function actualizarCausasOrganizacion(int $idUsuario, array $causas) :void {
         $org = $this->obtenerIDOrganizacion($idUsuario);
         if (!$org) return;

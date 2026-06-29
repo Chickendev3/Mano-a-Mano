@@ -294,7 +294,7 @@ function updateCampaignCardInDOM(camp) {
 }
 
 // ORGANIZATION CARD POPULATOR
-window.openOrgProfile = function(name, category, desc, location, stats) {
+window.openOrgProfile = function(id, name, category, desc, location, stats) {
   const oTitle = document.getElementById('org-profile-title');
   const oDesc = document.getElementById('org-profile-desc');
   const oLoc = document.getElementById('org-profile-location');
@@ -315,6 +315,11 @@ window.openOrgProfile = function(name, category, desc, location, stats) {
     if (category === 'Medio Ambiente') oAvatar.classList.add('avatar-1');
     else if (category === 'Acción Social') oAvatar.classList.add('avatar-2');
     else oAvatar.classList.add('avatar-3');
+  }
+
+  const fullBtn = document.getElementById('org-profile-full-btn');
+  if (fullBtn) {
+    fullBtn.href = `${BASE_URL}perfil/organizacion?id=${id}`;
   }
   
   openModal('modal-org-profile');

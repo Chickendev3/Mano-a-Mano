@@ -33,7 +33,11 @@ $rutas = [
     'obtener-postulantes' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerPostulantes'],
     'actualizar-estado-postulacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'actualizarEstadoPostulacion'],
     'eliminar-postulacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarPostulacion'],
-    'obtener-mis-postulaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisPostulaciones']
+    'obtener-mis-postulaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisPostulaciones'],
+
+    /* Perfiles Públicos */
+    'perfil/organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarOrganizacionPublico'],
+    'perfil/voluntario' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarVoluntarioPublico']
 
 ];
 ?>

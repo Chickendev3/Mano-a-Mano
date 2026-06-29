@@ -689,5 +689,140 @@ class perfilCtrl extends Controlador {
 
         echo json_encode(['success' => true, 'data' => $postulaciones]);
     }
+
+    public function mostrarOrganizacionPublico() : void {
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        if (!$id) {
+            header('Location: ' . BASE_URL . 'conectar');
+            return;
+        }
+
+        $modeloUsuario = $this->cargarModelo('Organizacion');
+        $usuario = $modeloUsuario->obtenerOrganizacionPorID($id);
+        if (!$usuario) {
+            header('Location: ' . BASE_URL . 'conectar');
+            return;
+        }
+
+        $modeloOrg = $this->cargarModelo('Organizacion');
+        $idOrg = $modeloOrg->obtenerIDOrganizacion($id);
+        if (!$idOrg) {
+            header('Location: ' . BASE_URL . 'conectar');
+            return;
+        }
+
+        $modeloCampania = $this->cargarModelo('Campania');
+
+        $causas = $modeloOrg->obtenerCausasOrganizacion($id);
+        $causas_organizacion = array_map(function($item) {
+            return $item['causa'];
+        }, $causas);
+
+        // Fetch campaigns and map them for frontend search/details
+        $campaniasRaw = $modeloCampania->obtenerCampaniasDeUsuario($id);
+        $campanias = [];
+        $campaniasDetails = [];
+        foreach ($campaniasRaw as $camp) {
+            $causasCamp = $modeloCampania->obtenerCausasDeCampania($camp['id']);
+            $images = $modeloCampania->obtenerArchivosDeCampania($camp['id']);
+            $tags = $causasCamp;
+            
+            $campanias[] = [
+                'id' => (int)$camp['id'],
+                'titulo' => $camp['title'],
+                'descripcion' => $camp['desc'],
+                'imagenes' => $images,
+                'tags' => $tags
+            ];
+
+            $campaniasDetails[$camp['id']] = [
+                'id' => (int)$camp['id'],
+                'title' => $camp['title'],
+                'desc' => $camp['desc'],
+                'tags' => $tags
+            ];
+        }
+
+        $miembros = $modeloOrg->obtenerMiembrosOrganizacion($id);
+
+        $datos = [
+            'usuario' => $usuario,
+            'causas_organizacion' => $causas_organizacion,
+            'campanias' => $campanias,
+            'campaniasDetails' => $campaniasDetails,
+            'miembros' => $miembros,
+            'cssPropio' => 'perfil_organizacion_vista.css',
+            'jsPropio' => 'perfil_organizacion_vista.js'
+        ];
+
+        $this->cargarVista('perfil_organizacion_vista', $datos, 'Perfil de ' . htmlspecialchars($usuario['nombre']) . ' - Mano a Mano');
+    }
+
+
+    public function mostrarVoluntarioPublico() : void {
+
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        if (!$id) {
+            header('Location: ' . BASE_URL . 'conectar');
+            return;
+        }
+
+        $modeloUsuario = $this->cargarModelo('Voluntario');
+        $usuario = $modeloUsuario->obtenerVoluntarioPorID($id);
+        if (!$usuario) {
+            header('Location: ' . BASE_URL . 'conectar');
+            return;
+        }
+
+        $modeloVol = $this->cargarModelo('Voluntario');
+        $idVol = $modeloVol->obtenerIDVoluntario($id);
+        if (!$idVol) {
+            header('Location: ' . BASE_URL . 'conectar');
+            return;
+        }
+        $modeloCampania = $this->cargarModelo('Campania');
+
+        $oficios = $modeloVol->obtenerOficiosVoluntario($id);
+        $insignias = $modeloVol->obtenerInsignias($id);
+
+        // Fetch campaigns created by this volunteer
+        $campaniasRaw = $modeloCampania->obtenerCampaniasDeUsuario($id);
+        $campanias = [];
+        $campaniasDetails = [];
+        foreach ($campaniasRaw as $camp) {
+            $causasCamp = $modeloCampania->obtenerCausasDeCampania($camp['id']);
+            $images = $modeloCampania->obtenerArchivosDeCampania($camp['id']);
+            $tags = $causasCamp;
+            
+            $campanias[] = [
+                'id' => (int)$camp['id'],
+                'titulo' => $camp['title'],
+                'descripcion' => $camp['desc'],
+                'imagenes' => $images,
+                'tags' => $tags
+            ];
+
+            $campaniasDetails[$camp['id']] = [
+                'id' => (int)$camp['id'],
+                'title' => $camp['title'],
+                'desc' => $camp['desc'],
+                'tags' => $tags
+            ];
+        }
+
+        $nombreCompleto = $usuario['nombre completo'];
+        $datos = [
+            'nombre_completo' => $nombreCompleto,
+            'usuario' => $usuario,
+            'oficios' => $oficios,
+            'insignias' => $insignias,
+            'campanias' => $campanias,
+            'campaniasDetails' => $campaniasDetails,
+            'cssPropio' => 'perfil_voluntario_vista.css',
+            'jsPropio' => 'perfil_voluntario_vista.js'
+        ];
+
+        $this->cargarVista('perfil_voluntario_vista', $datos, 'Perfil de ' . htmlspecialchars($usuario['nombre']) . ' - Mano a Mano');
+    }
 }
 ?>

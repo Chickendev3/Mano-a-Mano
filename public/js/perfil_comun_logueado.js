@@ -291,7 +291,7 @@ function openCampaignDetailsView(campaignId) {
   const mCreatorLink = document.getElementById("m-camp-creator-link");
   if (mCreatorLink) {
     if (camp.usuario_id) {
-      mCreatorLink.href = `${BASE_URL}perfil.php?id=${camp.usuario_id}`;         // Esto es lo que se cambia despuésss
+      mCreatorLink.href = `${BASE_URL}perfil/organizacion?id=${camp.usuario_id}`;         // Ya cambiado
       mCreatorLink.style.display = "flex";
       
       const mCreatorName = document.getElementById("m-camp-creator-name");
@@ -455,7 +455,7 @@ function renderAccordionCategory(containerId, list, actionRenderer) {
     div.innerHTML = `
       <div class="postulant-left">
         ${avatar}
-        <a href="${BASE_URL}perfil.php?id=${item.usuario_id}" class="postulant-name-link">${item.nombre_completo}</a>
+        <a href="${BASE_URL}perfil/voluntario?id=${item.usuario_id}" class="postulant-name-link">${item.nombre_completo}</a>
       </div>
       ${actionRenderer(item)}
     `;
@@ -1213,7 +1213,7 @@ function renderSentInvitations() {
       ? `<img src="${BASE_URL + inv.avatar}" alt="${inv.name}">` 
       : `<i data-lucide="user"></i>`;
 
-    const profileUrl = inv.type === "voluntario" ? "perfil_voluntario_vista" : "perfil_organizacion_vista";
+    const profileUrl = inv.type === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
     const labelType = inv.type === "voluntario" ? "Voluntario" : "Organización";
 
     let statusLabel = "";

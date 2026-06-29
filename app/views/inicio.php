@@ -201,6 +201,7 @@
             </div>
             <button class="btn btn-outline org-action-btn"
               onclick="openOrgProfile(
+                <?= $org['id'] ?>,
                 '<?= htmlspecialchars($org['nombre'], ENT_QUOTES) ?>',
                 '<?= htmlspecialchars($org['categoria'], ENT_QUOTES) ?>',
                 '<?= htmlspecialchars($org['descripcion'], ENT_QUOTES) ?>',

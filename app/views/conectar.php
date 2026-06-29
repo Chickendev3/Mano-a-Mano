@@ -77,7 +77,7 @@
       <?php else: ?>
         <div class="users-list" id="organizations-container">
           <?php foreach ($organizaciones as $org): ?>
-            <a href="<?= BASE_URL ?>perfil.php?id=<?= $org['id'] ?>" class="user-row-card">                           <!-- Corregir acá el archivo a donde vá el perfil visual -->
+            <a href="<?= BASE_URL ?>perfil/organizacion?id=<?= $org['id'] ?>" class="user-row-card">                           <!-- Corregir acá el archivo a donde vá el perfil visual -->
               <div class="user-row-avatar">
                 <img src="<?= !empty($org['img_perfil']) ? BASE_URL . $org['img_perfil'] : BASE_URL . 'img/img_generica.png' ?>" alt="<?= htmlspecialchars($org['nombre']) ?>" class="avatar-img">
               </div>
@@ -99,7 +99,7 @@
       <?php else: ?>
         <div class="users-list" id="volunteers-container">
           <?php foreach ($voluntarios as $vol): ?>
-            <a href="<?= BASE_URL ?>perfil.php?id=<?= $vol['id'] ?>" class="user-row-card">                     <!-- Corregir acá el archivo a donde vá el perfil visual -->
+            <a href="<?= BASE_URL ?>perfil/voluntario?id=<?= $vol['id'] ?>" class="user-row-card">                     <!-- Corregir acá el archivo a donde vá el perfil visual -->
               <div class="user-row-avatar">
                 <img src="<?= !empty($vol['img_perfil']) ? BASE_URL . $vol['img_perfil'] : BASE_URL . 'img/img_generica.png' ?>" alt="<?= htmlspecialchars($vol['nombre completo']) ?>" class="avatar-img">
               </div>

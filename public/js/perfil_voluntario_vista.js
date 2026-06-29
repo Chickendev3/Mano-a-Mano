@@ -69,7 +69,7 @@ function initializeTabs() {
 }
 
 // CAMPAIGN DETAIL DATA
-const campaignsDetailsData = {
+window.campaignsDetailsData = window.campaignsDetailsData || {
   1: {
     title: 'Reforestación Parque Central',
     desc: 'Sembrado de especies nativas para oxigenar y reconstruir el ecosistema del parque local. Los voluntarios plantaron árboles nativos, instalaron tutores y dialogaron con vecinos sobre sustentabilidad.',
