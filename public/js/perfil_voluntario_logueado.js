@@ -32,51 +32,7 @@ let currentPostulationsPage = 1;
 let currentCancelPostulationId = null;
 let currentVolunteeringPage = 1;
 
-// Base de Datos Simulada para Postulaciones (Voluntario a campañas externas)
-let postulations = [
-  {
-    id: 501,
-    campaignId: 1,
-    title: "Reforestación Parque Central",
-    desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia.",
-    status: "aceptado",
-    category: "medio Ambiente",
-    startDate: "2026-06-14",
-    endDate: "2026-06-21",
-    location: "Parque Central, Buenos Aires",
-    details: "Actividades de plantación, riego y tutorado de 50 plantines autóctonos. Se proveen herramientas y guantes.",
-    additionalInfo: "Dirección: Av. Sarmiento 2300 (junto al lago). Coordinador: Martín Silva (+54 11 9876-5432).",
-    images: ["img/campaign_park.png"]
-  },
-  {
-    id: 502,
-    campaignId: 2,
-    title: "Clases de Apoyo Digital",
-    desc: "Buscamos tutores para enseñar el uso de herramientas de oficina básicas y programación web inicial a jóvenes.",
-    status: "rechazado",
-    category: "Educacion",
-    startDate: "2026-06-18",
-    endDate: "2026-07-18",
-    location: "San Martín, Rosario",
-    details: "Tutorías presenciales de herramientas de oficina básicas (Word, Excel) y nociones iniciales de HTML/CSS para jóvenes de 12 a 18 años.",
-    additionalInfo: "Dirección: Belgrano 1200, Rosario. Coordinadora: Clara Gómez (+54 341 555-4321).",
-    images: ["img/campaign_tutoring.png"]
-  },
-  {
-    id: 503,
-    campaignId: 3,
-    title: "Colecta de Alimentos",
-    desc: "Ayudanos a clasificar, empaquetar y distribuir las donaciones del banco de alimentos destinadas a comedores.",
-    status: "pendiente",
-    category: "Accion Social",
-    startDate: "2026-06-21",
-    endDate: "2026-06-30",
-    location: "Centro, Córdoba",
-    details: "Recepción, control de vencimiento y clasificación por rubros de alimentos no perecederos. Distribución posterior a comedores infantiles.",
-    additionalInfo: "Dirección: Deán Funes 450, Córdoba. Coordinador: Juan Pérez (+54 351 444-1234).",
-    images: ["img/campaign_food.png"]
-  }
-];
+let postulations = [];
 
 // Base de Datos Simulada para Voluntariados (Historial de participación)
 let volunteering = [
@@ -220,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTabs();
   setupPostulationsGrid();
   setupVolunteeringGrid();
-  setupMockUploads();
 });
 
 // =========================================================================
@@ -595,20 +550,37 @@ function setupPostulationsGrid() {
   if (confirmCancelBtn) {
     confirmCancelBtn.addEventListener("click", () => {
       if (currentCancelPostulationId) {
-        postulations = postulations.filter(p => p.id !== currentCancelPostulationId);
-        closeModal("modal-cancel-postulation-confirm");
-        currentCancelPostulationId = null;
-        currentPostulationsPage = 1;
-        renderPostulations();
+        const formData = new FormData();
+        formData.append("id_postulacion", currentCancelPostulationId);
 
-        if (typeof showToast !== "undefined") {
-          showToast("Postulación cancelada", "Tu postulación ha sido cancelada y retirada de la lista.", true);
-        }
+        fetch(`${BASE_URL}eliminar-postulacion`, {
+          method: "POST",
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            closeModal("modal-cancel-postulation-confirm");
+            currentCancelPostulationId = null;
+            currentPostulationsPage = 1;
+            if (typeof showToast !== "undefined") {
+              showToast("Postulación cancelada", "Tu postulación ha sido cancelada y retirada de la lista.", true);
+            }
+            loadVolunteerPostulations();
+          } else {
+            if (typeof showToast !== "undefined") {
+              showToast("Error", data.message, false);
+            }
+          }
+        })
+        .catch(err => {
+          console.error("Error al cancelar postulación:", err);
+        });
       }
     });
   }
 
-  renderPostulations();
+  loadVolunteerPostulations();
 }
 
 function renderPostulations() {
@@ -1122,70 +1094,17 @@ function openVolunteeringDetailsView(volunteeringId) {
 // =========================================================================
 // SIMULADOR DE ESTADOS EN EL MODAL DE DETALLE (EXCLUSIVO VOLUNTARIO)
 // =========================================================================
-function updateModalStateBasedOnRadio() {
-  const selectedState = document.querySelector('input[name="dev-state-choice"]:checked')?.value || 'no-login';
-  const badge = document.getElementById('m-camp-accepted-badge');
-  const infoBox = document.getElementById('m-camp-sensitive-info');
-  const postulateBtn = document.getElementById('m-camp-postulate-btn');
-  
-  if (!postulateBtn) return;
 
-  if (badge) {
-    badge.style.display = 'none';
-    badge.className = 'modal-status-badge';
-  }
-  if (infoBox) infoBox.style.display = 'none';
-  postulateBtn.disabled = false;
-  postulateBtn.className = 'btn btn-primary';
-  postulateBtn.textContent = 'Postularme';
-
-  if (selectedState === 'no-login') {
-    // Estado estándar
-  } else if (selectedState === 'registrado-pendiente') {
-    if (badge) {
-      badge.textContent = 'PENDIENTE';
-      badge.className = 'modal-status-badge';
-      badge.style.backgroundColor = 'var(--color-primary-light)';
-      badge.style.color = 'var(--color-primary-dark)';
-      badge.style.border = '1px solid var(--color-primary)';
-      badge.style.display = 'inline-block';
+function loadVolunteerPostulations() {
+  fetch(`${BASE_URL}obtener-mis-postulaciones`)
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      postulations = data.data;
+      renderPostulations();
     }
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Pendiente ✓';
-  } else if (selectedState === 'registrado-aceptado') {
-    if (badge) {
-      badge.textContent = 'ACEPTADO';
-      badge.className = 'modal-status-badge accepted-pill';
-      badge.style.display = 'inline-block';
-      badge.style.backgroundColor = '';
-      badge.style.color = '';
-      badge.style.border = '';
-    }
-    if (infoBox) infoBox.style.display = 'block';
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Postulación Aceptada ✓';
-  } else if (selectedState === 'registrado-rechazado') {
-    if (badge) {
-      badge.textContent = 'RECHAZADO';
-      badge.className = 'modal-status-badge';
-      badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-      badge.style.color = '#EF4444';
-      badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-      badge.style.display = 'inline-block';
-    }
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Postulación Rechazada';
-  }
-}
-
-function setupMockUploads() {
-  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
-  radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      updateModalStateBasedOnRadio();
-    });
+  })
+  .catch(err => {
+    console.error("Error al cargar postulaciones:", err);
   });
 }

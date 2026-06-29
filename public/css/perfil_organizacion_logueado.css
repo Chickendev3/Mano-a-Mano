@@ -1,51 +1,8 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Perfil Organización Logueado - Stylesheet
    ========================================================================== */
 
 @import url('perfil_organizacion_vista.css');
-@import url('perfil_voluntario_logueado.css');
-
-/* Style adjustments for organization avatar upload trigger */
-.profile-avatar-circle.editable {
-  position: relative;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.profile-avatar-circle.editable img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-edit-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-  pointer-events: none;
-}
-
-.profile-avatar-circle.editable:hover .avatar-edit-overlay {
-  opacity: 1;
-}
-
-.avatar-edit-overlay i {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 4px;
-}
 
 /* Volunteer search area styles */
 .volunteer-search-container {

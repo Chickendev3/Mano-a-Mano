@@ -2,9 +2,6 @@
    Perfil Voluntario Vista - Stylesheet
    ========================================================================== */
 
-/* Import shared profile layouts, tabs, grids, carousels, and modal styles */
-@import url('perfil_organizacion_vista.css');
-
 /* Volunteer specific style modifications if any */
 .profile-badges-container {
   margin-top: 16px;

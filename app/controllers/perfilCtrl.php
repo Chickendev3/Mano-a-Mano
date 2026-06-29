@@ -630,13 +630,64 @@ class perfilCtrl extends Controlador {
 
         $modeloPostulacion = $this->cargarModelo('Postulacion');
         $creadorId = $modeloPostulacion->obtenerCreadorCampaniaPorPostulacion($idPostulacion);
-        if ($creadorId !== (int)$_SESSION['id_usuario']) {
-            echo json_encode(['success' => false, 'message' => 'Acceso denegado.']);
+        $postulanteUsuarioId = $modeloPostulacion->obtenerUsuarioIdDePostulacion($idPostulacion);
+        $idUsuarioLogueado = (int)$_SESSION['id_usuario'];
+        
+        if ($creadorId !== $idUsuarioLogueado && $postulanteUsuarioId !== $idUsuarioLogueado) {
+            echo json_encode(['success' => false, 'message' => 'No tienes permisos para eliminar esta postulación.']);
             return;
         }
 
         $exito = $modeloPostulacion->eliminarPostulacion($idPostulacion);
         echo json_encode(['success' => $exito, 'message' => $exito ? 'Postulación eliminada.' : 'Error al eliminar.']);
+    }
+
+    public function obtenerMisPostulaciones() {
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true || $_SESSION['usuario_rol'] !== 'voluntario') {
+            echo json_encode(['success' => false, 'message' => 'Acceso denegado.']);
+            return;
+        }
+
+        $modeloVoluntario = $this->cargarModelo('Voluntario');
+        $vol = $modeloVoluntario->obtenerIDVoluntario($_SESSION['id_usuario']);
+        if (!$vol) {
+            echo json_encode(['success' => true, 'data' => []]);
+            return;
+        }
+
+        $modeloPostulacion = $this->cargarModelo('Postulacion');
+        $postulacionesRaw = $modeloPostulacion->obtenerPostulacionesPorVoluntario($vol['id']);
+
+        $postulaciones = [];
+        $modeloCampania = $this->cargarModelo('Campania');
+
+        foreach ($postulacionesRaw as $post) {
+            $causes = $modeloCampania->obtenerCausasDeCampania($post['campania_id']);
+            $images = $modeloCampania->obtenerArchivosDeCampania($post['campania_id']);
+
+            $postulaciones[] = [
+                'id' => (int)$post['id'],
+                'campaignId' => (int)$post['campania_id'],
+                'title' => $post['titulo'],
+                'desc' => $post['descripcion'],
+                'status' => strtolower($post['estado']) === 'aceptada' || strtolower($post['estado']) === 'aceptado' ? 'aceptado' : (strtolower($post['estado']) === 'rechazada' || strtolower($post['estado']) === 'rechazado' ? 'rechazado' : 'pendiente'),
+                'category' => !empty($causes) ? $causes[0] : 'Solidario',
+                'startDate' => $post['fecha_inicio'],
+                'endDate' => $post['fecha_finalizacion'],
+                'location' => $post['ubicacion'],
+                'details' => $post['descripcion'],
+                'additionalInfo' => $post['info_adicional'],
+                'images' => $images
+            ];
+        }
+
+        echo json_encode(['success' => true, 'data' => $postulaciones]);
     }
 }
 ?>

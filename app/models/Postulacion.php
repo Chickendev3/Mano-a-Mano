@@ -46,7 +46,7 @@ class Postulacion {
         }
         
         /* Vista desde Voluntario (Lista de sus propias Postulaciones) */
-        $consulta = "SELECT p.id, u.img_perfil as 'imagen_perfil_creador', c.titulo, c.descripcion, e.estado 
+        $consulta = "SELECT p.id, c.id as campania_id, u.img_perfil as 'imagen_perfil_creador', c.titulo, c.descripcion, e.estado, c.ubicacion, c.fecha_inicio, c.fecha_finalizacion, c.info_adicional 
                         FROM postulaciones p JOIN voluntarios v ON p.voluntario_id = v.id
                                             JOIN campanias c ON p.campania_id = c.id
                                             JOIN usuarios u ON c.usuario_id = u.id
