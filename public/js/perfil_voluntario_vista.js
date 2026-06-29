@@ -1,14 +1,30 @@
 // JavaScript for Perfil Voluntario Vista
 let currentCampaignId = null;
-const appliedProfileCampaigns = new Set();
+const appliedCampaignsMap = new Map();
 
 // Pagination State
 const ITEMS_PER_PAGE = 2;
 let currentPage = 1;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Cargar postulaciones del voluntario si está logueado
+  if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID && SESSION_USER_ROL === 'voluntario') {
+    fetch(`${BASE_URL}obtener-mis-postulaciones`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success && res.data) {
+          res.data.forEach(post => {
+            appliedCampaignsMap.set(post.campaignId, {
+              status: post.status,
+              additionalInfo: post.additionalInfo
+            });
+          });
+        }
+      })
+      .catch(err => console.error("Error al cargar postulaciones:", err));
+  }
+
   initializeTabs();
-  initializeDevStateListeners();
   initializeCloseModalEvents();
   renderPagination();
 });
@@ -114,6 +130,9 @@ window.openCampaignDetailsModal = function(campaignId) {
   const mTitle = document.getElementById('m-camp-title');
   const mDesc = document.getElementById('m-camp-desc');
   const mTags = document.getElementById('m-camp-tags');
+  const mBadge = document.getElementById('m-camp-accepted-badge');
+  const mPostulateBtn = document.getElementById('m-camp-postulate-btn');
+  const mSensitive = document.getElementById('m-camp-sensitive-info');
   
   if (mTitle) mTitle.textContent = camp.title;
   if (mDesc) mDesc.textContent = camp.desc;
@@ -123,30 +142,53 @@ window.openCampaignDetailsModal = function(campaignId) {
     camp.tags.forEach(tag => {
       const span = document.createElement('span');
       span.className = 'tag-badge';
-      span.innerHTML = tag === 'Niñez' || tag === 'Comunidad' ? `<i data-lucide="tag"></i> ${tag}` : tag;
+      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
       mTags.appendChild(span);
     });
+  }
+  
+  if (mBadge) mBadge.style.display = "none";
+  if (mSensitive) mSensitive.style.display = "none";
+
+  const isOrg = typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "organizacion";
+  
+  if (mPostulateBtn) {
+    if (isOrg) {
+      mPostulateBtn.style.display = "none";
+    } else {
+      mPostulateBtn.style.display = "inline-flex";
+      
+      const app = appliedCampaignsMap.get(campaignId);
+      if (app) {
+        mPostulateBtn.disabled = true;
+        mPostulateBtn.textContent = "Ya postulado";
+        
+        if (mBadge) {
+          mBadge.textContent = app.status.toUpperCase();
+          mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+          mBadge.style.display = "inline-block";
+        }
+        
+        if (app.status === "aceptado" && mSensitive) {
+          mSensitive.innerHTML = `
+            <h4>Información de coordinación</h4>
+            <div class="info-alert-content">
+              <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
+            </div>
+          `;
+          mSensitive.style.display = "block";
+        }
+      } else {
+        mPostulateBtn.disabled = false;
+        mPostulateBtn.textContent = "Postularme";
+      }
+    }
   }
   
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
   
-  // Preset selector choices based on state
-  if (IS_LOGGED_IN) {
-    if (appliedProfileCampaigns.has(campaignId)) {
-      const radio = document.querySelector('input[name="dev-state-choice"][value="registrado-pendiente"]');
-      if (radio) radio.checked = true;
-    } else {
-      const radio = document.querySelector('input[name="dev-state-choice"][value="no-login"]');
-      if (radio) radio.checked = true;
-    }
-  } else {
-    const radio = document.querySelector('input[name="dev-state-choice"][value="no-login"]');
-    if (radio) radio.checked = true;
-  }
-
-  updateModalStateBasedOnRadio();
   openModal('modal-profile-camp-detail');
 };
 
@@ -155,7 +197,7 @@ window.closeProfileModal = function(id) {
   closeModal(id);
 };
 
-// CLOSE EVENT LISTENERS (Escape key)
+// CLOSE EVENT LISTENERS (Escape & Click-Outside)
 function initializeCloseModalEvents() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -167,19 +209,13 @@ function initializeCloseModalEvents() {
   });
 }
 
-// DEVELOPER STATE LISTENERS FOR REVIEW
-function initializeDevStateListeners() {
-  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
-  radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      updateModalStateBasedOnRadio();
-    });
-  });
-
+// REAL POSTULATION EVENT LISTENER
+document.addEventListener('DOMContentLoaded', () => {
   const postulateBtn = document.getElementById('m-camp-postulate-btn');
   if (postulateBtn) {
     postulateBtn.addEventListener('click', () => {
-      if (!IS_LOGGED_IN) {
+      const isLoggedIn = typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID;
+      if (!isLoggedIn) {
         if (typeof showToast !== 'undefined') {
           showToast('Inicio de sesión requerido', 'Tenés que iniciar sesión para postularte a las campañas.', false);
         }
@@ -190,84 +226,39 @@ function initializeDevStateListeners() {
         return;
       }
 
-      // Logged in postulation logic
-      if (currentCampaignId) {
-        appliedProfileCampaigns.add(currentCampaignId);
-      }
+      postulateBtn.disabled = true;
+      const formData = new FormData();
+      formData.append("id_campania", currentCampaignId);
 
-      const radioPending = document.querySelector('input[name="dev-state-choice"][value="registrado-pendiente"]');
-      if (radioPending) {
-        radioPending.checked = true;
-      }
-      updateModalStateBasedOnRadio();
-
-      if (typeof showToast !== 'undefined') {
-        showToast('Postulación procesada', 'Se ha guardado tu postulación como pendiente.', true);
-      }
+      fetch(`${BASE_URL}postular-campania`, {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        postulateBtn.disabled = false;
+        if (data.success) {
+          if (typeof showToast !== 'undefined') {
+            showToast('Postulación exitosa', data.message, true);
+          }
+          appliedCampaignsMap.set(currentCampaignId, {
+            status: 'pendiente',
+            additionalInfo: ''
+          });
+          closeModal('modal-profile-camp-detail');
+        } else {
+          if (typeof showToast !== 'undefined') {
+            showToast('No se pudo postular', data.message, false);
+          }
+        }
+      })
+      .catch(err => {
+        postulateBtn.disabled = false;
+        console.error("Error al postularse:", err);
+      });
     });
   }
-}
-
-function updateModalStateBasedOnRadio() {
-  const selectedState = document.querySelector('input[name="dev-state-choice"]:checked')?.value || 'no-login';
-  
-  const badge = document.getElementById('m-camp-accepted-badge');
-  const infoBox = document.getElementById('m-camp-sensitive-info');
-  const postulateBtn = document.getElementById('m-camp-postulate-btn');
-  
-  if (!postulateBtn) return;
-
-  // Reset standard state
-  if (badge) {
-    badge.style.display = 'none';
-    badge.className = 'modal-status-badge';
-  }
-  if (infoBox) infoBox.style.display = 'none';
-  postulateBtn.disabled = false;
-  postulateBtn.className = 'btn btn-primary';
-  postulateBtn.textContent = 'Postularme';
-
-  if (selectedState === 'no-login') {
-    // Normal
-  } else if (selectedState === 'registrado-pendiente') {
-    if (badge) {
-      badge.textContent = 'PENDIENTE';
-      badge.className = 'modal-status-badge';
-      badge.style.backgroundColor = 'var(--color-primary-light)';
-      badge.style.color = 'var(--color-primary-dark)';
-      badge.style.border = '1px solid var(--color-primary)';
-      badge.style.display = 'inline-block';
-    }
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Pendiente ✓';
-  } else if (selectedState === 'registrado-aceptado') {
-    if (badge) {
-      badge.textContent = 'ACEPTADO';
-      badge.className = 'modal-status-badge accepted-pill';
-      badge.style.display = 'inline-block';
-      badge.style.backgroundColor = '';
-      badge.style.color = '';
-      badge.style.border = '';
-    }
-    if (infoBox) infoBox.style.display = 'block';
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Postulación Aceptada ✓';
-  } else if (selectedState === 'registrado-rechazado') {
-    if (badge) {
-      badge.textContent = 'RECHAZADO';
-      badge.className = 'modal-status-badge';
-      badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-      badge.style.color = '#EF4444';
-      badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-      badge.style.display = 'inline-block';
-    }
-    postulateBtn.disabled = true;
-    postulateBtn.className = 'btn btn-ghost';
-    postulateBtn.textContent = 'Postulación Rechazada';
-  }
-}
+});
 
 // CLIENT-SIDE DYNAMIC PAGINATION
 window.renderPagination = function() {

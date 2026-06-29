@@ -33,15 +33,6 @@ function renderModalDetalleCampaniaPublico() {
       
       <div class="modal-tags-row" id="m-camp-tags"></div>
       
-      <div class="dev-state-selector-card">
-        <span class="dev-label">Simular Estado (Voluntario Logueado):</span>
-        <div class="dev-options">
-          <label><input type="radio" name="dev-state-choice" value="no-login" checked> No registrado</label>
-          <label><input type="radio" name="dev-state-choice" value="registrado-pendiente"> Registrado (Pendiente)</label>
-          <label><input type="radio" name="dev-state-choice" value="registrado-aceptado"> Registrado (Aceptado)</label>
-          <label><input type="radio" name="dev-state-choice" value="registrado-rechazado"> Registrado (Rechazado)</label>
-        </div>
-      </div>
 
       <div class="unlocked-info-box" id="m-camp-sensitive-info" style="display: none;"></div>
 

@@ -1,7 +1,25 @@
 // CONECTAR PAGE - Lógica de Búsqueda e Interactividad
 let currentViewedCampaignId = null;
+const appliedCampaignsMap = new Map();
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Cargar postulaciones del voluntario si está logueado
+  if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID && SESSION_USER_ROL === 'voluntario') {
+    fetch(`${BASE_URL}obtener-mis-postulaciones`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success && res.data) {
+          res.data.forEach(post => {
+            appliedCampaignsMap.set(post.campaignId, {
+              status: post.status,
+              additionalInfo: post.additionalInfo
+            });
+          });
+        }
+      })
+      .catch(err => console.error("Error al cargar postulaciones del voluntario:", err));
+  }
+
   const keywordInput = document.getElementById('keyword-search-input');
   const locationInput = document.getElementById('location-search-input');
   const categorySelect = document.getElementById('category-select');
@@ -221,8 +239,8 @@ window.openCampaignDetails = function(campaignId) {
   }
 
   // Ocultamos las secciones privadas y de organizaciones asociadas en esta vista general
-  const assocSec = document.getElementById("m-camp-associations-sec");
-  if (assocSec) assocSec.style.display = "none";
+  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
+  if (ownerSection) ownerSection.style.display = "none";
   if (mBadge) mBadge.style.display = "none";
   if (mSensitive) mSensitive.style.display = "none";
 
@@ -230,10 +248,43 @@ window.openCampaignDetails = function(campaignId) {
   if (devStateCard) devStateCard.style.display = "none";
 
   if (mPostulateBtn) {
-    // Si la campaña es convocatoria, mostramos el botón de postulación
     const isOwner = camp.usuario_id == SESSION_USER_ID;
     const isOrg = SESSION_USER_ROL === "organizacion";
-    mPostulateBtn.style.display = (camp.tipo === "convocatoria" && !isOwner && !isOrg) ? "inline-flex" : "none";
+    
+    if (camp.tipo === "convocatoria" && !isOwner && !isOrg) {
+      mPostulateBtn.style.display = "inline-flex";
+      
+      const app = appliedCampaignsMap.get(campaignId);
+      if (app) {
+        // Ya se postuló
+        mPostulateBtn.disabled = true;
+        mPostulateBtn.textContent = "Ya postulado";
+        
+        // Mostrar badge de estado
+        if (mBadge) {
+          mBadge.textContent = app.status.toUpperCase();
+          mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+          mBadge.style.display = "inline-block";
+        }
+        
+        // Si fue aceptado, mostrar información de coordinación
+        if (app.status === "aceptado" && mSensitive) {
+          mSensitive.innerHTML = `
+            <h4>Información de coordinación</h4>
+            <div class="info-alert-content">
+              <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
+            </div>
+          `;
+          mSensitive.style.display = "block";
+        }
+      } else {
+        // No se ha postulado
+        mPostulateBtn.disabled = false;
+        mPostulateBtn.textContent = "Postularme";
+      }
+    } else {
+      mPostulateBtn.style.display = "none";
+    }
   }
 
   openModal("modal-profile-camp-detail");

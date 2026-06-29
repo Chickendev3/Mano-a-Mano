@@ -45,7 +45,7 @@ class Organizacion extends Usuario {
         return $this->bd->resultados();
     }
 
-    public function obtenerOrganizacionPorID( int $idUsuario ) :array {
+    public function obtenerOrganizacionPorID( int $idUsuario ) :array|bool {
         $consulta = "SELECT u.id as 'id', u.nombre as 'nombre', u.email, u.descripcion, u.telefono, u.ubicacion, u.img_perfil 
                         FROM usuarios u JOIN organizaciones o ON u.id = o.usuario_id
                         WHERE o.usuario_id = :id";
