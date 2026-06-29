@@ -1482,3 +1482,444 @@ select:focus-visible {
     font-size: 14px;
   }
 }
+
+/* Pastillas de Estado del Voluntario */
+.rejected-pill {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.pending-pill {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+/* Enlace Cancelar Postulación en Tarjeta */
+.post-cancel-btn-inline {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.post-cancel-btn-inline:hover {
+  color: #EF4444;
+}
+
+/* ==========================================================================
+   ESTILOS DE EDICIÓN Y COMPONENTES DE DASHBOARD COMPARTIDOS
+   ========================================================================== */
+
+/* Fila de Metadatos de Cabecera */
+.profile-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+.profile-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.profile-meta-item i {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+}
+
+/* Formulario de Edición Rápida */
+.profile-info-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.edit-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.edit-row label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.edit-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.edit-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Listado de Etiquetas y Sugerencias de Causas/Oficios */
+.edit-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.edit-tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.edit-tag-remove-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  transition: color var(--transition-fast);
+}
+.edit-tag-remove-btn:hover {
+  color: #EF4444;
+}
+.tag-search-wrapper {
+  position: relative;
+  width: 100%;
+}
+.tag-suggestions-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  list-style: none;
+  padding: 4px 0;
+  margin: 0;
+  display: none;
+}
+.tag-suggestions-list.active {
+  display: block;
+}
+.tag-suggestion-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color var(--transition-fast);
+}
+.tag-suggestion-item:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-primary);
+}
+
+/* Modales de Creación y Edición de Campañas */
+.campaign-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 576px) {
+  .form-group-row {
+    grid-template-columns: 1fr;
+  }
+}
+.radio-group-type {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.radio-label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+/* Cargador y Previsualizador de Fotos */
+.image-upload-simulation {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  background-color: var(--color-background);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+.image-upload-simulation:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface-hover);
+}
+.image-upload-simulation-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+}
+.image-upload-simulation-content i {
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-muted);
+}
+.uploaded-images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+.uploaded-image-preview {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  background-color: var(--color-surface-hover);
+}
+.uploaded-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.remove-preview-img-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: background-color var(--transition-fast);
+}
+.remove-preview-img-btn:hover {
+  background-color: rgba(239, 68, 68, 0.9);
+}
+
+/* Cabeceras de Paneles Internos */
+.pane-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Cajas de Aviso Vacío (Placeholder Panes) */
+.placeholder-pane-content {
+  text-align: center;
+  padding: 48px 24px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+.placeholder-pane-content i {
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-muted);
+}
+.placeholder-pane-content h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.placeholder-pane-content p {
+  font-size: 14px;
+  max-width: 450px;
+  line-height: 1.5;
+}
+
+/* Tarjetas y Contenedores de Invitaciones */
+.invite-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  gap: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+.invite-card:hover {
+  transform: scale(1.01);
+}
+.invite-card-img-col {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+.invite-card-img-col.campaign-img {
+  border-radius: var(--radius-md);
+}
+.invite-card-img-col.user-avatar {
+  border-radius: 50%;
+}
+.invite-card-img-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.invite-card-img-col i {
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-muted);
+}
+.invite-card-content-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+.invite-card-actions-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+.invite-meta-link {
+  font-size: 13px;
+  color: var(--color-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.invite-meta-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+.aceptar-invite-btn {
+  background-color: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+  color: #ffffff !important;
+  width: 140px;
+}
+.rechazar-invite-btn {
+  background-color: transparent !important;
+  border-color: #EF4444 !important;
+  color: #EF4444 !important;
+  width: 140px;
+}
+.rechazar-invite-btn:hover {
+  background-color: rgba(239, 68, 68, 0.05) !important;
+}
+
+/* Badges de Estado de Postulación */
+.postulation-status-btn {
+  display: inline-block;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-weight: 700;
+  text-align: center;
+  width: 140px;
+  padding: 10px 16px;
+  border: none;
+  font-size: 14px;
+  text-transform: capitalize;
+  cursor: default;
+  box-shadow: var(--shadow-sm);
+}
+.postulation-status-btn.aceptado {
+  background-color: var(--color-success);
+}
+.postulation-status-btn.rechazado {
+  background-color: #EF4444;
+}
+.postulation-status-btn.pendiente {
+  background-color: #6B7280;
+}
+.post-cancel-btn {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: center;
+  display: block;
+  width: 140px;
+  transition: color var(--transition-fast);
+}
+.post-cancel-btn:hover {
+  color: #EF4444;
+}
+.postulation-actions-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}

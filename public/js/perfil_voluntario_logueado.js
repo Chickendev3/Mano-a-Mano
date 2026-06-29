@@ -645,34 +645,30 @@ function renderPostulations() {
     article.className = cardClass;
     article.addEventListener("click", () => openPostulationDetailsView(post.id));
 
-    article.innerHTML = `
+        article.innerHTML = `
       <div class="alt-card-img-col">
         <div class="alt-card-img-placeholder">
           ${imgHTML}
         </div>
       </div>
       <div class="alt-card-content-col" style="position: relative;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; width: 100%;">
           <h3 class="alt-card-title">${post.title}</h3>
           
-          <!-- Imprime la causa directamente -->
           <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
             ${post.category || "Solidario"}
           </span>
         </div>
         <p class="alt-card-desc">${post.desc}</p>
         
-        <div class="camp-card-actions" style="margin-top: auto;">
-          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Ver detalles</button>
+        <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <button class="post-cancel-btn-inline" onclick="event.stopPropagation(); window.openCancelPostulationConfirmModal(${post.id});">
+            Cancelar postulación
+          </button>
           
-          <span class="modal-status-badge ${statusPillClass}" style="font-size: 11px; padding: 6px 12px;">
+          <span class="modal-status-badge ${statusPillClass}" style="font-size: 12px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase;">
             ${statusLabels[post.status] || "Pendiente"}
           </span>
-
-          <button class="camp-action-btn delete" title="Cancelar postulación" onclick="event.stopPropagation(); window.openCancelPostulationConfirmModal(${post.id});" style="margin-left: 12px;">
-            <i data-lucide="x-circle" style="width:18px; height:18px;"></i>
-          </button>
         </div>
       </div>
     `;
