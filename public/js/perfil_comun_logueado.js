@@ -1365,9 +1365,6 @@ function renderSentInvitations() {
 
     const article = document.createElement("article");
     article.className = "invite-card";
-    article.addEventListener("click", () => {
-      window.location.href = `${BASE_URL}${profileUrl}?id=${inv.destinatarioId}`;
-    });
 
     article.innerHTML = `
       <div class="invite-card-img-col user-avatar">

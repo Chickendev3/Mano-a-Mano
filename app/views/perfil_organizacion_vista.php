@@ -4,6 +4,7 @@
  * Mano a Mano MVC
  */
 /** @var array $campaniasDetails */
+/** @var array $usuario */
 ?>
 <main class="profile-view-container">
   
