@@ -1052,5 +1052,89 @@ class perfilCtrl extends Controlador {
 
         echo json_encode(['success' => true, 'data' => $asociaciones]);
     }
+
+    public function obtenerCampaniaPorIdPublico () {
+        
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
+            return;
+        }
+
+        $idCampania = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        if ($idCampania <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID de campaña inválido.']);
+            return;
+        }
+
+        $modeloCampania = $this->cargarModelo('Campania');
+
+        // Datos base de la campaña
+        $camp = $modeloCampania->obtenerCampaniaPorID($idCampania);
+        if (!$camp) {
+            echo json_encode(['success' => false, 'message' => 'Campaña no encontrada.']);
+            return;
+        }
+
+        // Tipo (convocatoria / informativa)
+        $tipo = $modeloCampania->obtenerTipoPorID((int)$camp['tipo_id']);
+
+        // Causas, imágenes y asociaciones aceptadas
+        $causes = $modeloCampania->obtenerCausasDeCampania($idCampania);
+        $images = $modeloCampania->obtenerArchivosDeCampania($idCampania);
+
+        // Organizaciones asociadas a esta campaña (invitaciones aceptadas)
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $associations = $modeloInvitacion->obtenerAsociacionesPorCampania($idCampania);
+
+        // Creador: nombre, imagen y rol
+        $creatorId   = (int)$camp['usuario_id'];
+        $creatorRole = 'organizacion';
+        $creatorName = '';
+        $creatorImg  = '';
+
+        $modeloOrg = $this->cargarModelo('Organizacion');
+        $org = $modeloOrg->obtenerOrganizacionPorID($creatorId);
+        if ($org) {
+            $creatorName = $org['nombre'] ?? '';
+            $creatorImg  = $org['img_perfil'] ?? '';
+            $creatorRole = 'organizacion';
+        } else {
+            $modeloVol = $this->cargarModelo('Voluntario');
+            $vol = $modeloVol->obtenerVoluntarioPorID($creatorId);
+            if ($vol) {
+                $nombre   = $vol['nombre'] ?? '';
+                $apellido = $vol['apellido'] ?? '';
+                $creatorName = trim("$nombre $apellido");
+                $creatorImg  = $vol['img_perfil'] ?? '';
+                $creatorRole = 'voluntario';
+            }
+        }
+
+        $campaniaMapeada = [
+            'id'                => $idCampania,
+            'title'             => $camp['titulo'],
+            'desc'              => $camp['descripcion'],
+            'location'          => $camp['ubicacion'],
+            'startDate'         => $camp['fecha_inicio'],
+            'endDate'           => $camp['fecha_finalizacion'],
+            'type'              => strtolower($tipo) === 'convocatoria' ? 'convocatoria' : 'informativa',
+            'causes'            => $causes,
+            'category'          => !empty($causes) ? $causes[0] : '',
+            'images'            => $images,
+            'associations'      => $associations,
+            'usuario_id'        => $creatorId,
+            'usuario_nombre'    => $creatorName,
+            'usuario_rol'       => $creatorRole,
+            'usuario_img_perfil'=> $creatorImg,
+            'info_adicional'    => $camp['info_adicional'] ?? ''
+        ];
+
+        echo json_encode(['success' => true, 'data' => $campaniaMapeada]);
+    }
 }
 ?>

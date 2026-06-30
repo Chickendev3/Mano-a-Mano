@@ -43,6 +43,7 @@ $rutas = [
     'responder-invitacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'responderInvitacion'],
     'cancelar-invitacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'cancelarInvitacion'],
     'obtener-mis-asociaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisAsociaciones'],
+    'obtener-campania-por-id'  => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerCampaniaPorIdPublico'],
 
     /* Perfiles Públicos */
     'perfil/organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarOrganizacionPublico'],

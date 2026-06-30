@@ -269,10 +269,29 @@ function renderPagination(totalPages) {
 // Variable para trackear la campaña visualizada en el modal
 let currentViewedCampaignId = null;
 
-function openCampaignDetailsView(campaignId) {
-  const camp = campaigns.find(c => c.id === campaignId);
-  if (!camp) return;
+function openCampaignDetailsView(campaignId, options = {}) {
+  const campLocal = campaigns.find(c => c.id === campaignId);
 
+  if (campLocal) {
+    // Campaña disponible localmente: renderizar de inmediato
+    _renderCampaignModal(campLocal, options);
+  } else {
+    // Campaña externa (ej: de una invitación): obtenerla del backend
+    fetch(`${BASE_URL}obtener-campania-por-id?id=${campaignId}`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          _renderCampaignModal(res.data, options);
+        } else {
+          console.warn("No se pudo obtener el detalle de la campaña:", res.message);
+        }
+      })
+      .catch(err => console.error("Error al cargar detalle de campaña:", err));
+  }
+}
+
+function _renderCampaignModal(camp, options = {}) {
+  const campaignId = camp.id;
   currentViewedCampaignId = campaignId;
 
   const isOwner = camp.usuario_id == SESSION_USER_ID;
@@ -394,9 +413,13 @@ function openCampaignDetailsView(campaignId) {
   if (devStateCard) devStateCard.style.display = "none";
 
   if (mPostulateBtn) {
-    const isOwner = camp.usuario_id == SESSION_USER_ID;
-    const isOrg = SESSION_USER_ROL === "organizacion";
-    mPostulateBtn.style.display = (camp.type === "convocatoria" && !isOwner && !isOrg) ? "inline-flex" : "none";
+    if (options.hidePostulateBtn) {
+      mPostulateBtn.style.display = "none";
+    } else {
+      const isOwner = camp.usuario_id == SESSION_USER_ID;
+      const isOrg = SESSION_USER_ROL === "organizacion";
+      mPostulateBtn.style.display = (camp.type === "convocatoria" && !isOwner && !isOrg) ? "inline-flex" : "none";
+    }
   }
 
   openModal("modal-profile-camp-detail");
@@ -1142,7 +1165,7 @@ function renderReceivedInvitations() {
 
     const article = document.createElement("article");
     article.className = "invite-card";
-    article.addEventListener("click", () => openReceivedCampaignDetailsView(inv.id));
+    article.addEventListener("click", () => openCampaignDetailsView(inv.campaignId, { hidePostulateBtn: true }));     /* Acaaa */
 
     let actionsHTML = "";
     if (inv.status === "pendiente") {
@@ -1378,7 +1401,7 @@ function renderSentInvitations() {
           <a href="${BASE_URL}${profileUrl}?id=${inv.destinatarioId}" class="invite-meta-link" onclick="event.stopPropagation();">
             <i data-lucide="user" style="width:12px; height:12px;"></i> Ir al perfil de ${name}
           </a>
-          <button type="button" class="invite-meta-link" onclick="event.stopPropagation(); openSentCampaignDetailsView(${inv.id});">
+          <button type="button" class="invite-meta-link" onclick="event.stopPropagation(); openCampaignDetailsView(${inv.campaignId});">
             <i data-lucide="external-link" style="width:12px; height:12px;"></i> Campaña invitada: <strong>${campaignTitle}</strong>
           </button>
         </div>
@@ -1444,115 +1467,6 @@ function renderSentPagination(totalPages) {
   container.appendChild(nextBtn);
 }
 
-function openReceivedCampaignDetailsView(invitationId) {
-  const inv = receivedInvitations.find(i => i.id === invitationId);
-  if (!inv) return;
-
-  const mTitle = document.getElementById("m-camp-title");
-  const mDesc = document.getElementById("m-camp-desc");
-  const mTags = document.getElementById("m-camp-tags");
-  const mBadge = document.getElementById("m-camp-accepted-badge");
-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
-  const mSensitive = document.getElementById("m-camp-sensitive-info");
-
-  if (mTitle) mTitle.textContent = inv.title;
-  
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.location}</p>
-      <p><strong>Período:</strong> ${inv.startDate} al ${inv.endDate}</p>
-    `;
-  }
-
-  if (mTags) {
-    mTags.innerHTML = "";
-    const label = inv.category || "Solidario";
-    const span = document.createElement("span");
-    span.className = "tag-badge";
-    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${label}`;
-    mTags.appendChild(span);
-
-    const typeSpan = document.createElement("span");
-    typeSpan.className = "tag-badge";
-    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
-    typeSpan.style.color = "var(--color-primary)";
-    typeSpan.style.fontWeight = "600";
-    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
-    mTags.appendChild(typeSpan);
-  }
-
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) devStateCard.style.display = "none";
-
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
-
-  if (mPostulateBtn) {
-    mPostulateBtn.style.display = "none";
-  }
-
-  openModal("modal-profile-camp-detail");
-  
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
-
-function openSentCampaignDetailsView(invitationId) {
-  const inv = sentInvitations.find(i => i.id === invitationId);
-  if (!inv) return;
-
-  const mTitle = document.getElementById("m-camp-title");
-  const mDesc = document.getElementById("m-camp-desc");
-  const mTags = document.getElementById("m-camp-tags");
-  const mBadge = document.getElementById("m-camp-accepted-badge");
-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
-  const mSensitive = document.getElementById("m-camp-sensitive-info");
-
-  if (mTitle) mTitle.textContent = inv.campaignTitle;
-  
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${inv.campaignDesc}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${inv.campaignLocation}</p>
-      <p><strong>Período:</strong> ${inv.campaignStartDate} al ${inv.campaignEndDate}</p>
-    `;
-  }
-
-  if (mTags) {
-    mTags.innerHTML = "";
-    const label = inv.campaignCategory || "Solidario";
-    const span = document.createElement("span");
-    span.className = "tag-badge";
-    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${label}`;
-    mTags.appendChild(span);
-    
-    const typeSpan = document.createElement("span");
-    typeSpan.className = "tag-badge";
-    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
-    typeSpan.style.color = "var(--color-primary)";
-    typeSpan.style.fontWeight = "600";
-    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
-    mTags.appendChild(typeSpan);
-  }
-
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) devStateCard.style.display = "none";
-
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
-
-  if (mPostulateBtn) {
-    mPostulateBtn.style.display = "none";
-  }
-
-  openModal("modal-profile-camp-detail");
-  
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
 
 // =========================================================================
 // MENSAJES DINÁMICOS Y VALIDACIONES DE FORMULARIO AJAX (FETCH)

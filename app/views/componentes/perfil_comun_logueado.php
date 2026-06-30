@@ -428,12 +428,6 @@ function renderModalDetalleCampania() {
       </div>
     </div>
 
-    <!-- Acciones del Footer del Modal -->
-    <div class="modal-footer-actions">
-      <button class="btn btn-ghost" onclick="closeModal('modal-profile-camp-detail')">Cerrar</button>
-      <button class="btn btn-primary" id="m-camp-postulate-btn">Postularme</button>
-    </div>
-
     <!-- Sección de Gestión de Postulaciones (Visible solo para el Creador de la Campaña) -->
     <div class="modal-owner-postulations-sec" id="m-camp-owner-postulations-sec" style="display: none; margin-top: 24px;">
       <h4 style="margin-bottom: 16px; font-weight: 600; color: var(--color-text-dark); border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
@@ -472,6 +466,12 @@ function renderModalDetalleCampania() {
           <!-- Inyectado por JS -->
         </div>
       </details>
+    </div>
+
+        <!-- Acciones del Footer del Modal -->
+    <div class="modal-footer-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-profile-camp-detail')">Cerrar</button>
+      <button class="btn btn-primary" id="m-camp-postulate-btn">Postularme</button>
     </div>
     
   </div>
