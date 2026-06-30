@@ -219,7 +219,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
           Invitaciones
         </button>
         <button class="profile-tab-btn" id="tab-btn-voluntariado" aria-controls="pane-voluntariado" aria-selected="false">
-          Voluntariado
+          Voluntariados
         </button>
       </div>
 
