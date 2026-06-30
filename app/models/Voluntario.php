@@ -91,9 +91,18 @@ class Voluntario extends Usuario{
         return $this->bd->resultado();
     }
 
-    /* public function obtenerCampaniasPorVoluntario ( int $idVoluntario ) :array {
+    public function buscarVoluntariosPorEmail ( string $busqueda  ) :array {
+        $consulta = "SELECT u.id as 'id_usuario', v.id as 'id_voluntario', u.nombre, v.apellido, u.email as 'email', u.telefono, u.ubicacion, v.telefono_emergencia, u.img_perfil 
+                        FROM usuarios u JOIN voluntarios v ON u.id = v.usuario_id
+                        WHERE u.email LIKE :q";
+    
+        $this->bd->consulta($consulta);
+        // Se agrega '%' para permitir coincidencias parciales en búsquedas
+        $this->bd->asignar(":q", "%" . $busqueda . "%");
+        $this->bd->ejecutar();
 
-    } */
+        return $this->bd->resultados();
+    }
 
     public function obtenerInsignias ( int $idUsuario ) : array {
         $idVol = $this->obtenerIDVoluntario( $idUsuario );

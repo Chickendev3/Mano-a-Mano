@@ -12,6 +12,9 @@ class perfilCtrl extends Controlador {
             $modeloRol = $this->cargarModelo('Voluntario');
             $infoUsuario = $modeloRol->obtenerVoluntarioPorID($_SESSION['id_usuario']);
             $insignias = $modeloRol->obtenerInsignias($_SESSION['id_usuario']);
+            $listaInsignias = array_map(function($item) {
+                return $item['nombre'];
+            }, $insignias);
             $oficiosVol = $modeloRol->obtenerOficiosVoluntario($_SESSION['id_usuario']);
             $listaOficiosVol = array_map(function($item) {
                 return $item['oficio'];
@@ -66,7 +69,7 @@ class perfilCtrl extends Controlador {
                   'causas' => $causasMapeadas,
                   'campaniasUsuario' => $campaniasUsuario ?? [],
 
-                  'insignias' => $insignias ?? [],
+                  'insignias' => $listaInsignias ?? [],
                   'oficios_voluntario' => $listaOficiosVol ?? [],
                   'oficios' => $listaOficios ?? [],
                   'causas_organizacion' => $listaCausasOrg ?? []
@@ -509,6 +512,7 @@ class perfilCtrl extends Controlador {
         }
     }
 
+    /* Gestión de Postulaciones */
     public function postularCampania() {
 
         if (session_status() === PHP_SESSION_NONE) {
@@ -695,6 +699,7 @@ class perfilCtrl extends Controlador {
         echo json_encode(['success' => true, 'data' => $postulaciones]);
     }
 
+    /* Conectar */
     public function mostrarOrganizacionPublico() : void {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
         if (!$id) {
@@ -783,7 +788,6 @@ class perfilCtrl extends Controlador {
         $this->cargarVista('perfil_organizacion_vista', $datos, 'Perfil de ' . htmlspecialchars($usuario['nombre']) . ' - Mano a Mano');
     }
 
-
     public function mostrarVoluntarioPublico() : void {
 
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -850,6 +854,7 @@ class perfilCtrl extends Controlador {
         $this->cargarVista('perfil_voluntario_vista', $datos, 'Perfil de ' . htmlspecialchars($usuario['nombre']) . ' - Mano a Mano');
     }
 
+    /* Gestión de Invitaciones y Asociaciones */
     public function obtenerMisInvitacionesRecibidas() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -1157,5 +1162,118 @@ class perfilCtrl extends Controlador {
 
         echo json_encode(['success' => true, 'data' => $campaniaMapeada]);
     }
+
+    /* Gestión de Voluntarios Fijos */
+    public function obtenerMisVoluntariosFijos() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'organizacion') {
+            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
+            return;
+        }
+
+        $modeloOrg = $this->cargarModelo('Organizacion');
+        $fixed = $modeloOrg->obtenerVoluntariosFijosPorOrganizacion($_SESSION['id_usuario'], true);
+        $discharged = $modeloOrg->obtenerVoluntariosFijosPorOrganizacion($_SESSION['id_usuario'], false);
+
+        echo json_encode(['success' => true, 'fixed' => $fixed, 'discharged' => $discharged]);
+    }
+
+    public function buscarVoluntariosEmail() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'organizacion') {
+            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
+            return;
+        }
+
+        $q = isset($_GET['q']) ? trim($_GET['q']) : '';
+        $modeloVol = $this->cargarModelo('Voluntario');
+        $voluntarios = $modeloVol->buscarVoluntariosPorEmail($q);
+
+        echo json_encode(['success' => true, 'data' => $voluntarios]);
+    }
+
+    public function altaVoluntarioFijo() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'organizacion') {
+            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
+            return;
+        }
+
+        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $modeloVol = $this->cargarModelo('Voluntario');
+        $modeloOrg = $this->cargarModelo('Organizacion');
+
+        $vols = $modeloVol->buscarVoluntariosPorEmail($email);
+        $vol = null;
+        foreach ($vols as $v) {
+            if (strtolower($v['email']) === strtolower($email)) {
+                $vol = $v;
+                break;
+            }
+        }
+
+        if (!$vol) {
+            echo json_encode(['success' => false, 'message' => 'Voluntario no encontrado.']);
+            return;
+        }
+
+        $idOrgArr = $modeloOrg->obtenerIDOrganizacion($_SESSION['id_usuario']);
+        if (!$idOrgArr) {
+            echo json_encode(['success' => false, 'message' => 'Organización no encontrada.']);
+            return;
+        }
+
+        $ok = $modeloOrg->agregarVoluntarioFijo((int)$idOrgArr['id'], (int)$vol['id_voluntario']);
+        if ($ok) {
+            echo json_encode(['success' => true, 'message' => 'Voluntario dado de alta.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al dar de alta.']);
+        }
+    }
+
+    public function bajaVoluntarioFijo() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'organizacion') {
+            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
+            return;
+        }
+
+        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $modeloVol = $this->cargarModelo('Voluntario');
+        $modeloOrg = $this->cargarModelo('Organizacion');
+
+        $vols = $modeloVol->buscarVoluntariosPorEmail($email);
+        $vol = null;
+        foreach ($vols as $v) {
+            if (strtolower($v['email']) === strtolower($email)) {
+                $vol = $v;
+                break;
+            }
+        }
+
+        if (!$vol) {
+            echo json_encode(['success' => false, 'message' => 'Voluntario no encontrado.']);
+            return;
+        }
+
+        $idOrgArr = $modeloOrg->obtenerIDOrganizacion($_SESSION['id_usuario']);
+        if (!$idOrgArr) {
+            echo json_encode(['success' => false, 'message' => 'Organización no encontrada.']);
+            return;
+        }
+
+        $ok = $modeloOrg->darDeBajaVoluntarioFijo((int)$idOrgArr['id'], (int)$vol['id_voluntario']);
+        if ($ok) {
+            echo json_encode(['success' => true, 'message' => 'Voluntario dado de baja.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al dar de baja.']);
+        }
+    }
+
 }
 ?>

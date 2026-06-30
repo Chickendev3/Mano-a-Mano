@@ -31,12 +31,7 @@ class conectarCtrl extends Controlador {
         $this->cargarVista('conectar', $datos, 'Conectar - Mano a Mano');
     }
 
-    public function busqueda () :void {
-
-        
-
-    }
-
+    
 
 }
 ?>

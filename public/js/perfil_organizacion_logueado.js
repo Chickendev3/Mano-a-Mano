@@ -451,67 +451,6 @@ function setupMockUploads() {
 // ==========================================
 // 9. GESTIONAR VOLUNTARIOS FIJOS LÓGICA
 // ==========================================
-
-// Mock user database for search simulation
-let volunteerUsersDB = [
-  {
-    email: "juan.perez@gmail.com",
-    name: "Juan",
-    lastName: "Pérez",
-    avatar: ""
-  },
-  {
-    email: "maria.gomez@gmail.com",
-    name: "María",
-    lastName: "Gómez",
-    avatar: ""
-  },
-  {
-    email: "carlos.rodriguez@gmail.com",
-    name: "Carlos",
-    lastName: "Rodríguez",
-    avatar: ""
-  },
-  {
-    email: "lucia.fernandez@gmail.com",
-    name: "Lucía",
-    lastName: "Fernández",
-    avatar: ""
-  },
-  {
-    email: "sofia.lopez@gmail.com",
-    name: "Sofía",
-    lastName: "López",
-    avatar: ""
-  }
-];
-
-// Active fixed volunteers
-let fixedVolunteers = [
-  {
-    email: "carlos.rodriguez@gmail.com",
-    name: "Carlos",
-    lastName: "Rodríguez",
-    avatar: ""
-  },
-  {
-    email: "lucia.fernandez@gmail.com",
-    name: "Lucía",
-    lastName: "Fernández",
-    avatar: ""
-  }
-];
-
-// Discharged volunteers
-let dischargedVolunteers = [
-  {
-    email: "maria.gomez@gmail.com",
-    name: "Maria",
-    lastName: "Gomez",
-    avatar: ""
-  }
-];
-
 function setupVolunteersSection() {
   const toggleSearchBtn = document.getElementById("btn-toggle-volunteer-search");
   const searchContainer = document.getElementById("volunteer-search-container");
@@ -543,8 +482,20 @@ function setupVolunteersSection() {
     });
   }
 
-  // Initial render of lists
-  renderVolunteerLists();
+  loadVolunteersFromBD();
+}
+
+function loadVolunteersFromBD() {
+  fetch(`${BASE_URL}obtener-mis-voluntarios-fijos`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        fixedVolunteers = res.fixed;
+        dischargedVolunteers = res.discharged;
+        renderVolunteerLists();
+      }
+    })
+    .catch(err => console.error("Error al cargar lista de voluntarios fijos:", err));
 }
 
 function renderVolunteerLists() {
@@ -636,8 +587,8 @@ function performVolunteerSearch() {
   
   if (!emailInput || !resultsDiv) return;
 
-  const searchEmail = emailInput.value.trim().toLowerCase();
-  if (!searchEmail) {
+  const q = emailInput.value.trim();
+  if (!q) {
     resultsDiv.innerHTML = `
       <div style="color: #EF4444; font-size: 14px; font-weight: 500;">
         Por favor, ingrese un correo electrónico para buscar.
@@ -646,121 +597,125 @@ function performVolunteerSearch() {
     return;
   }
 
-  // Find user in the mock DB
-  const foundUser = volunteerUsersDB.find(u => u.email.toLowerCase() === searchEmail);
+  fetch(`${BASE_URL}buscar-voluntarios-email?q=${encodeURIComponent(q)}`)
+    .then(res => res.json())
+    .then(res => {
+      resultsDiv.innerHTML = "";
+      if (res.success && res.data.length > 0) {
+        res.data.forEach(foundUser => {
+          const isActive = fixedVolunteers.some(v => v.email.toLowerCase() === foundUser.email.toLowerCase());
+          
+          const avatarHTML = foundUser.img_perfil 
+            ? `<img src="${BASE_URL + foundUser.img_perfil}" alt="${foundUser.nombre}">`
+            : `<i data-lucide="user"></i>`;
 
-  if (!foundUser) {
-    resultsDiv.innerHTML = `
-      <div style="color: #EF4444; font-size: 14px; font-weight: 500; padding: 12px; background-color: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-sm);">
-        No se encontró ningún usuario registrado con el correo: <strong>${emailInput.value}</strong>
-      </div>
-    `;
-    return;
-  }
+          const article = document.createElement("article");
+          article.className = "invite-card volunteer-card";
+          article.style.backgroundColor = "var(--color-surface)";
+          article.style.marginBottom = "8px";
 
-  // Check if already active
-  const isActive = fixedVolunteers.some(v => v.email.toLowerCase() === searchEmail);
-  
-  const avatarHTML = foundUser.avatar 
-    ? `<img src="${BASE_URL + foundUser.avatar}" alt="${foundUser.name}">`
-    : `<i data-lucide="user"></i>`;
+          if (isActive) {
+            article.innerHTML = `
+              <div class="invite-card-img-col user-avatar">
+                ${avatarHTML}
+              </div>
+              <div class="invite-card-content-col">
+                <h3 class="alt-card-title">${foundUser.nombre} ${foundUser.apellido}</h3>
+                <p class="alt-card-desc">${foundUser.email}</p>
+              </div>
+              <div class="invite-card-actions-col">
+                <span class="volunteer-status-badge">
+                  Ya es voluntario fijo
+                </span>
+              </div>
+            `;
+          } else {
+            article.innerHTML = `
+              <div class="invite-card-img-col user-avatar">
+                ${avatarHTML}
+              </div>
+              <div class="invite-card-content-col">
+                <h3 class="alt-card-title">${foundUser.nombre} ${foundUser.apellido}</h3>
+                <p class="alt-card-desc">${foundUser.email}</p>
+              </div>
+              <div class="invite-card-actions-col">
+                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="enrollVolunteer('${foundUser.email}')">
+                  <i data-lucide="user-check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Dar de Alta
+                </button>
+              </div>
+            `;
+          }
+          resultsDiv.appendChild(article);
+        });
 
-  if (isActive) {
-    resultsDiv.innerHTML = `
-      <article class="invite-card volunteer-card" style="margin-bottom: 0; background-color: var(--color-surface);">
-        <div class="invite-card-img-col user-avatar">
-          ${avatarHTML}
-        </div>
-        <div class="invite-card-content-col">
-          <h3 class="alt-card-title">${foundUser.name} ${foundUser.lastName}</h3>
-          <p class="alt-card-desc">${foundUser.email}</p>
-        </div>
-        <div class="invite-card-actions-col">
-          <span class="volunteer-status-badge">
-            Ya es voluntario fijo
-          </span>
-        </div>
-      </article>
-    `;
-  } else {
-    resultsDiv.innerHTML = `
-      <article class="invite-card volunteer-card" style="margin-bottom: 0; background-color: var(--color-surface);">
-        <div class="invite-card-img-col user-avatar">
-          ${avatarHTML}
-        </div>
-        <div class="invite-card-content-col">
-          <h3 class="alt-card-title">${foundUser.name} ${foundUser.lastName}</h3>
-          <p class="alt-card-desc">${foundUser.email}</p>
-        </div>
-        <div class="invite-card-actions-col">
-          <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="enrollVolunteer('${foundUser.email}')">
-            <i data-lucide="user-check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Dar de Alta
-          </button>
-        </div>
-      </article>
-    `;
-  }
-
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
+        if (typeof lucide !== "undefined") {
+          lucide.createIcons();
+        }
+      } else {
+        resultsDiv.innerHTML = `
+          <div style="color: #EF4444; font-size: 14px; font-weight: 500; padding: 12px; background-color: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-sm);">
+            No se encontró ningún usuario registrado con el correo: <strong>${q}</strong>
+          </div>
+        `;
+      }
+    })
+    .catch(err => console.error("Error al buscar voluntarios:", err));
 }
 
 window.enrollVolunteer = function(email) {
-  // Check if in discharged list, remove it
-  const dischargedIndex = dischargedVolunteers.findIndex(v => v.email.toLowerCase() === email.toLowerCase());
-  let volunteerToEnroll = null;
+  const formData = new FormData();
+  formData.append("email", email);
 
-  if (dischargedIndex !== -1) {
-    volunteerToEnroll = dischargedVolunteers.splice(dischargedIndex, 1)[0];
-  } else {
-    // If not in discharged, look in volunteerUsersDB
-    const dbUser = volunteerUsersDB.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (dbUser) {
-      volunteerToEnroll = { ...dbUser };
+  fetch(`${BASE_URL}alta-voluntario-fijo`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.success) {
+      if (typeof showToast !== "undefined") {
+        showToast("Voluntario dado de alta", res.message || "Se sumó a tus voluntarios fijos.", true);
+      }
+      const searchInput = document.getElementById("volunteer-search-email");
+      const resultsDiv = document.getElementById("volunteer-search-results");
+      if (searchInput) searchInput.value = "";
+      if (resultsDiv) resultsDiv.innerHTML = "";
+      
+      const searchContainer = document.getElementById("volunteer-search-container");
+      if (searchContainer) searchContainer.style.display = "none";
+
+      loadVolunteersFromBD();
+    } else {
+      if (typeof showToast !== "undefined") {
+        showToast("Error", res.message || "No se pudo dar de alta.", false);
+      }
     }
-  }
-
-  if (volunteerToEnroll) {
-    // Add to active if not already there
-    if (!fixedVolunteers.some(v => v.email.toLowerCase() === email.toLowerCase())) {
-      fixedVolunteers.push(volunteerToEnroll);
-    }
-
-    // Reset search UI
-    const searchInput = document.getElementById("volunteer-search-email");
-    const resultsDiv = document.getElementById("volunteer-search-results");
-    if (searchInput) searchInput.value = "";
-    if (resultsDiv) resultsDiv.innerHTML = "";
-    
-    const searchContainer = document.getElementById("volunteer-search-container");
-    if (searchContainer) searchContainer.style.display = "none";
-
-    renderVolunteerLists();
-
-    if (typeof showToast !== "undefined") {
-      showToast("Voluntario dado de alta", `${volunteerToEnroll.name} ${volunteerToEnroll.lastName} se sumó a tus voluntarios fijos.`, true);
-    }
-  }
+  })
+  .catch(err => console.error("Error al dar de alta voluntario:", err));
 };
 
 window.dischargeVolunteer = function(email) {
-  const activeIndex = fixedVolunteers.findIndex(v => v.email.toLowerCase() === email.toLowerCase());
-  
-  if (activeIndex !== -1) {
-    const removedVolunteer = fixedVolunteers.splice(activeIndex, 1)[0];
-    
-    // Add to discharged list if not already there
-    if (!dischargedVolunteers.some(v => v.email.toLowerCase() === email.toLowerCase())) {
-      dischargedVolunteers.push(removedVolunteer);
-    }
+  const formData = new FormData();
+  formData.append("email", email);
 
-    renderVolunteerLists();
-
-    if (typeof showToast !== "undefined") {
-      showToast("Voluntario dado de baja", `${removedVolunteer.name} ${removedVolunteer.lastName} fue removido de la lista activa.`, true);
+  fetch(`${BASE_URL}baja-voluntario-fijo`, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.success) {
+      if (typeof showToast !== "undefined") {
+        showToast("Voluntario dado de baja", res.message || "Removido de tus voluntarios fijos.", true);
+      }
+      loadVolunteersFromBD();
+    } else {
+      if (typeof showToast !== "undefined") {
+        showToast("Error", res.message || "No se pudo dar de baja.", false);
+      }
     }
-  }
+  })
+  .catch(err => console.error("Error al dar de baja voluntario:", err));
 };
 
 // ==========================================
@@ -930,3 +885,14 @@ function renderAssociationsPagination(totalPages) {
 }
 
 
+
+/* Redirección de BUSQUEDA DE VOLUNTARIO al presionar "Buscar" - VOLUNTARIOS FIJOS */
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      const q = keywordInput ? keywordInput.value.trim() : '';
+ 
+      if (q) params.set('q', q);
+ 
+      window.location.href = `${BASE_URL}conectar?${params.toString()}`;
+    });
+  }

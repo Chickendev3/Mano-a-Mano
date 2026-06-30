@@ -14,7 +14,7 @@ $rutas = [
 
     /* Conectar */
     'conectar' => ['controlador' => 'conectarCtrl', 'metodo' => 'index'],
-    'busqueda' => ['controlador' => 'conectarCtrl', 'metodo' => 'busqueda'],
+    /* 'busqueda' => ['controlador' => 'conectarCtrl', 'metodo' => 'busqueda'], */
 
     /* Contacto */
     'contacto' => ['controlador' => 'contactoCtrl', 'metodo' => 'index'],
@@ -34,6 +34,12 @@ $rutas = [
     'actualizar-estado-postulacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'actualizarEstadoPostulacion'],
     'eliminar-postulacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarPostulacion'],
     'obtener-mis-postulaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisPostulaciones'],
+
+    /* Gestión de Voluntarios Fijos - Organización */
+    'obtener-mis-voluntarios-fijos' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisVoluntariosFijos'],
+    'buscar-voluntarios-email' => ['controlador' => 'perfilCtrl', 'metodo' => 'buscarVoluntariosEmail'],
+    'alta-voluntario-fijo' => ['controlador' => 'perfilCtrl', 'metodo' => 'altaVoluntarioFijo'],
+    'baja-voluntario-fijo' => ['controlador' => 'perfilCtrl', 'metodo' => 'bajaVoluntarioFijo'],
 
     /* Invitaciones y Asociaciones */
     'obtener-mis-invitaciones-recibidas' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisInvitacionesRecibidas'],

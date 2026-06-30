@@ -81,35 +81,6 @@ class Organizacion extends Usuario {
         return $this->bd->resultado();
     }
 
-    /* -------------------- INSERTAR DATOS -------------------- */
-    public function nuevaOrganizacion( string $nombre, string $email, string $clave, string $telefono, ?string $ubicacion = null ) :bool {
-        
-        parent::nuevoUsuario($nombre, $email, $clave, $telefono, $ubicacion);
-        $sql = "SELECT id FROM usuarios u WHERE u.email = :email";
-        $this->bd->consulta($sql);
-        $this->bd->asignar(":email", $email);
-        $this->bd->ejecutar();
-        $usuarioID = $this->bd->resultado()['id'];
-
-        $consulta = "INSERT INTO `organizaciones`(`usuario_id`) 
-                        VALUES (:us_id)";
-        $this->bd->consulta($consulta);
-
-        $this->bd->asignar(":us_id", $usuarioID);
-
-        return $this->bd->ejecutar();
-    }
-
-
-    /* -------------------- ACTUALIZAR DATOS -------------------- */
-    public function actualizarDatosOrganizacion (int $idUsuario, array $datos) :bool {
-        /* $datos tiene los campos que se quieren actualizar */
-        
-        parent::actualizarDatosUsuario($idUsuario, $datos);
-                 
-        return true;
-    }
-
     public function obtenerCausasOrganizacion(int $idUsuario) :array {
         $consulta = "SELECT c.causa 
                         FROM organizaciones_causas oc
@@ -138,6 +109,81 @@ class Organizacion extends Usuario {
         $this->bd->asignar(":id_org", (int)$idOrgArr['id']);
         $this->bd->ejecutar();
         return $this->bd->resultados();
+    }
+
+    public function obtenerVoluntariosFijosPorOrganizacion(int $idOrgUsuario, bool $activo = true) :array {
+        $idOrg = $this->obtenerIDOrganizacion($idOrgUsuario);
+        if (!$idOrg) {
+            return [];
+        }
+        $consulta = "SELECT u.email, u.nombre as name, v.apellido as lastName, u.img_perfil as avatar
+                        FROM voluntarios_fijos vf 
+                        JOIN voluntarios v ON vf.voluntario_id = v.id
+                        JOIN usuarios u ON v.usuario_id = u.id
+                        WHERE vf.organizacion_id = :id_org AND vf.activo = :activo;";
+                        
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_org", (int)$idOrg['id']);
+        $this->bd->asignar(":activo", $activo);
+        $this->bd->ejecutar();
+
+        return $this->bd->resultados();
+    }
+
+    /* -------------------- INSERTAR DATOS -------------------- */
+    public function nuevaOrganizacion( string $nombre, string $email, string $clave, string $telefono, ?string $ubicacion = null ) :bool {
+        
+        parent::nuevoUsuario($nombre, $email, $clave, $telefono, $ubicacion);
+        $sql = "SELECT id FROM usuarios u WHERE u.email = :email";
+        $this->bd->consulta($sql);
+        $this->bd->asignar(":email", $email);
+        $this->bd->ejecutar();
+        $usuarioID = $this->bd->resultado()['id'];
+
+        $consulta = "INSERT INTO `organizaciones`(`usuario_id`) 
+                        VALUES (:us_id)";
+        $this->bd->consulta($consulta);
+
+        $this->bd->asignar(":us_id", $usuarioID);
+
+        return $this->bd->ejecutar();
+    }
+
+    public function agregarVoluntarioFijo(int $idOrg, int $idVol) :bool {
+        // Consultamos 'activo' en lugar de un 'id' que no existe
+        $consultaCheck = "SELECT activo FROM voluntarios_fijos WHERE organizacion_id = :id_org AND voluntario_id = :id_vol;";
+        
+        $this->bd->consulta($consultaCheck);
+        $this->bd->asignar(":id_org", $idOrg);
+        $this->bd->asignar(":id_vol", $idVol);
+        $this->bd->ejecutar();
+
+        $exists = $this->bd->resultado();
+        if ($exists) {
+            // Si existe, se actualizamos a activo = true filtrando por la clave compuesta
+            $consultaUpdate = "UPDATE voluntarios_fijos SET activo = true WHERE organizacion_id = :id_org AND voluntario_id = :id_vol;";
+            $this->bd->consulta($consultaUpdate);
+            $this->bd->asignar(":id_org", $idOrg);
+            $this->bd->asignar(":id_vol", $idVol);
+
+            return $this->bd->ejecutar();
+        } else {
+            // Si no existe, se inserta el nuevo registro
+            $consultaInsert = "INSERT INTO voluntarios_fijos (organizacion_id, voluntario_id, activo) VALUES (:id_org, :id_vol, true);";
+            $this->bd->consulta($consultaInsert);
+            $this->bd->asignar(":id_org", $idOrg);
+            $this->bd->asignar(":id_vol", $idVol);
+            return $this->bd->ejecutar();
+        }
+    }
+
+    /* -------------------- ACTUALIZAR DATOS -------------------- */
+    public function actualizarDatosOrganizacion (int $idUsuario, array $datos) :bool {
+        /* $datos tiene los campos que se quieren actualizar */
+        
+        parent::actualizarDatosUsuario($idUsuario, $datos);
+                 
+        return true;
     }
 
     public function actualizarCausasOrganizacion(int $idUsuario, array $causas) :void {
@@ -170,6 +216,17 @@ class Organizacion extends Usuario {
                 $this->bd->ejecutar();
             }
         }
+    }
+
+    public function darDeBajaVoluntarioFijo(int $idOrg, int $idVol) :bool {
+
+        $consultaUpdate = "UPDATE voluntarios_fijos SET activo = false WHERE organizacion_id = :id_org AND voluntario_id = :id_vol;";
+        
+        $this->bd->consulta($consultaUpdate);
+        $this->bd->asignar(":id_org", $idOrg);
+        $this->bd->asignar(":id_vol", $idVol);
+        
+        return $this->bd->ejecutar();
     }
 
     /* -------------------- ELIMINAR -------------------- */
