@@ -55,16 +55,16 @@
     </div>
     
     <!-- Right Photo Hero with Organic Wave Crop and Quote Card -->
-    <div class="hero-image-wrapper">
+    <!--<div class="hero-image-wrapper">
       <div class="hero-photo-container">
         <img src="<?= BASE_URL ?>img/hero_new.png" alt="Voluntarios felices colaborando mano a mano" class="hero-photo">
-        <!-- SVG wave mask filled with #E9E2D6 to crop the left edge of the photo -->
+        
         <div class="hero-organic-mask">
           <svg viewBox="0 0 100 800" preserveAspectRatio="none" width="100%" height="100%">
             <path fill="#E9E2D6" d="M100,0 C60,150 100,300 40,450 C0,580 80,700 100,800 L0,800 L0,0 Z"></path>
           </svg>
         </div>
-      </div>
+      </div> -->
       
       <!-- Floating Quote Card over the photo -->
       <div class="hero-quote-floating-card">
