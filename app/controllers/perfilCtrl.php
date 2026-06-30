@@ -1066,7 +1066,8 @@ class perfilCtrl extends Controlador {
                 'additionalInfo' => $assoc['info_adicional'],
                 'partnerName' => $esCreador ? $assoc['invited_name'] : $assoc['creator_name'],
                 'partnerImg' => $esCreador ? $assoc['invited_img'] : $assoc['creator_img'],
-                'partnerId' => $esCreador ? $assoc['invited_id'] : $assoc['creator_id']
+                'partnerId' => $esCreador ? $assoc['invited_id'] : $assoc['creator_id'],
+                'partnerRole' => $esCreador ? $assoc['invited_role'] : $assoc['creator_role']
             ];
         }
 

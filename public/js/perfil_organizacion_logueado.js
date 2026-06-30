@@ -850,45 +850,30 @@ function renderAssociations() {
     return;
   }
 
-  paginated.forEach(assoc => {
-    const imgUrl = assoc.images && assoc.images.length > 0 ? assoc.images[0] : "";
-    const imgHTML = imgUrl 
-      ? `<img src="${BASE_URL + imgUrl}" alt="${assoc.title}">` 
-      : `<i data-lucide="image"></i>`;
-
-    const profileUrl = `perfil/organizacion?id=${assoc.partnerId}`;
+    paginated.forEach(assoc => {
+    const imgHTML = assoc.partnerImg 
+      ? `<img src="${BASE_URL + assoc.partnerImg}" alt="${assoc.partnerName}">` 
+      : `<i data-lucide="${assoc.partnerRole === 'voluntario' ? 'user' : 'building'}"></i>`;
 
     const article = document.createElement("article");
     article.className = "invite-card";
+    article.style.cursor = "pointer";
     article.addEventListener("click", () => {
-      openAssociationCampaignDetailsView(assoc.id);
+      openCampaignDetailsView(assoc.id);
     });
 
     article.innerHTML = `
-      <div class="invite-card-img-col campaign-img">
+      <div class="invite-card-img-col user-avatar">
         ${imgHTML}
       </div>
       <div class="invite-card-content-col">
-        <h3 class="alt-card-title">${assoc.title}</h3>
-        <p class="alt-card-desc">${assoc.desc}</p>
-        
-        <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
-          <span style="font-size: 12px; color: var(--color-text-muted);">
-            <i data-lucide="calendar" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> Período: ${assoc.startDate} al ${assoc.endDate}
-          </span>
-          <span style="font-size: 12px; color: var(--color-text-muted);">
-            <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${assoc.location || "Sin ubicación"}
-          </span>
-          <a href="${BASE_URL + profileUrl}" class="invite-meta-link" onclick="event.stopPropagation();">
-            <i data-lucide="user" style="width:12px; height:12px;"></i> En asociación con: <strong>${assoc.partnerName}</strong>
-          </a>
+        <h3 class="alt-card-title" style="margin-bottom: 2px;">${assoc.partnerName}</h3>
+        <span style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">
+          ${assoc.partnerRole === 'voluntario' ? 'Particular' : 'Organización'}
+        </span>
+        <div style="margin-top: 8px; font-size: 13px; color: var(--color-text-secondary);">
+          Colaborando en la campaña: <strong>${assoc.title}</strong>
         </div>
-      </div>
-      
-      <div class="invite-card-actions-col">
-        <a href="${BASE_URL + profileUrl}" class="btn btn-ghost" onclick="event.stopPropagation();" style="border: 1px solid var(--color-border); padding: 8px 16px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-secondary); background: none;">
-          <i data-lucide="external-link" style="width:14px; height:14px;"></i> Ir al perfil
-        </a>
       </div>
     `;
     grid.appendChild(article);
@@ -944,53 +929,4 @@ function renderAssociationsPagination(totalPages) {
   container.appendChild(nextBtn);
 }
 
-function openAssociationCampaignDetailsView(associationId) {
-  const assoc = associations.find(a => a.id === associationId);
-  if (!assoc) return;
 
-  // Prefill shared modal labels
-  const mTitle = document.getElementById("m-camp-title");
-  const mDesc = document.getElementById("m-camp-desc");
-  const mTags = document.getElementById("m-camp-tags");
-  const mBadge = document.getElementById("m-camp-accepted-badge");
-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
-  const mSensitive = document.getElementById("m-camp-sensitive-info");
-
-  if (mTitle) mTitle.textContent = assoc.title;
-  
-  if (mDesc) {
-    mDesc.innerHTML = `
-      <p style="margin-bottom:12px;"><strong>Resumen:</strong> ${assoc.desc}</p>
-      <p style="margin-bottom:12px;"><strong>Detalle:</strong> ${assoc.details}</p>
-      <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${assoc.location || "Sin ubicación"}</p>
-      <p><strong>Período:</strong> ${assoc.startDate} al ${assoc.endDate}</p>
-    `;
-  }
-
-  if (mTags) {
-    mTags.innerHTML = "";
-    const tags = [getCategoryLabel(assoc.category), "Convocatoria"];
-    tags.forEach(tag => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
-  }
-
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) devStateCard.style.display = "none";
-
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
-
-  if (mPostulateBtn) {
-    mPostulateBtn.style.display = "none";
-  }
-
-  openModal("modal-profile-camp-detail");
-  
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
