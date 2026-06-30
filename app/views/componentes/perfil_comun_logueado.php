@@ -426,6 +426,10 @@ function renderModalDetalleCampania() {
           <!-- Organizaciones inyectadas por JS -->
         </div>
       </div>
+      <!-- Sección de Asistencia (Generación / Ingreso de código) -->
+      <div class="modal-attendance-sec" id="m-camp-attendance-sec" style="display: none; margin-top: 24px; padding: 16px; background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+        <!-- Inyectado por JS -->
+      </div>
     </div>
 
     <!-- Sección de Gestión de Postulaciones (Visible solo para el Creador de la Campaña) -->

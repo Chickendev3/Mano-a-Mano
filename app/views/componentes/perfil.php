@@ -45,6 +45,10 @@ function renderModalDetalleCampaniaPublico() {
         <h4>Organizaciones en asociación</h4>
         <div class="modal-associations-circles" id="m-camp-associations-list"></div>
       </div>
+      <!-- Sección de Asistencia (Generación / Ingreso de código) -->
+      <div class="modal-attendance-sec" id="m-camp-attendance-sec" style="display: none; margin-top: 24px; padding: 16px; background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+        <!-- Inyectado por JS -->
+      </div>
     </div>
     
     <div class="modal-footer-actions">

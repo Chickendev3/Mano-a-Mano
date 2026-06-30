@@ -50,6 +50,9 @@ $rutas = [
     'cancelar-invitacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'cancelarInvitacion'],
     'obtener-mis-asociaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisAsociaciones'],
     'obtener-campania-por-id'  => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerCampaniaPorIdPublico'],
+    'generar-codigo-asistencia' => ['controlador' => 'perfilCtrl', 'metodo' => 'generarCodigoAsistencia'],
+    'validar-codigo-asistencia' => ['controlador' => 'perfilCtrl', 'metodo' => 'validarCodigoAsistencia'],
+    'obtener-mis-voluntariados' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisVoluntariados'],
 
     /* Perfiles Públicos */
     'perfil/organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarOrganizacionPublico'],

@@ -1,0 +1,2019 @@
+﻿diff --git a/app/controllers/perfilCtrl.php b/app/controllers/perfilCtrl.php
+index 55a60f7..067d398 100644
+--- a/app/controllers/perfilCtrl.php
++++ b/app/controllers/perfilCtrl.php
+@@ -56,12 +56,6 @@ class perfilCtrl extends Controlador {
+         $modeloCampania = $this->cargarModelo('Campania');
+         $campaniasUsuario = $modeloCampania->obtenerCampaniasDeUsuario($_SESSION['id_usuario']);
+ 
+-        /* Voluntarios Particular */
+-        // Traer valor del contador de asistencias.
+-
+-        /* Organizaciones Particular */
+-        
+-
+ 
+         $datos = ['cssPropio' => $css,
+ 				  'jsPropio' => $js,
+@@ -839,6 +833,30 @@ class perfilCtrl extends Controlador {
+             ];
+         }
+ 
++        $modeloAsistencia = $this->cargarModelo('Asistencia');
++        $rawAsist = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
++        $voluntariados = [];
++        $today = date('Y-m-d');
++        foreach ($rawAsist as $asist) {
++            $campId = (int)$asist['campania_id'];
++            $camp = $modeloCampania->obtenerCampaniaPorID($campId);
++            if ($camp) {
++                $causes = $modeloCampania->obtenerCausasDeCampania($campId);
++                $images = $modeloCampania->obtenerArchivosDeCampania($campId);
++                $voluntariados[] = [
++                    'id' => $campId,
++                    'title' => $camp['titulo'],
++                    'desc' => $camp['descripcion'],
++                    'category' => !empty($causes) ? $causes[0] : 'Solidario',
++                    'startDate' => $camp['fecha_inicio'],
++                    'endDate' => $camp['fecha_finalizacion'],
++                    'location' => $camp['ubicacion'],
++                    'status' => $camp['fecha_finalizacion'] >= $today ? 'activa' : 'finalizada',
++                    'images' => $images
++                ];
++            }
++        }
++
+         $nombreCompleto = $usuario['nombre completo'];
+         $datos = [
+             'nombre_completo' => $nombreCompleto,
+@@ -847,6 +865,7 @@ class perfilCtrl extends Controlador {
+             'insignias' => $insignias,
+             'campanias' => $campanias,
+             'campaniasDetails' => $campaniasDetails,
++            'voluntariados' => $voluntariados,
+             'cssPropio' => 'perfil_voluntario_vista.css',
+             'jsPropio' => 'perfil_voluntario_vista.js'
+         ];
+@@ -1141,6 +1160,36 @@ class perfilCtrl extends Controlador {
+             }
+         }
+ 
++        $modeloAsistencia = $this->cargarModelo('Asistencia');
++        $codigoActivo = null;
++        $segundosRestantes = 0;
++        
++        $db = new BaseDatos();
++        $db->consulta("SELECT codigo, fecha_vencimiento FROM codigos_asistencia WHERE campania_id = :id_camp AND fecha_vencimiento > NOW() ORDER BY id DESC LIMIT 1;");
++        $db->asignar(":id_camp", $idCampania);
++        $db->ejecutar();
++        $codRes = $db->resultado();
++        if ($codRes) {
++            $codigoActivo = $codRes['codigo'];
++            $venc = strtotime($codRes['fecha_vencimiento']);
++            $segundosRestantes = max(0, $venc - time());
++        }
++
++        $asistenciaRegistrada = false;
++        if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'voluntario') {
++            $modeloVol = $this->cargarModelo('Voluntario');
++            $idVol = $modeloVol->obtenerIDVoluntario($_SESSION['id_usuario']);
++            if ($idVol) {
++                $asistencias = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
++                foreach ($asistencias as $asist) {
++                    if ((int)$asist['campania_id'] === $idCampania) {
++                        $asistenciaRegistrada = true;
++                        break;
++                    }
++                }
++            }
++        }
++
+         $campaniaMapeada = [
+             'id'                => $idCampania,
+             'title'             => $camp['titulo'],
+@@ -1157,7 +1206,10 @@ class perfilCtrl extends Controlador {
+             'usuario_nombre'    => $creatorName,
+             'usuario_rol'       => $creatorRole,
+             'usuario_img_perfil'=> $creatorImg,
+-            'info_adicional'    => $camp['info_adicional'] ?? ''
++            'info_adicional'    => $camp['info_adicional'] ?? '',
++            'asistencia_registrada' => $asistenciaRegistrada,
++            'codigo_activo'     => $codigoActivo,
++            'segundos_restantes'=> $segundosRestantes
+         ];
+ 
+         echo json_encode(['success' => true, 'data' => $campaniaMapeada]);
+@@ -1275,5 +1327,166 @@ class perfilCtrl extends Controlador {
+         }
+     }
+ 
++    public function generarCodigoAsistencia() {
++        if (session_status() === PHP_SESSION_NONE) session_start();
++        header('Content-Type: application/json');
++        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
++            echo json_encode(['success' => false, 'message' => 'Sesi├│n no v├ílida.']);
++            return;
++        }
++
++        $idCampania = isset($_POST['id_campania']) ? (int)$_POST['id_campania'] : 0;
++        if ($idCampania <= 0) {
++            echo json_encode(['success' => false, 'message' => 'Campa├▒a no v├ílida.']);
++            return;
++        }
++
++        $modeloCampania = $this->cargarModelo('Campania');
++        $camp = $modeloCampania->obtenerCampaniaPorID($idCampania);
++        if (!$camp) {
++            echo json_encode(['success' => false, 'message' => 'Campa├▒a no encontrada.']);
++            return;
++        }
++
++        if ((int)$camp['usuario_id'] !== (int)$_SESSION['id_usuario']) {
++            echo json_encode(['success' => false, 'message' => 'No tienes permiso para generar c├│digos para esta campa├▒a.']);
++            return;
++        }
++
++        $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
++        $codigo = '';
++        for ($i = 0; $i < 7; $i++) {
++            $codigo .= $chars[rand(0, strlen($chars) - 1)];
++        }
++
++        $modeloAsistencia = $this->cargarModelo('Asistencia');
++        $ok = $modeloAsistencia->insertarCodigoAsistencia($idCampania, $codigo);
++
++        if ($ok) {
++            echo json_encode(['success' => true, 'codigo' => $codigo, 'vence_en' => 300]);
++        } else {
++            echo json_encode(['success' => false, 'message' => 'No se pudo generar el c├│digo.']);
++        }
++    }
++
++    public function validarCodigoAsistencia() {
++        if (session_status() === PHP_SESSION_NONE) session_start();
++        header('Content-Type: application/json');
++        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'voluntario') {
++            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
++            return;
++        }
++
++        $idCampania = isset($_POST['id_campania']) ? (int)$_POST['id_campania'] : 0;
++        $codigo = isset($_POST['codigo']) ? strtoupper(trim($_POST['codigo'])) : '';
++
++        if ($idCampania <= 0 || empty($codigo)) {
++            echo json_encode(['success' => false, 'message' => 'Par├ímetros inv├ílidos.']);
++            return;
++        }
++
++        $modeloVol = $this->cargarModelo('Voluntario');
++        $idVol = $modeloVol->obtenerIDVoluntario($_SESSION['id_usuario']);
++        if (!$idVol) {
++            echo json_encode(['success' => false, 'message' => 'Voluntario no encontrado.']);
++            return;
++        }
++
++        $modeloPost = $this->cargarModelo('Postulacion');
++        $postulaciones = $modeloPost->obtenerPostulacionesPorCampania($idCampania);
++        $esAceptado = false;
++        foreach ($postulaciones as $post) {
++            if ((int)$post['voluntario_id'] === $idVol && strtolower($post['estado']) === 'aceptado') {
++                $esAceptado = true;
++                break;
++            }
++        }
++
++        if (!$esAceptado) {
++            $modeloInvitacion = $this->cargarModelo('Invitacion');
++            $invitaciones = $modeloInvitacion->obtenerInvitacionesPorDestinatario($_SESSION['id_usuario']);
++            foreach ($invitaciones as $inv) {
++                if ((int)$inv['campania_id'] === $idCampania && strtolower($inv['estado']) === 'aceptado') {
++                    $esAceptado = true;
++                    break;
++                }
++            }
++        }
++
++        if (!$esAceptado) {
++            echo json_encode(['success' => false, 'message' => 'No est├ís aceptado en esta campa├▒a para registrar asistencia.']);
++            return;
++        }
++
++        $modeloAsistencia = $this->cargarModelo('Asistencia');
++
++        $asistencias = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
++        foreach ($asistencias as $asist) {
++            if ((int)$asist['campania_id'] === $idCampania) {
++                echo json_encode(['success' => false, 'message' => 'Ya registraste tu asistencia en esta campa├▒a.']);
++                return;
++            }
++        }
++
++        $coincide = $modeloAsistencia->verificaCoincidencia($codigo, $idCampania);
++
++        if ($coincide) {
++            $ok = $modeloAsistencia->registrarAsistencia($idVol, $idCampania);
++            if ($ok) {
++                echo json_encode(['success' => true, 'message' => 'Asistencia registrada correctamente.']);
++            } else {
++                echo json_encode(['success' => false, 'message' => 'Error al registrar la asistencia.']);
++            }
++        } else {
++            echo json_encode(['success' => false, 'message' => 'C├│digo de asistencia inv├ílido o vencido.']);
++        }
++    }
++
++    public function obtenerMisVoluntariados() {
++        if (session_status() === PHP_SESSION_NONE) session_start();
++        header('Content-Type: application/json');
++        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'voluntario') {
++            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
++            return;
++        }
++
++        $modeloAsistencia = $this->cargarModelo('Asistencia');
++        $modeloVol = $this->cargarModelo('Voluntario');
++        $modeloCampania = $this->cargarModelo('Campania');
++
++        $idVol = $modeloVol->obtenerIDVoluntario($_SESSION['id_usuario']);
++        if (!$idVol) {
++            echo json_encode(['success' => true, 'data' => []]);
++            return;
++        }
++
++        $raw = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
++        $voluntariados = [];
++        $today = date('Y-m-d');
++
++        foreach ($raw as $asist) {
++            $campId = (int)$asist['campania_id'];
++            $camp = $modeloCampania->obtenerCampaniaPorID($campId);
++            if ($camp) {
++                $causes = $modeloCampania->obtenerCausasDeCampania($campId);
++                $images = $modeloCampania->obtenerArchivosDeCampania($campId);
++
++                $voluntariados[] = [
++                    'id' => $campId,
++                    'title' => $camp['titulo'],
++                    'desc' => $camp['descripcion'],
++                    'category' => !empty($causes) ? $causes[0] : 'Solidario',
++                    'startDate' => $camp['fecha_inicio'],
++                    'endDate' => $camp['fecha_finalizacion'],
++                    'location' => $camp['ubicacion'],
++                    'status' => $camp['fecha_finalizacion'] >= $today ? 'activa' : 'finalizada',
++                    'images' => $images
++                ];
++            }
++        }
++
++        echo json_encode(['success' => true, 'data' => $voluntariados]);
++    }
++
+ }
+ ?>
+\ No newline at end of file
+diff --git a/app/models/Asistencia.php b/app/models/Asistencia.php
+index 5c3854f..bd7c66b 100644
+--- a/app/models/Asistencia.php
++++ b/app/models/Asistencia.php
+@@ -27,20 +27,31 @@ class Asistencia {
+         
+         $this->bd->consulta($consulta);
+ 
+-        $this->bd->asignar(":codig_ing", $ingreso);
++        $this->bd->asignar(":codigo_ing", $ingreso);
+         $this->bd->asignar(":id_camp", $idCampania);
+         $this->bd->ejecutar();
+         
+-        $result = $this->bd->resultado()['id'];
++        $result = $this->bd->resultado();
+         return $result ? true : false;
+     }
+ 
++    public function obtenerAsistenciasPorVoluntario ( int $idVoluntario ) :array {
++        $consulta = "SELECT * FROM `asistencias` WHERE voluntario_id = :id_vol";
++
++        $this->bd->consulta($consulta);
++
++        $this->bd->asignar(":id_vol", $idVoluntario);
++        $this->bd->ejecutar();
++
++        return $this->bd->resultados();
++    }
++
+ 
+     /* ------------------------ INSERTAR DATOS ------------------------ */
+     public function insertarCodigoAsistencia ( string $idCampania, string $codigo ) :bool{
+         $this->eliminaCodigosVencidos();
+ 
+-        $consulta = "INSERT INTO `codigos_asistencia`(, `campania_id`, `codigo`, `fecha_vencimiento`) 
++        $consulta = "INSERT INTO `codigos_asistencia`(`campania_id`, `codigo`, `fecha_vencimiento`) 
+                         VALUES (:id_camp, :codigo, (NOW() + INTERVAL 5 MINUTE))";
+         
+         $this->bd->consulta($consulta);
+diff --git a/app/rutas.php b/app/rutas.php
+index fdf13c7..0431f8c 100644
+--- a/app/rutas.php
++++ b/app/rutas.php
+@@ -50,6 +50,9 @@ $rutas = [
+     'cancelar-invitacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'cancelarInvitacion'],
+     'obtener-mis-asociaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisAsociaciones'],
+     'obtener-campania-por-id'  => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerCampaniaPorIdPublico'],
++    'generar-codigo-asistencia' => ['controlador' => 'perfilCtrl', 'metodo' => 'generarCodigoAsistencia'],
++    'validar-codigo-asistencia' => ['controlador' => 'perfilCtrl', 'metodo' => 'validarCodigoAsistencia'],
++    'obtener-mis-voluntariados' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisVoluntariados'],
+ 
+     /* Perfiles P├║blicos */
+     'perfil/organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarOrganizacionPublico'],
+diff --git a/app/views/componentes/perfil.php b/app/views/componentes/perfil.php
+index f573ee3..e65a6a2 100644
+--- a/app/views/componentes/perfil.php
++++ b/app/views/componentes/perfil.php
+@@ -45,6 +45,10 @@ function renderModalDetalleCampaniaPublico() {
+         <h4>Organizaciones en asociaci├│n</h4>
+         <div class="modal-associations-circles" id="m-camp-associations-list"></div>
+       </div>
++      <!-- Secci├│n de Asistencia (Generaci├│n / Ingreso de c├│digo) -->
++      <div class="modal-attendance-sec" id="m-camp-attendance-sec" style="display: none; margin-top: 24px; padding: 16px; background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
++        <!-- Inyectado por JS -->
++      </div>
+     </div>
+     
+     <div class="modal-footer-actions">
+diff --git a/app/views/componentes/perfil_comun_logueado.php b/app/views/componentes/perfil_comun_logueado.php
+index 856e3ba..e6a811b 100644
+--- a/app/views/componentes/perfil_comun_logueado.php
++++ b/app/views/componentes/perfil_comun_logueado.php
+@@ -426,6 +426,10 @@ function renderModalDetalleCampania() {
+           <!-- Organizaciones inyectadas por JS -->
+         </div>
+       </div>
++      <!-- Secci├│n de Asistencia (Generaci├│n / Ingreso de c├│digo) -->
++      <div class="modal-attendance-sec" id="m-camp-attendance-sec" style="display: none; margin-top: 24px; padding: 16px; background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
++        <!-- Inyectado por JS -->
++      </div>
+     </div>
+ 
+     <!-- Secci├│n de Gesti├│n de Postulaciones (Visible solo para el Creador de la Campa├▒a) -->
+diff --git a/app/views/perfil_voluntario_vista.php b/app/views/perfil_voluntario_vista.php
+index 2caf164..ff0ce12 100644
+--- a/app/views/perfil_voluntario_vista.php
++++ b/app/views/perfil_voluntario_vista.php
+@@ -141,38 +141,36 @@
+           </div>
+         </div>
+ 
+-        <!-- PANE: VOLUNTARIADOS (Mockup Mold) -->
+-        <div class="profile-pane" id="pane-voluntariados" role="tabpanel">
++        <!-- PANE: VOLUNTARIADOS -->
++        <div class="profile-pane" id="pane-voluntariados" role="tabpanel" style="display: none;">
+           <div class="alternating-grid">
+-            
+-            <!-- Card 1 (Image Left) -->
+-            <article class="alt-card">
+-              <div class="alt-card-img-col">
+-                <div class="alt-card-img-placeholder">
+-                  <i data-lucide="image"></i>
++            <?php if (empty($voluntariados)): ?>
++              <div class="volunteer-empty-state">No ha participado en ning├║n voluntariado todav├¡a.</div>
++            <?php else: ?>
++              <?php foreach ($voluntariados as $index => $camp): 
++                $isReverse = ($index % 2 !== 0);
++                $cardClass = $isReverse ? 'alt-card alt-card-reverse' : 'alt-card';
++                $imgHTML = '<i data-lucide="image"></i>';
++                if (!empty($camp['images'])) {
++                    $imgHTML = '<img src="' . BASE_URL . htmlspecialchars($camp['images'][0]) . '" alt="' . htmlspecialchars($camp['title']) . '" style="width:100%; height:100%; object-fit:cover;">';
++                }
++              ?>
++              <article class="<?= $cardClass ?>" onclick="openCampaignDetailsModal(<?= $camp['id'] ?>)" style="cursor: pointer;">
++                <div class="alt-card-img-col">
++                  <div class="alt-card-img-placeholder">
++                    <?= $imgHTML ?>
++                  </div>
+                 </div>
+-              </div>
+-              <div class="alt-card-content-col">
+-                <h3 class="alt-card-title">Reforestaci├│n Parque Central (Molde)</h3>
+-                <p class="alt-card-desc">Ejemplo de voluntariado realizado. En el futuro, aqu├¡ se listar├ín de forma din├ímica las asistencias computadas.</p>
+-                <button class="btn btn-primary btn-info" onclick="openCampaignDetailsModal(1)">+ M├ís informaci├│n</button>
+-              </div>
+-            </article>
+-
+-            <!-- Card 2 (Image Right) -->
+-            <article class="alt-card alt-card-reverse">
+-              <div class="alt-card-img-col">
+-                <div class="alt-card-img-placeholder">
+-                  <i data-lucide="image"></i>
++                <div class="alt-card-content-col">
++                  <h3 class="alt-card-title"><?= htmlspecialchars($camp['title']) ?></h3>
++                  <div class="profile-tags-wrapper" style="margin-top: 4px; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; display: flex;">
++                    <span class="tag-badge" style="padding: 4px 12px; font-size: 11px; height: auto;"><i data-lucide="tag" style="width:10px; height:10px;"></i> <?= htmlspecialchars($camp['category'] ?? 'Solidario') ?></span>
++                  </div>
++                  <p class="alt-card-desc"><?= htmlspecialchars($camp['desc'] ?? '') ?></p>
+                 </div>
+-              </div>
+-              <div class="alt-card-content-col">
+-                <h3 class="alt-card-title">Colecta de Alimentos San Mart├¡n (Molde)</h3>
+-                <p class="alt-card-desc">Colabor├® en la distribuci├│n, clasificaci├│n de stock y log├¡stica de donaciones destinadas a comedores.</p>
+-                <button class="btn btn-primary btn-info" onclick="openCampaignDetailsModal(3)">+ M├ís informaci├│n</button>
+-              </div>
+-            </article>
+-
++              </article>
++              <?php endforeach; ?>
++            <?php endif; ?>
+           </div>
+         </div>
+ 
+diff --git a/public/js/conectar.js b/public/js/conectar.js
+index eb13974..27aedf8 100644
+--- a/public/js/conectar.js
++++ b/public/js/conectar.js
+@@ -1,5 +1,6 @@
+ // CONECTAR PAGE - L├│gica de B├║squeda e Interactividad
+ let currentViewedCampaignId = null;
++let attendanceInterval = null;
+ const appliedCampaignsMap = new Map();
+ 
+ document.addEventListener('DOMContentLoaded', () => {
+@@ -147,202 +148,378 @@ document.addEventListener('DOMContentLoaded', () => {
+ 
+ // MODAL DE DETALLE DE CAMPA├æA DIN├üMICO DESDE EL BUSCADOR
+ window.openCampaignDetails = function(campaignId) {
+-  // Buscamos la campa├▒a en el listado de la base de datos inyectado por PHP
+-  const campaignsList = window.campaigns || [];
+-  const camp = campaignsList.find(c => c.id === campaignId);
+-  if (!camp) return;
+-
+-  currentViewedCampaignId = campaignId;
+-
+-  const mTitle = document.getElementById("m-camp-title");
+-  const mDesc = document.getElementById("m-camp-desc");
+-  const mTags = document.getElementById("m-camp-tags");
+-  const mBadge = document.getElementById("m-camp-accepted-badge");
+-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+-  const mSensitive = document.getElementById("m-camp-sensitive-info");
+-
+-  if (mTitle) mTitle.textContent = camp.titulo;
+-  
+-  // Respetamos la distribuci├│n original en forma de lista de p├írrafos simples
+-  if (mDesc) {
+-    mDesc.innerHTML = `
+-      <p style="margin-bottom:12px;"><strong>Descripci├│n:</strong> ${camp.descripcion}</p>
+-      <p style="margin-bottom:12px;"><strong>Ubicaci├│n:</strong> ${camp.ubicacion}</p>
+-      <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.fecha_inicio}</p>
+-      <p><strong>Fecha de finalizaci├│n:</strong> ${camp.fecha_finalizacion}</p>
+-    `;
+-  }
++  fetch(`${BASE_URL}obtener-campania-por-id?id=${campaignId}`)
++    .then(res => res.json())
++    .then(res => {
++      if (res.success) {
++        const camp = res.data;
++        currentViewedCampaignId = campaignId;
++
++        const mTitle = document.getElementById("m-camp-title");
++        const mDesc = document.getElementById("m-camp-desc");
++        const mTags = document.getElementById("m-camp-tags");
++        const mBadge = document.getElementById("m-camp-accepted-badge");
++        const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
++        const mSensitive = document.getElementById("m-camp-sensitive-info");
++
++        if (mTitle) mTitle.textContent = camp.title;
++        
++        if (mDesc) {
++          mDesc.innerHTML = `
++            <p style="margin-bottom:12px;"><strong>Descripci├│n:</strong> ${camp.desc}</p>
++            <p style="margin-bottom:12px;"><strong>Ubicaci├│n:</strong> ${camp.location}</p>
++            <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.startDate}</p>
++            <p><strong>Fecha de finalizaci├│n:</strong> ${camp.endDate}</p>
++          `;
++        }
+ 
+-  // Renderizado de causas directamente como etiquetas
+-  if (mTags) {
+-    mTags.innerHTML = "";
+-    const causesList = camp.causes || (camp.category ? [camp.category] : []);
+-    causesList.forEach(cause => {
+-      const span = document.createElement("span");
+-      span.className = "tag-badge";
+-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${cause}`;
+-      mTags.appendChild(span);
+-    });
++        if (mTags) {
++          mTags.innerHTML = "";
++          const causesList = camp.causes || (camp.category ? [camp.category] : []);
++          causesList.forEach(cause => {
++            const span = document.createElement("span");
++            span.className = "tag-badge";
++            span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${cause}`;
++            mTags.appendChild(span);
++          });
+ 
+-    // Tipo de campa├▒a
+-    const typeSpan = document.createElement("span");
+-    typeSpan.className = "tag-badge";
+-    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+-    typeSpan.style.color = "var(--color-primary)";
+-    typeSpan.style.fontWeight = "600";
+-    const typeLabel = camp.tipo === "convocatoria" ? "Convocatoria" : "Informativa";
+-    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
+-    mTags.appendChild(typeSpan);
+-  }
++          const typeSpan = document.createElement("span");
++          typeSpan.className = "tag-badge";
++          typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
++          typeSpan.style.color = "var(--color-primary)";
++          typeSpan.style.fontWeight = "600";
++          const typeLabel = camp.type === "convocatoria" ? "Convocatoria" : "Informativa";
++          typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
++          mTags.appendChild(typeSpan);
++        }
+ 
+-  // L├│gica de inyecci├│n del Creador
+-  const mCreatorLink = document.getElementById("m-camp-creator-link");
+-  if (mCreatorLink) {
+-    if (camp.usuario_id) {
+-      const creatorProfileUrl = camp.usuario_rol === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
+-      mCreatorLink.href = `${BASE_URL}${creatorProfileUrl}?id=${camp.usuario_id}`;
+-      mCreatorLink.style.display = "flex";
+-      
+-      const mCreatorName = document.getElementById("m-camp-creator-name");
+-      if (mCreatorName) {
+-        mCreatorName.textContent = camp.usuario_nombre || camp.nombre || "Organizaci├│n";
+-      }
+-      
+-      const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
+-      if (mCreatorAvatar) {
+-        if (camp.usuario_img_perfil) {
+-          mCreatorAvatar.innerHTML = `<img src="${BASE_URL + camp.usuario_img_perfil}" alt="Logo creador" class="creator-avatar-img">`;
+-        } else {
+-          mCreatorAvatar.innerHTML = `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
++        const mCreatorLink = document.getElementById("m-camp-creator-link");
++        if (mCreatorLink) {
++          if (camp.usuario_id) {
++            const creatorProfileUrl = camp.usuario_rol === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
++            mCreatorLink.href = `${BASE_URL}${creatorProfileUrl}?id=${camp.usuario_id}`;
++            mCreatorLink.style.display = "flex";
++            
++            const mCreatorName = document.getElementById("m-camp-creator-name");
++            if (mCreatorName) {
++              mCreatorName.textContent = camp.usuario_nombre || "Creador";
++            }
++            
++            const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
++            if (mCreatorAvatar) {
++              if (camp.usuario_img_perfil) {
++                mCreatorAvatar.innerHTML = `<img src="${BASE_URL + camp.usuario_img_perfil}" alt="Logo creador" class="creator-avatar-img">`;
++              } else {
++                mCreatorAvatar.innerHTML = `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
++              }
++            }
++          } else {
++            mCreatorLink.style.display = "none";
++          }
+         }
+-      }
+-    } else {
+-      mCreatorLink.style.display = "none";
+-    }
+-  }
+ 
+-  // Carga de la Galer├¡a de Fotos reales si la campa├▒a tiene
+-  const gallerySec = document.getElementById("m-camp-gallery-sec");
+-  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+-  if (gallerySec && galleryGrid) {
+-    galleryGrid.innerHTML = "";
+-    if (camp.images && camp.images.length > 0) {
+-      camp.images.forEach(imgUrl => {
+-        const div = document.createElement("div");
+-        div.className = "gallery-placeholder-img";
+-        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campa├▒a" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
+-        galleryGrid.appendChild(div);
+-      });
+-      gallerySec.style.display = "block";
+-    } else {
+-      gallerySec.style.display = "none";
+-    }
+-  }
++        const gallerySec = document.getElementById("m-camp-gallery-sec");
++        const galleryGrid = document.getElementById("m-camp-gallery-grid");
++        if (gallerySec && galleryGrid) {
++          galleryGrid.innerHTML = "";
++          if (camp.images && camp.images.length > 0) {
++            camp.images.forEach(imgUrl => {
++              const div = document.createElement("div");
++              div.className = "gallery-placeholder-img";
++              div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campa├▒a" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
++              galleryGrid.appendChild(div);
++            });
++            gallerySec.style.display = "block";
++          } else {
++            gallerySec.style.display = "none";
++          }
++        }
+ 
+-  const assocSec = document.getElementById("m-camp-associations-sec");
+-  const assocList = document.getElementById("m-camp-associations-list");
+-  if (assocSec && assocList) {
+-    assocList.innerHTML = "";
+-    if (camp.associations && camp.associations.length > 0) {
+-      camp.associations.forEach(org => {
+-        const a = document.createElement("a");
+-        a.href = `${BASE_URL}perfil/organizacion?id=${org.id}`;
+-        a.className = "association-circle";
+-        a.title = org.nombre;
+-        if (org.img_perfil) {
+-          a.innerHTML = `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`;
+-        } else {
+-          a.innerHTML = `<div class="association-logo-placeholder" style="width:40px; height:40px; border-radius:50%; background-color:var(--color-border); display:flex; align-items:center; justify-content:center; color:var(--color-text-light);"><i data-lucide="building" style="width:16px; height:16px;"></i></div>`;
++        const assocSec = document.getElementById("m-camp-associations-sec");
++        const assocList = document.getElementById("m-camp-associations-list");
++        if (assocSec && assocList) {
++          assocList.innerHTML = "";
++          if (camp.associations && camp.associations.length > 0) {
++            camp.associations.forEach(org => {
++              const a = document.createElement("a");
++              a.href = `${BASE_URL}perfil/organizacion?id=${org.id}`;
++              a.className = "association-circle";
++              a.title = org.nombre;
++              if (org.img_perfil) {
++                a.innerHTML = `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`;
++              } else {
++                a.innerHTML = `<div class="association-logo-placeholder" style="width:40px; height:40px; border-radius:50%; background-color:var(--color-border); display:flex; align-items:center; justify-content:center; color:var(--color-text-light);"><i data-lucide="building" style="width:16px; height:16px;"></i></div>`;
++              }
++              assocList.appendChild(a);
++            });
++            assocSec.style.display = "block";
++          } else {
++            assocSec.style.display = "none";
++          }
+         }
+-        assocList.appendChild(a);
+-      });
+-      assocSec.style.display = "block";
+-    } else {
+-      assocSec.style.display = "none";
+-    }
+-  }
+ 
+-  if (mBadge) mBadge.style.display = "none";
+-  
+-    // L├│gica de visualizaci├│n de informaci├│n de coordinaci├│n (adicional)
+-  let showAdditionalInfo = false;
+-  if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID) {
+-    const isOwner = camp.usuario_id == SESSION_USER_ID;
+-    if (isOwner) {
+-      showAdditionalInfo = true;
+-    } else if (SESSION_USER_ROL === "voluntario") {
+-      const app = appliedCampaignsMap.get(campaignId);
+-      if (app && app.status === "aceptado") {
+-        showAdditionalInfo = true;
+-      }
+-    } else if (SESSION_USER_ROL === "organizacion" && camp.associations) {
+-      const isAssociated = camp.associations.some(org => org.id == SESSION_USER_ID);
+-      if (isAssociated) {
+-        showAdditionalInfo = true;
+-      }
+-    }
+-  }
++        if (mBadge) mBadge.style.display = "none";
++        
++        let showAdditionalInfo = false;
++        if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID) {
++          const isOwner = camp.usuario_id == SESSION_USER_ID;
++          if (isOwner) {
++            showAdditionalInfo = true;
++          } else if (SESSION_USER_ROL === "voluntario") {
++            const app = appliedCampaignsMap.get(campaignId);
++            if (app && app.status === "aceptado") {
++              showAdditionalInfo = true;
++            }
++          } else if (SESSION_USER_ROL === "organizacion" && camp.associations) {
++            const isAssociated = camp.associations.some(org => org.id == SESSION_USER_ID);
++            if (isAssociated) {
++              showAdditionalInfo = true;
++            }
++          }
++        }
+ 
+-  if (mSensitive) {
+-    if (showAdditionalInfo) {
+-      mSensitive.innerHTML = `
+-        <h4>Informaci├│n de coordinaci├│n</h4>
+-        <div class="info-alert-content">
+-          <p>${camp.info_adicional || "No hay informaci├│n adicional registrada."}</p>
+-        </div>
+-      `;
+-      mSensitive.style.display = "block";
+-    } else {
+-      mSensitive.style.display = "none";
+-    }
+-  }
++        if (mSensitive) {
++          if (showAdditionalInfo) {
++            mSensitive.innerHTML = `
++              <h4>Informaci├│n de coordinaci├│n</h4>
++              <div class="info-alert-content">
++                <p>${camp.info_adicional || "No hay informaci├│n adicional registrada."}</p>
++              </div>
++            `;
++            mSensitive.style.display = "block";
++          } else {
++            mSensitive.style.display = "none";
++          }
++        }
+ 
+-  const devStateCard = document.querySelector(".dev-state-selector-card");
+-  if (devStateCard) devStateCard.style.display = "none";
++        if (mPostulateBtn) {
++          const isOwner = camp.usuario_id == SESSION_USER_ID;
++          const isOrg = SESSION_USER_ROL === "organizacion";
++          
++          if (camp.type === "convocatoria" && !isOwner && !isOrg) {
++            mPostulateBtn.style.display = "inline-flex";
++            
++            const app = appliedCampaignsMap.get(campaignId);
++            if (app) {
++              mPostulateBtn.disabled = true;
++              mPostulateBtn.textContent = "Ya postulado";
++              
++              if (mBadge) {
++                mBadge.textContent = app.status.toUpperCase();
++                mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
++                mBadge.style.display = "inline-block";
++              }
++            } else {
++              mPostulateBtn.disabled = false;
++              mPostulateBtn.textContent = "Postularme";
++            }
++          } else {
++            mPostulateBtn.style.display = "none";
++          }
++        }
+ 
+-  if (mPostulateBtn) {
+-    const isOwner = camp.usuario_id == SESSION_USER_ID;
+-    const isOrg = SESSION_USER_ROL === "organizacion";
+-    
+-    if (camp.tipo === "convocatoria" && !isOwner && !isOrg) {
+-      mPostulateBtn.style.display = "inline-flex";
+-      
+-      const app = appliedCampaignsMap.get(campaignId);
+-      if (app) {
+-        // Ya se postul├│
+-        mPostulateBtn.disabled = true;
+-        mPostulateBtn.textContent = "Ya postulado";
+-        
+-        // Mostrar badge de estado
+-        if (mBadge) {
+-          mBadge.textContent = app.status.toUpperCase();
+-          mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+-          mBadge.style.display = "inline-block";
++        // L├│gica de validaci├│n de asistencia
++        const attendanceSec = document.getElementById("m-camp-attendance-sec");
++        if (attendanceSec) {
++          attendanceSec.style.display = "none";
++          attendanceSec.innerHTML = "";
++          
++          if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID && camp.type === 'convocatoria') {
++            const isOwner = camp.usuario_id == SESSION_USER_ID;
++            
++            let isAcceptedVol = false;
++            if (!isOwner && SESSION_USER_ROL === 'voluntario') {
++              if (appliedCampaignsMap.has(camp.id)) {
++                const app = appliedCampaignsMap.get(camp.id);
++                if (app && app.status === 'aceptado') {
++                  isAcceptedVol = true;
++                }
++              }
++            }
++
++            if (isOwner) {
++              attendanceSec.style.display = "block";
++              
++              let timerHTML = "";
++              if (camp.codigo_activo) {
++                timerHTML = `
++                  <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++                    <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${camp.codigo_activo}</strong></span>
++                    <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++                  </div>
++                `;
++              }
++
++              attendanceSec.innerHTML = `
++                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++                  <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++                    Validaci├│n de Asistencia
++                    <span class="info-tooltip-trigger" title="Compart├¡ el c├│digo generado con los voluntarios que participaron de la campa├▒a. El c├│digo vence pasados 5 minutos (puedes generar nuevos si los necesitas)." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++                  </h4>
++                </div>
++                <button class="btn btn-primary" id="btn-generate-attendance-code" style="width: 100%; justify-content: center; gap: 8px;">
++                  <i data-lucide="key" style="width: 16px; height: 16px;"></i> Generar C├│digo
++                </button>
++                <div id="attendance-code-result-area">${timerHTML}</div>
++              `;
++
++              if (camp.codigo_activo && camp.segundos_restantes > 0) {
++                startAttendanceCountdown(camp.segundos_restantes);
++              }
++
++              const genBtn = document.getElementById("btn-generate-attendance-code");
++              if (genBtn) {
++                genBtn.addEventListener("click", () => {
++                  genBtn.disabled = true;
++                  const formData = new FormData();
++                  formData.append("id_campania", camp.id);
++
++                  fetch(`${BASE_URL}generar-codigo-asistencia`, {
++                    method: "POST",
++                    body: formData
++                  })
++                  .then(res => res.json())
++                  .then(res => {
++                    genBtn.disabled = false;
++                    if (res.success) {
++                      camp.codigo_activo = res.codigo;
++                      camp.segundos_restantes = res.vence_en;
++                      
++                      document.getElementById("attendance-code-result-area").innerHTML = `
++                        <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++                          <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${res.codigo}</strong></span>
++                          <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++                        </div>
++                      `;
++                      startAttendanceCountdown(res.vence_en);
++                      if (typeof lucide !== "undefined") lucide.createIcons();
++                    } else {
++                      alert(res.message || "Error al generar c├│digo.");
++                    }
++                  })
++                  .catch(err => {
++                    genBtn.disabled = false;
++                    console.error(err);
++                  });
++                });
++              }
++            } 
++            else if (isAcceptedVol) {
++              attendanceSec.style.display = "block";
++
++              if (camp.asistencia_registrada) {
++                attendanceSec.innerHTML = `
++                  <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++                    <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++                  </div>
++                `;
++              } else {
++                attendanceSec.innerHTML = `
++                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++                    <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++                      Validar Asistencia
++                      <span class="info-tooltip-trigger" title="Ingres├í el c├│digo provisto por la organizaci├│n de la campa├▒a para registrar tu participaci├│n y que figure en tu perfil." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++                    </h4>
++                  </div>
++                  <div id="attendance-input-area">
++                    <button class="btn btn-primary" id="btn-show-attendance-input" style="width: 100%; justify-content: center; gap: 8px;">
++                      <i data-lucide="key" style="width: 16px; height: 16px;"></i> Ingresar C├│digo
++                    </button>
++                  </div>
++                `;
++
++                const showInputBtn = document.getElementById("btn-show-attendance-input");
++                if (showInputBtn) {
++                  showInputBtn.addEventListener("click", () => {
++                    document.getElementById("attendance-input-area").innerHTML = `
++                      <div style="display: flex; gap: 8px; margin-top: 8px;">
++                        <input type="text" id="attendance-code-val" class="edit-input" placeholder="Ej: ABC1234" maxlength="10" style="text-transform: uppercase; flex: 1;">
++                        <button class="btn btn-primary" id="btn-validate-attendance-code" style="padding: 10px 20px;">Validar</button>
++                      </div>
++                      <div id="attendance-validation-error" style="color: #EF4444; font-size: 12px; margin-top: 4px; display: none;"></div>
++                    `;
++                    
++                    const valBtn = document.getElementById("btn-validate-attendance-code");
++                    const valInput = document.getElementById("attendance-code-val");
++                    if (valBtn && valInput) {
++                      valBtn.addEventListener("click", () => {
++                        const codeVal = valInput.value.trim().toUpperCase();
++                        if (!codeVal) return;
++
++                        valBtn.disabled = true;
++                        const formData = new FormData();
++                        formData.append("id_campania", camp.id);
++                        formData.append("codigo", codeVal);
++
++                        fetch(`${BASE_URL}validar-codigo-asistencia`, {
++                          method: "POST",
++                          body: formData
++                        })
++                        .then(res => res.json())
++                        .then(res => {
++                          valBtn.disabled = false;
++                          if (res.success) {
++                            camp.asistencia_registrada = true;
++                            attendanceSec.innerHTML = `
++                              <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++                                <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++                              </div>
++                            `;
++                            if (typeof lucide !== "undefined") lucide.createIcons();
++                            if (typeof showToast !== "undefined") {
++                              showToast("Asistencia Confirmada", res.message, true);
++                            }
++                            setTimeout(() => {
++                              window.location.reload();
++                            }, 1000);
++                          } else {
++                            const errDiv = document.getElementById("attendance-validation-error");
++                            if (errDiv) {
++                              errDiv.textContent = res.message;
++                              errDiv.style.display = "block";
++                            }
++                          }
++                        })
++                        .catch(err => {
++                          valBtn.disabled = false;
++                          console.error(err);
++                        });
++                      });
++                    }
++                  });
++                }
++              }
++            }
++          }
+         }
+-        
+-        // Si fue aceptado, mostrar informaci├│n de coordinaci├│n
+-        if (app.status === "aceptado" && mSensitive) {
+-          mSensitive.innerHTML = `
+-            <h4>Informaci├│n de coordinaci├│n</h4>
+-            <div class="info-alert-content">
+-              <p>${camp.info_adicional || "No hay informaci├│n adicional registrada."}</p>
+-            </div>
+-          `;
+-          mSensitive.style.display = "block";
++
++        function startAttendanceCountdown(secondsLeft) {
++          if (attendanceInterval) clearInterval(attendanceInterval);
++          let remaining = secondsLeft;
++          const timerSpan = document.getElementById("attendance-timer");
++          
++          attendanceInterval = setInterval(() => {
++            remaining--;
++            if (remaining <= 0) {
++              clearInterval(attendanceInterval);
++              if (timerSpan) timerSpan.innerHTML = "Expirado";
++            } else {
++              const min = Math.floor(remaining / 60).toString().padStart(2, '0');
++              const sec = (remaining % 60).toString().padStart(2, '0');
++              if (timerSpan) {
++                timerSpan.innerHTML = `<i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> ${min}:${sec}`;
++                if (typeof lucide !== "undefined") lucide.createIcons();
++              }
++            }
++          }, 1000);
+         }
+-      } else {
+-        // No se ha postulado
+-        mPostulateBtn.disabled = false;
+-        mPostulateBtn.textContent = "Postularme";
+-      }
+-    } else {
+-      mPostulateBtn.style.display = "none";
+-    }
+-  }
+ 
+-  openModal("modal-profile-camp-detail");
++        openModal("modal-profile-camp-detail");
+ 
+-  if (typeof lucide !== "undefined") {
+-    lucide.createIcons();
+-  }
++        if (typeof lucide !== "undefined") {
++          lucide.createIcons();
++        }
++      }
++    })
++    .catch(err => console.error("Error al cargar detalle de campa├▒a:", err));
+ };
+\ No newline at end of file
+diff --git a/public/js/perfil_comun_logueado.js b/public/js/perfil_comun_logueado.js
+index 906c9c8..f03811c 100644
+--- a/public/js/perfil_comun_logueado.js
++++ b/public/js/perfil_comun_logueado.js
+@@ -268,6 +268,7 @@ function renderPagination(totalPages) {
+ // =========================================================================
+ // Variable para trackear la campa├▒a visualizada en el modal
+ let currentViewedCampaignId = null;
++let attendanceInterval = null;
+ 
+ function openCampaignDetailsView(campaignId, options = {}) {
+   const campLocal = campaigns.find(c => c.id === campaignId);
+@@ -453,6 +454,207 @@ function _renderCampaignModal(camp, options = {}) {
+     }
+   }
+ 
++  // L├│gica de validaci├│n de asistencia
++  const attendanceSec = document.getElementById("m-camp-attendance-sec");
++  if (attendanceSec) {
++    attendanceSec.style.display = "none";
++    attendanceSec.innerHTML = "";
++    
++    if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID && camp.type === 'convocatoria') {
++      const isOwner = camp.usuario_id == SESSION_USER_ID;
++      
++      let isAcceptedVol = false;
++      if (!isOwner && SESSION_USER_ROL === 'voluntario') {
++        if (typeof appliedCampaignsMap !== 'undefined' && appliedCampaignsMap.has(camp.id)) {
++          const app = appliedCampaignsMap.get(camp.id);
++          if (app && app.status === 'aceptado') {
++            isAcceptedVol = true;
++          }
++        } else if (typeof postulations !== 'undefined') {
++          const post = postulations.find(p => p.campaignId === camp.id);
++          if (post && post.status === 'aceptado') {
++            isAcceptedVol = true;
++          }
++        }
++      }
++
++      if (isOwner) {
++        attendanceSec.style.display = "block";
++        
++        let timerHTML = "";
++        if (camp.codigo_activo) {
++          timerHTML = `
++            <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++              <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${camp.codigo_activo}</strong></span>
++              <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++            </div>
++          `;
++        }
++
++        attendanceSec.innerHTML = `
++          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++            <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++              Validaci├│n de Asistencia
++              <span class="info-tooltip-trigger" title="Compart├¡ el c├│digo generado con los voluntarios que participaron de la campa├▒a. El c├│digo vence pasados 5 minutos (puedes generar nuevos si los necesitas)." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++            </h4>
++          </div>
++          <button class="btn btn-primary" id="btn-generate-attendance-code" style="width: 100%; justify-content: center; gap: 8px;">
++            <i data-lucide="key" style="width: 16px; height: 16px;"></i> Generar C├│digo
++          </button>
++          <div id="attendance-code-result-area">${timerHTML}</div>
++        `;
++
++        if (camp.codigo_activo && camp.segundos_restantes > 0) {
++          startAttendanceCountdown(camp.segundos_restantes);
++        }
++
++        const genBtn = document.getElementById("btn-generate-attendance-code");
++        if (genBtn) {
++          genBtn.addEventListener("click", () => {
++            genBtn.disabled = true;
++            const formData = new FormData();
++            formData.append("id_campania", camp.id);
++
++            fetch(`${BASE_URL}generar-codigo-asistencia`, {
++              method: "POST",
++              body: formData
++            })
++            .then(res => res.json())
++            .then(res => {
++              genBtn.disabled = false;
++              if (res.success) {
++                camp.codigo_activo = res.codigo;
++                camp.segundos_restantes = res.vence_en;
++                
++                document.getElementById("attendance-code-result-area").innerHTML = `
++                  <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++                    <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${res.codigo}</strong></span>
++                    <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++                  </div>
++                `;
++                startAttendanceCountdown(res.vence_en);
++                if (typeof lucide !== "undefined") lucide.createIcons();
++              } else {
++                alert(res.message || "Error al generar c├│digo.");
++              }
++            })
++            .catch(err => {
++              genBtn.disabled = false;
++              console.error(err);
++            });
++          });
++        }
++      } 
++      else if (isAcceptedVol) {
++        attendanceSec.style.display = "block";
++
++        if (camp.asistencia_registrada) {
++          attendanceSec.innerHTML = `
++            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++              <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++            </div>
++          `;
++        } else {
++          attendanceSec.innerHTML = `
++            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++              <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++                Validar Asistencia
++                <span class="info-tooltip-trigger" title="Ingres├í el c├│digo provisto por la organizaci├│n de la campa├▒a para registrar tu participaci├│n y que figure en tu perfil." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++              </h4>
++            </div>
++            <div id="attendance-input-area">
++              <button class="btn btn-primary" id="btn-show-attendance-input" style="width: 100%; justify-content: center; gap: 8px;">
++                <i data-lucide="key" style="width: 16px; height: 16px;"></i> Ingresar C├│digo
++              </button>
++            </div>
++          `;
++
++          const showInputBtn = document.getElementById("btn-show-attendance-input");
++          if (showInputBtn) {
++            showInputBtn.addEventListener("click", () => {
++              document.getElementById("attendance-input-area").innerHTML = `
++                <div style="display: flex; gap: 8px; margin-top: 8px;">
++                  <input type="text" id="attendance-code-val" class="edit-input" placeholder="Ej: ABC1234" maxlength="10" style="text-transform: uppercase; flex: 1;">
++                  <button class="btn btn-primary" id="btn-validate-attendance-code" style="padding: 10px 20px;">Validar</button>
++                </div>
++                <div id="attendance-validation-error" style="color: #EF4444; font-size: 12px; margin-top: 4px; display: none;"></div>
++              `;
++              
++              const valBtn = document.getElementById("btn-validate-attendance-code");
++              const valInput = document.getElementById("attendance-code-val");
++              if (valBtn && valInput) {
++                valBtn.addEventListener("click", () => {
++                  const codeVal = valInput.value.trim().toUpperCase();
++                  if (!codeVal) return;
++
++                  valBtn.disabled = true;
++                  const formData = new FormData();
++                  formData.append("id_campania", camp.id);
++                  formData.append("codigo", codeVal);
++
++                  fetch(`${BASE_URL}validar-codigo-asistencia`, {
++                    method: "POST",
++                    body: formData
++                  })
++                  .then(res => res.json())
++                  .then(res => {
++                    valBtn.disabled = false;
++                    if (res.success) {
++                      camp.asistencia_registrada = true;
++                      attendanceSec.innerHTML = `
++                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++                          <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++                        </div>
++                      `;
++                      if (typeof lucide !== "undefined") lucide.createIcons();
++                      if (typeof showToast !== "undefined") {
++                        showToast("Asistencia Confirmada", res.message, true);
++                      }
++                      if (typeof loadVolunteeringFromBD === "function") {
++                        loadVolunteeringFromBD();
++                      }
++                    } else {
++                      const errDiv = document.getElementById("attendance-validation-error");
++                      if (errDiv) {
++                        errDiv.textContent = res.message;
++                        errDiv.style.display = "block";
++                      }
++                    }
++                  })
++                  .catch(err => {
++                    valBtn.disabled = false;
++                    console.error(err);
++                  });
++                });
++              }
++            });
++          }
++        }
++      }
++    }
++  }
++
++  function startAttendanceCountdown(secondsLeft) {
++    if (attendanceInterval) clearInterval(attendanceInterval);
++    let remaining = secondsLeft;
++    const timerSpan = document.getElementById("attendance-timer");
++    
++    attendanceInterval = setInterval(() => {
++      remaining--;
++      if (remaining <= 0) {
++        clearInterval(attendanceInterval);
++        if (timerSpan) timerSpan.innerHTML = "Expirado";
++      } else {
++        const min = Math.floor(remaining / 60).toString().padStart(2, '0');
++        const sec = (remaining % 60).toString().padStart(2, '0');
++        if (timerSpan) {
++          timerSpan.innerHTML = `<i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> ${min}:${sec}`;
++          if (typeof lucide !== "undefined") lucide.createIcons();
++        }
++      }
++    }, 1000);
++  }
++
+   openModal("modal-profile-camp-detail");
+ 
+   if (typeof lucide !== "undefined") {
+diff --git a/public/js/perfil_organizacion_vista.js b/public/js/perfil_organizacion_vista.js
+index b4b93df..3f46501 100644
+--- a/public/js/perfil_organizacion_vista.js
++++ b/public/js/perfil_organizacion_vista.js
+@@ -1,5 +1,6 @@
+ // JavaScript for Perfil Organizaci├│n Vista
+ let currentCampaignId = null;
++let attendanceInterval = null;
+ const appliedCampaignsMap = new Map();
+ 
+ // Pagination State
+@@ -336,11 +337,209 @@ window.openCampaignDetailsModal = function(id) {
+           }
+         }
+         
+-        if (typeof lucide !== 'undefined') {
+-          lucide.createIcons();
++  // L├│gica de validaci├│n de asistencia
++  const attendanceSec = document.getElementById("m-camp-attendance-sec");
++  if (attendanceSec) {
++    attendanceSec.style.display = "none";
++    attendanceSec.innerHTML = "";
++    
++    if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID && camp.type === 'convocatoria') {
++      const isOwner = camp.usuario_id == SESSION_USER_ID;
++      
++      let isAcceptedVol = false;
++      if (!isOwner && SESSION_USER_ROL === 'voluntario') {
++        if (appliedCampaignsMap.has(camp.id)) {
++          const app = appliedCampaignsMap.get(camp.id);
++          if (app && app.status === 'aceptado') {
++            isAcceptedVol = true;
++          }
+         }
++      }
++
++      if (isOwner) {
++        attendanceSec.style.display = "block";
+         
+-        openModal('modal-profile-camp-detail');
++        let timerHTML = "";
++        if (camp.codigo_activo) {
++          timerHTML = `
++            <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++              <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${camp.codigo_activo}</strong></span>
++              <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++            </div>
++          `;
++        }
++
++        attendanceSec.innerHTML = `
++          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++            <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++              Validaci├│n de Asistencia
++              <span class="info-tooltip-trigger" title="Compart├¡ el c├│digo generado con los voluntarios que participaron de la campa├▒a. El c├│digo vence pasados 5 minutos (puedes generar nuevos si los necesitas)." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++            </h4>
++          </div>
++          <button class="btn btn-primary" id="btn-generate-attendance-code" style="width: 100%; justify-content: center; gap: 8px;">
++            <i data-lucide="key" style="width: 16px; height: 16px;"></i> Generar C├│digo
++          </button>
++          <div id="attendance-code-result-area">${timerHTML}</div>
++        `;
++
++        if (camp.codigo_activo && camp.segundos_restantes > 0) {
++          startAttendanceCountdown(camp.segundos_restantes);
++        }
++
++        const genBtn = document.getElementById("btn-generate-attendance-code");
++        if (genBtn) {
++          genBtn.addEventListener("click", () => {
++            genBtn.disabled = true;
++            const formData = new FormData();
++            formData.append("id_campania", camp.id);
++
++            fetch(`${BASE_URL}generar-codigo-asistencia`, {
++              method: "POST",
++              body: formData
++            })
++            .then(res => res.json())
++            .then(res => {
++              genBtn.disabled = false;
++              if (res.success) {
++                camp.codigo_activo = res.codigo;
++                camp.segundos_restantes = res.vence_en;
++                
++                document.getElementById("attendance-code-result-area").innerHTML = `
++                  <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++                    <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${res.codigo}</strong></span>
++                    <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++                  </div>
++                `;
++                startAttendanceCountdown(res.vence_en);
++                if (typeof lucide !== "undefined") lucide.createIcons();
++              } else {
++                alert(res.message || "Error al generar c├│digo.");
++              }
++            })
++            .catch(err => {
++              genBtn.disabled = false;
++              console.error(err);
++            });
++          });
++        }
++      } 
++      else if (isAcceptedVol) {
++        attendanceSec.style.display = "block";
++
++        if (camp.asistencia_registrada) {
++          attendanceSec.innerHTML = `
++            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++              <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++            </div>
++          `;
++        } else {
++          attendanceSec.innerHTML = `
++            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++              <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++                Validar Asistencia
++                <span class="info-tooltip-trigger" title="Ingres├í el c├│digo provisto por la organizaci├│n de la campa├▒a para registrar tu participaci├│n y que figure en tu perfil." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++              </h4>
++            </div>
++            <div id="attendance-input-area">
++              <button class="btn btn-primary" id="btn-show-attendance-input" style="width: 100%; justify-content: center; gap: 8px;">
++                <i data-lucide="key" style="width: 16px; height: 16px;"></i> Ingresar C├│digo
++              </button>
++            </div>
++          `;
++
++          const showInputBtn = document.getElementById("btn-show-attendance-input");
++          if (showInputBtn) {
++            showInputBtn.addEventListener("click", () => {
++              document.getElementById("attendance-input-area").innerHTML = `
++                <div style="display: flex; gap: 8px; margin-top: 8px;">
++                  <input type="text" id="attendance-code-val" class="edit-input" placeholder="Ej: ABC1234" maxlength="10" style="text-transform: uppercase; flex: 1;">
++                  <button class="btn btn-primary" id="btn-validate-attendance-code" style="padding: 10px 20px;">Validar</button>
++                </div>
++                <div id="attendance-validation-error" style="color: #EF4444; font-size: 12px; margin-top: 4px; display: none;"></div>
++              `;
++              
++              const valBtn = document.getElementById("btn-validate-attendance-code");
++              const valInput = document.getElementById("attendance-code-val");
++              if (valBtn && valInput) {
++                valBtn.addEventListener("click", () => {
++                  const codeVal = valInput.value.trim().toUpperCase();
++                  if (!codeVal) return;
++
++                  valBtn.disabled = true;
++                  const formData = new FormData();
++                  formData.append("id_campania", camp.id);
++                  formData.append("codigo", codeVal);
++
++                  fetch(`${BASE_URL}validar-codigo-asistencia`, {
++                    method: "POST",
++                    body: formData
++                  })
++                  .then(res => res.json())
++                  .then(res => {
++                    valBtn.disabled = false;
++                    if (res.success) {
++                      camp.asistencia_registrada = true;
++                      attendanceSec.innerHTML = `
++                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++                          <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++                        </div>
++                      `;
++                      if (typeof lucide !== "undefined") lucide.createIcons();
++                      if (typeof showToast !== "undefined") {
++                        showToast("Asistencia Confirmada", res.message, true);
++                      }
++                      
++                      // Refresh public view or similar
++                      setTimeout(() => {
++                        window.location.reload();
++                      }, 1000);
++                    } else {
++                      const errDiv = document.getElementById("attendance-validation-error");
++                      if (errDiv) {
++                        errDiv.textContent = res.message;
++                        errDiv.style.display = "block";
++                      }
++                    }
++                  })
++                  .catch(err => {
++                    valBtn.disabled = false;
++                    console.error(err);
++                  });
++                });
++              }
++            });
++          }
++        }
++      }
++    }
++  }
++
++  function startAttendanceCountdown(secondsLeft) {
++    if (attendanceInterval) clearInterval(attendanceInterval);
++    let remaining = secondsLeft;
++    const timerSpan = document.getElementById("attendance-timer");
++    
++    attendanceInterval = setInterval(() => {
++      remaining--;
++      if (remaining <= 0) {
++        clearInterval(attendanceInterval);
++        if (timerSpan) timerSpan.innerHTML = "Expirado";
++      } else {
++        const min = Math.floor(remaining / 60).toString().padStart(2, '0');
++        const sec = (remaining % 60).toString().padStart(2, '0');
++        if (timerSpan) {
++          timerSpan.innerHTML = `<i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> ${min}:${sec}`;
++          if (typeof lucide !== "undefined") lucide.createIcons();
++        }
++      }
++    }, 1000);
++  }
++
++  if (typeof lucide !== 'undefined') {
++    lucide.createIcons();
++  }
++  
++  openModal('modal-profile-camp-detail');
+       }
+     })
+     .catch(err => console.error("Error al cargar detalle de campa├▒a:", err));
+diff --git a/public/js/perfil_voluntario_logueado.js b/public/js/perfil_voluntario_logueado.js
+index 7fe0105..fc69800 100644
+--- a/public/js/perfil_voluntario_logueado.js
++++ b/public/js/perfil_voluntario_logueado.js
+@@ -35,68 +35,7 @@ let currentVolunteeringPage = 1;
+ let postulations = [];
+ 
+ // Base de Datos Simulada para Voluntariados (Historial de participaci├│n)
+-let volunteering = [
+-  {
+-    id: 901,
+-    title: "Reforestaci├│n Parque Central",
+-    desc: "Sumate a nuestra jornada de plantaci├│n de ├írboles nativos para recuperar el pulm├│n verde de la ciudad.",
+-    category: "Medio Ambiente",
+-    startDate: "2026-06-14",
+-    endDate: "2026-06-21",
+-    location: "Parque Central, Buenos Aires",
+-    status: "activa",
+-    ownerName: "Techo Verde",
+-    ownerType: "organizacion",
+-    images: ["img/campaign_park.png"],
+-    details: "Actividades de plantaci├│n, riego y tutorado de 50 plantines aut├│ctonos. Se proveen herramientas y guantes.",
+-    additionalInfo: "Direcci├│n: Av. Sarmiento 2300 (junto al lago). Coordinador: Mart├¡n Silva (+54 11 9876-5432)."
+-  },
+-  {
+-    id: 902,
+-    title: "Apoyo Escolar Primario",
+-    desc: "Clases de apoyo escolar para ni├▒os en situaci├│n de vulnerabilidad en la biblioteca popular.",
+-    category: "Educacion",
+-    startDate: "2026-06-20",
+-    endDate: "2026-12-20",
+-    location: "San Mart├¡n, Buenos Aires",
+-    status: "activa",
+-    ownerName: "Mentes Brillantes",
+-    ownerType: "organizacion",
+-    images: ["img/campaign_tutoring.png"],
+-    details: "Buscamos voluntarios con disposici├│n pedag├│gica para guiar y motivar a ni├▒os de escuela primaria en sus tareas de matem├íticas y lengua.",
+-    additionalInfo: "Direcci├│n exacta: Belgrano 456, San Mart├¡n. Coordinador: Lucas G├│mez (+54 11 5555-1234). Traer cartuchera y cuaderno."
+-  },
+-  {
+-    id: 903,
+-    title: "Taller de RCP y Primeros Auxilios",
+-    desc: "Taller te├│rico-pr├íctico de reanimaci├│n cardiopulmonar y primeros auxilios b├ísicos para la comunidad.",
+-    category: "Salud",
+-    startDate: "2026-03-01",
+-    endDate: "2026-03-15",
+-    location: "Salguero 120, CABA",
+-    status: "finalizada",
+-    ownerName: "Juan P├®rez",
+-    ownerType: "voluntario",
+-    images: ["img/camp_placeholder.png"],
+-    details: "Taller interactivo abierto a la comunidad sobre maniobras b├ísicas de reanimaci├│n y primeros auxilios.",
+-    additionalInfo: "Direcci├│n: Salguero 120, CABA. Coordinador: Juan P├®rez (+54 11 3333-7777). Se entrega certificado de asistencia."
+-  },
+-  {
+-    id: 904,
+-    title: "Colecta Navide├▒a",
+-    desc: "Recepci├│n y empaquetado de juguetes y alimentos navide├▒os para familias necesitadas.",
+-    category: "Accion Social",
+-    startDate: "2025-12-01",
+-    endDate: "2025-12-25",
+-    location: "Mansilla 2900, CABA",
+-    status: "finalizada",
+-    ownerName: "C├íritas",
+-    ownerType: "organizacion",
+-    images: ["img/campaign_food.png"],
+-    details: "Campa├▒a para recolectar y clasificar alimentos no perecederos y juguetes para la mesa navide├▒a.",
+-    additionalInfo: "Direcci├│n: Mansilla 2900, CABA. Coordinadora: Hermana Teresa (+54 11 2222-1111)."
+-  }
+-];
++let volunteering = [];
+ 
+ // =========================================================================
+ // INICIALIZACI├ôN ESPEC├ìFICA DEL VOLUNTARIO
+@@ -666,133 +605,7 @@ window.openCancelPostulationConfirmModal = function(id) {
+ function openPostulationDetailsView(postulationId) {
+   const post = postulations.find(p => p.id === postulationId);
+   if (!post) return;
+-
+-  const mTitle = document.getElementById("m-camp-title");
+-  const mDesc = document.getElementById("m-camp-desc");
+-  const mLocation = document.getElementById("m-camp-location");
+-  const mStartDate = document.getElementById("m-camp-start-date");
+-  const mEndDate = document.getElementById("m-camp-end-date");
+-  const mTags = document.getElementById("m-camp-tags");
+-  const mBadge = document.getElementById("m-camp-accepted-badge");
+-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+-  const mSensitive = document.getElementById("m-camp-sensitive-info");
+-
+-  const mCreatorLink = document.getElementById("m-camp-creator-link");
+-  if (mCreatorLink) {
+-    if (post.creatorId) {
+-      const creatorProfileUrl = post.creatorRole === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
+-      mCreatorLink.href = `${BASE_URL}${creatorProfileUrl}?id=${post.creatorId}`;
+-      mCreatorLink.style.display = "flex";
+-      
+-      const mCreatorName = document.getElementById("m-camp-creator-name");
+-      if (mCreatorName) {
+-        mCreatorName.textContent = post.creatorName || "Creador";
+-      }
+-      
+-      const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
+-      if (mCreatorAvatar) {
+-        if (post.creatorImg) {
+-          mCreatorAvatar.innerHTML = `<img src="${BASE_URL + post.creatorImg}" alt="Logo creador" class="creator-avatar-img">`;
+-        } else {
+-          mCreatorAvatar.innerHTML = `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
+-        }
+-      }
+-    } else {
+-      mCreatorLink.style.display = "none";
+-    }
+-  }
+-
+-  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
+-  if (ownerSection) ownerSection.style.display = "none";
+-
+-  if (mTitle) mTitle.textContent = post.title;
+-  if (mDesc) mDesc.textContent = post.desc;
+-  
+-  if (mLocation) {
+-    mLocation.innerHTML = `<i data-lucide="map-pin" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.location}</span>`;
+-  }
+-  if (mStartDate) {
+-    mStartDate.innerHTML = `<i data-lucide="calendar" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.startDate}</span>`;
+-  }
+-  if (mEndDate) {
+-    mEndDate.innerHTML = `<i data-lucide="calendar-check" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${post.endDate}</span>`;
+-  }
+-
+-  if (mTags) {
+-    mTags.innerHTML = "";
+-    const span = document.createElement("span");
+-    span.className = "tag-badge";
+-    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${post.category || "Solidario"}`;
+-    mTags.appendChild(span);
+-    const typeSpan = document.createElement("span");
+-    typeSpan.className = "tag-badge";
+-    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+-    typeSpan.style.color = "var(--color-primary)";
+-    typeSpan.style.fontWeight = "600";
+-    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+-    mTags.appendChild(typeSpan);
+-  }
+-
+-  if (mBadge) {
+-    const statusLabels = {
+-      pendiente: "PENDIENTE",
+-      aceptado: "ACEPTADO",
+-      rechazado: "RECHAZADO"
+-    };
+-    mBadge.textContent = statusLabels[post.status] || "PENDIENTE";
+-    mBadge.className = `modal-status-badge ${post.status === "aceptado" ? "accepted-pill" : (post.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+-    mBadge.style.display = "inline-block";
+-  }
+-
+-  if (mSensitive) {
+-    if (post.status === "aceptado") {
+-      mSensitive.innerHTML = `
+-        <h4>Informaci├│n de coordinaci├│n</h4>
+-        <div class="info-alert-content">
+-          <p>${post.additionalInfo || "No hay informaci├│n adicional registrada."}</p>
+-        </div>
+-      `;
+-      mSensitive.style.display = "block";
+-    } else {
+-      mSensitive.style.display = "none";
+-    }
+-  }
+-
+-  const devStateCard = document.querySelector(".dev-state-selector-card");
+-  if (devStateCard) devStateCard.style.display = "none";
+-  
+-  if (mPostulateBtn) mPostulateBtn.style.display = "none";
+-  
+-  const gallerySec = document.getElementById("m-camp-gallery-sec");
+-  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+-  if (gallerySec && galleryGrid) {
+-    galleryGrid.innerHTML = "";
+-    if (post.images && post.images.length > 0) {
+-      post.images.forEach(imgUrl => {
+-        const div = document.createElement("div");
+-        div.className = "gallery-img-wrapper";
+-        div.style.borderRadius = "var(--radius-md)";
+-        div.style.overflow = "hidden";
+-        div.style.aspectRatio = "1 / 1";
+-        div.style.backgroundColor = "var(--color-surface-hover)";
+-        div.style.border = "1px solid var(--color-border)";
+-        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+-        galleryGrid.appendChild(div);
+-      });
+-      gallerySec.style.display = "block";
+-    } else {
+-      gallerySec.style.display = "none";
+-    }
+-  }
+-
+-  const assocSec = document.getElementById("m-camp-associations-sec");
+-  if (assocSec) assocSec.style.display = "none";
+-
+-  openModal("modal-profile-camp-detail");
+-
+-  if (typeof lucide !== "undefined") {
+-    lucide.createIcons();
+-  }
++  openCampaignDetailsView(post.campaignId);
+ }
+ 
+ // =========================================================================
+@@ -814,8 +627,22 @@ function setupVolunteeringGrid() {
+       renderVolunteering();
+     });
+   }
++
++  loadVolunteeringFromBD();
+ }
+ 
++window.loadVolunteeringFromBD = function() {
++  fetch(`${BASE_URL}obtener-mis-voluntariados`)
++    .then(res => res.json())
++    .then(res => {
++      if (res.success) {
++        volunteering = res.data;
++        renderVolunteering();
++      }
++    })
++    .catch(err => console.error("Error al cargar voluntariados:", err));
++};
++
+ function renderVolunteering() {
+   const grid = document.getElementById("my-volunteering-grid");
+   if (!grid) return;
+@@ -865,7 +692,7 @@ function renderVolunteering() {
+ 
+     const article = document.createElement("article");
+     article.className = cardClass;
+-    article.addEventListener("click", () => openVolunteeringDetailsView(item.id));
++    article.addEventListener("click", () => openCampaignDetailsView(item.id));
+ 
+     article.innerHTML = `
+       <div class="alt-card-img-col">
+@@ -949,109 +776,6 @@ function renderVolunteeringPagination(totalPages) {
+   container.appendChild(nextBtn);
+ }
+ 
+-function openVolunteeringDetailsView(volunteeringId) {
+-  const item = volunteering.find(v => v.id === volunteeringId);
+-  if (!item) return;
+-  
+-  const mTitle = document.getElementById("m-camp-title");
+-  const mDesc = document.getElementById("m-camp-desc");
+-  const mLocation = document.getElementById("m-camp-location");
+-  const mStartDate = document.getElementById("m-camp-start-date");
+-  const mEndDate = document.getElementById("m-camp-end-date");
+-  const mTags = document.getElementById("m-camp-tags");
+-  const mBadge = document.getElementById("m-camp-accepted-badge");
+-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+-  const mSensitive = document.getElementById("m-camp-sensitive-info");
+-
+-  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
+-  if (ownerSection) ownerSection.style.display = "none";
+-
+-  const mCreatorLink = document.getElementById("m-camp-creator-link");
+-  if (mCreatorLink) {
+-    mCreatorLink.style.display = "none";
+-  }
+-
+-  if (mTitle) mTitle.textContent = item.title;
+-  if (mDesc) mDesc.textContent = item.desc;
+-  
+-  if (mLocation) {
+-    mLocation.innerHTML = `<i data-lucide="map-pin" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.location}</span>`;
+-  }
+-  if (mStartDate) {
+-    mStartDate.innerHTML = `<i data-lucide="calendar" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.startDate}</span>`;
+-  }
+-  if (mEndDate) {
+-    mEndDate.innerHTML = `<i data-lucide="calendar-check" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.endDate}</span>`;
+-  }
+-
+-  if (mTags) {
+-    mTags.innerHTML = "";
+-    const span = document.createElement("span");
+-    span.className = "tag-badge";
+-    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${item.category || "Solidario"}`;
+-    mTags.appendChild(span);
+-
+-    const typeSpan = document.createElement("span");
+-    typeSpan.className = "tag-badge";
+-    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+-    typeSpan.style.color = "var(--color-primary)";
+-    typeSpan.style.fontWeight = "600";
+-    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
+-    mTags.appendChild(typeSpan);
+-  }
+-
+-  if (mBadge) {
+-    mBadge.textContent = "ACTIVA";
+-    mBadge.className = "modal-status-badge accepted-pill";
+-    mBadge.style.display = "inline-block";
+-  }
+-
+-  if (mSensitive) {
+-    mSensitive.innerHTML = `
+-      <h4>Informaci├│n de coordinaci├│n</h4>
+-      <div class="info-alert-content">
+-        <p>${item.additionalInfo || "No hay informaci├│n adicional registrada."}</p>
+-      </div>
+-    `;
+-    mSensitive.style.display = "block";
+-  }
+-
+-  const devStateCard = document.querySelector(".dev-state-selector-card");
+-  if (devStateCard) devStateCard.style.display = "none";
+-
+-  if (mPostulateBtn) mPostulateBtn.style.display = "none";
+-
+-  const gallerySec = document.getElementById("m-camp-gallery-sec");
+-  const galleryGrid = document.getElementById("m-camp-gallery-grid");
+-  if (gallerySec && galleryGrid) {
+-    galleryGrid.innerHTML = "";
+-    if (item.images && item.images.length > 0) {
+-      item.images.forEach(imgUrl => {
+-        const div = document.createElement("div");
+-        div.className = "gallery-img-wrapper";
+-        div.style.borderRadius = "var(--radius-md)";
+-        div.style.overflow = "hidden";
+-        div.style.aspectRatio = "1 / 1";
+-        div.style.backgroundColor = "var(--color-surface-hover)";
+-        div.style.border = "1px solid var(--color-border)";
+-        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+-        galleryGrid.appendChild(div);
+-      });
+-      gallerySec.style.display = "block";
+-    } else {
+-      gallerySec.style.display = "none";
+-    }
+-  }
+-
+-  const assocSec = document.getElementById("m-camp-associations-sec");
+-  if (assocSec) assocSec.style.display = "none";
+-
+-  openModal("modal-profile-camp-detail");
+-
+-  if (typeof lucide !== "undefined") {
+-    lucide.createIcons();
+-  }
+-}
+ 
+ // =========================================================================
+ // SIMULADOR DE ESTADOS EN EL MODAL DE DETALLE (EXCLUSIVO VOLUNTARIO)
+diff --git a/public/js/perfil_voluntario_vista.js b/public/js/perfil_voluntario_vista.js
+index 3f01bf2..b019cc1 100644
+--- a/public/js/perfil_voluntario_vista.js
++++ b/public/js/perfil_voluntario_vista.js
+@@ -1,5 +1,6 @@
+ // JavaScript for Perfil Voluntario Vista
+ let currentCampaignId = null;
++let attendanceInterval = null;
+ const appliedCampaignsMap = new Map();
+ 
+ // Pagination State
+@@ -294,11 +295,209 @@ window.openCampaignDetailsModal = function(id) {
+           }
+         }
+         
+-        if (typeof lucide !== 'undefined') {
+-          lucide.createIcons();
++  // L├│gica de validaci├│n de asistencia
++  const attendanceSec = document.getElementById("m-camp-attendance-sec");
++  if (attendanceSec) {
++    attendanceSec.style.display = "none";
++    attendanceSec.innerHTML = "";
++    
++    if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID && camp.type === 'convocatoria') {
++      const isOwner = camp.usuario_id == SESSION_USER_ID;
++      
++      let isAcceptedVol = false;
++      if (!isOwner && SESSION_USER_ROL === 'voluntario') {
++        if (appliedCampaignsMap.has(camp.id)) {
++          const app = appliedCampaignsMap.get(camp.id);
++          if (app && app.status === 'aceptado') {
++            isAcceptedVol = true;
++          }
+         }
++      }
++
++      if (isOwner) {
++        attendanceSec.style.display = "block";
+         
+-        openModal('modal-profile-camp-detail');
++        let timerHTML = "";
++        if (camp.codigo_activo) {
++          timerHTML = `
++            <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++              <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${camp.codigo_activo}</strong></span>
++              <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++            </div>
++          `;
++        }
++
++        attendanceSec.innerHTML = `
++          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++            <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++              Validaci├│n de Asistencia
++              <span class="info-tooltip-trigger" title="Compart├¡ el c├│digo generado con los voluntarios que participaron de la campa├▒a. El c├│digo vence pasados 5 minutos (puedes generar nuevos si los necesitas)." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++            </h4>
++          </div>
++          <button class="btn btn-primary" id="btn-generate-attendance-code" style="width: 100%; justify-content: center; gap: 8px;">
++            <i data-lucide="key" style="width: 16px; height: 16px;"></i> Generar C├│digo
++          </button>
++          <div id="attendance-code-result-area">${timerHTML}</div>
++        `;
++
++        if (camp.codigo_activo && camp.segundos_restantes > 0) {
++          startAttendanceCountdown(camp.segundos_restantes);
++        }
++
++        const genBtn = document.getElementById("btn-generate-attendance-code");
++        if (genBtn) {
++          genBtn.addEventListener("click", () => {
++            genBtn.disabled = true;
++            const formData = new FormData();
++            formData.append("id_campania", camp.id);
++
++            fetch(`${BASE_URL}generar-codigo-asistencia`, {
++              method: "POST",
++              body: formData
++            })
++            .then(res => res.json())
++            .then(res => {
++              genBtn.disabled = false;
++              if (res.success) {
++                camp.codigo_activo = res.codigo;
++                camp.segundos_restantes = res.vence_en;
++                
++                document.getElementById("attendance-code-result-area").innerHTML = `
++                  <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
++                    <span>C├│digo activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${res.codigo}</strong></span>
++                    <span id="attendance-timer" style="font-size: 13px; font-weight: 600; color: var(--color-text-secondary);"><i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> 05:00</span>
++                  </div>
++                `;
++                startAttendanceCountdown(res.vence_en);
++                if (typeof lucide !== "undefined") lucide.createIcons();
++              } else {
++                alert(res.message || "Error al generar c├│digo.");
++              }
++            })
++            .catch(err => {
++              genBtn.disabled = false;
++              console.error(err);
++            });
++          });
++        }
++      } 
++      else if (isAcceptedVol) {
++        attendanceSec.style.display = "block";
++
++        if (camp.asistencia_registrada) {
++          attendanceSec.innerHTML = `
++            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++              <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++            </div>
++          `;
++        } else {
++          attendanceSec.innerHTML = `
++            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
++              <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
++                Validar Asistencia
++                <span class="info-tooltip-trigger" title="Ingres├í el c├│digo provisto por la organizaci├│n de la campa├▒a para registrar tu participaci├│n y que figure en tu perfil." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
++              </h4>
++            </div>
++            <div id="attendance-input-area">
++              <button class="btn btn-primary" id="btn-show-attendance-input" style="width: 100%; justify-content: center; gap: 8px;">
++                <i data-lucide="key" style="width: 16px; height: 16px;"></i> Ingresar C├│digo
++              </button>
++            </div>
++          `;
++
++          const showInputBtn = document.getElementById("btn-show-attendance-input");
++          if (showInputBtn) {
++            showInputBtn.addEventListener("click", () => {
++              document.getElementById("attendance-input-area").innerHTML = `
++                <div style="display: flex; gap: 8px; margin-top: 8px;">
++                  <input type="text" id="attendance-code-val" class="edit-input" placeholder="Ej: ABC1234" maxlength="10" style="text-transform: uppercase; flex: 1;">
++                  <button class="btn btn-primary" id="btn-validate-attendance-code" style="padding: 10px 20px;">Validar</button>
++                </div>
++                <div id="attendance-validation-error" style="color: #EF4444; font-size: 12px; margin-top: 4px; display: none;"></div>
++              `;
++              
++              const valBtn = document.getElementById("btn-validate-attendance-code");
++              const valInput = document.getElementById("attendance-code-val");
++              if (valBtn && valInput) {
++                valBtn.addEventListener("click", () => {
++                  const codeVal = valInput.value.trim().toUpperCase();
++                  if (!codeVal) return;
++
++                  valBtn.disabled = true;
++                  const formData = new FormData();
++                  formData.append("id_campania", camp.id);
++                  formData.append("codigo", codeVal);
++
++                  fetch(`${BASE_URL}validar-codigo-asistencia`, {
++                    method: "POST",
++                    body: formData
++                  })
++                  .then(res => res.json())
++                  .then(res => {
++                    valBtn.disabled = false;
++                    if (res.success) {
++                      camp.asistencia_registrada = true;
++                      attendanceSec.innerHTML = `
++                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
++                          <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
++                        </div>
++                      `;
++                      if (typeof lucide !== "undefined") lucide.createIcons();
++                      if (typeof showToast !== "undefined") {
++                        showToast("Asistencia Confirmada", res.message, true);
++                      }
++                      
++                      // Refresh public view or similar
++                      setTimeout(() => {
++                        window.location.reload();
++                      }, 1000);
++                    } else {
++                      const errDiv = document.getElementById("attendance-validation-error");
++                      if (errDiv) {
++                        errDiv.textContent = res.message;
++                        errDiv.style.display = "block";
++                      }
++                    }
++                  })
++                  .catch(err => {
++                    valBtn.disabled = false;
++                    console.error(err);
++                  });
++                });
++              }
++            });
++          }
++        }
++      }
++    }
++  }
++
++  function startAttendanceCountdown(secondsLeft) {
++    if (attendanceInterval) clearInterval(attendanceInterval);
++    let remaining = secondsLeft;
++    const timerSpan = document.getElementById("attendance-timer");
++    
++    attendanceInterval = setInterval(() => {
++      remaining--;
++      if (remaining <= 0) {
++        clearInterval(attendanceInterval);
++        if (timerSpan) timerSpan.innerHTML = "Expirado";
++      } else {
++        const min = Math.floor(remaining / 60).toString().padStart(2, '0');
++        const sec = (remaining % 60).toString().padStart(2, '0');
++        if (timerSpan) {
++          timerSpan.innerHTML = `<i data-lucide="clock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> ${min}:${sec}`;
++          if (typeof lucide !== "undefined") lucide.createIcons();
++        }
++      }
++    }, 1000);
++  }
++
++  if (typeof lucide !== 'undefined') {
++    lucide.createIcons();
++  }
++  
++  openModal('modal-profile-camp-detail');
+       }
+     })
+     .catch(err => console.error("Error al cargar detalle de campa├▒a:", err));

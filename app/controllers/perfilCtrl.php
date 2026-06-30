@@ -56,12 +56,6 @@ class perfilCtrl extends Controlador {
         $modeloCampania = $this->cargarModelo('Campania');
         $campaniasUsuario = $modeloCampania->obtenerCampaniasDeUsuario($_SESSION['id_usuario']);
 
-        /* Voluntarios Particular */
-        // Traer valor del contador de asistencias.
-
-        /* Organizaciones Particular */
-        
-
 
         $datos = ['cssPropio' => $css,
 				  'jsPropio' => $js,
@@ -539,12 +533,11 @@ class perfilCtrl extends Controlador {
         $idUsuario = $_SESSION['id_usuario'];
 
         $modeloVoluntario = $this->cargarModelo('Voluntario');
-        $vol = $modeloVoluntario->obtenerIDVoluntario($idUsuario);
-        if (!$vol) {
+        $idVoluntario = $modeloVoluntario->obtenerIDVoluntario($idUsuario);
+        if ($idVoluntario === false) {
             echo json_encode(['success' => false, 'message' => 'No se encontró el voluntario correspondiente.']);
             return;
         }
-        $idVoluntario = $vol['id'];
 
         $modeloPostulacion = $this->cargarModelo('Postulacion');
         
@@ -570,11 +563,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $idCampania = filter_input(INPUT_POST, 'id_campania', FILTER_VALIDATE_INT);
         if (!$idCampania) {
@@ -659,14 +647,14 @@ class perfilCtrl extends Controlador {
         }
 
         $modeloVoluntario = $this->cargarModelo('Voluntario');
-        $vol = $modeloVoluntario->obtenerIDVoluntario($_SESSION['id_usuario']);
-        if (!$vol) {
+        $idVol = $modeloVoluntario->obtenerIDVoluntario($_SESSION['id_usuario']);
+        if ($idVol === false) {
             echo json_encode(['success' => true, 'data' => []]);
             return;
         }
 
         $modeloPostulacion = $this->cargarModelo('Postulacion');
-        $postulacionesRaw = $modeloPostulacion->obtenerPostulacionesPorVoluntario($vol['id']);
+        $postulacionesRaw = $modeloPostulacion->obtenerPostulacionesPorVoluntario($idVol);
 
         $postulaciones = [];
         $modeloCampania = $this->cargarModelo('Campania');
@@ -839,6 +827,30 @@ class perfilCtrl extends Controlador {
             ];
         }
 
+        $modeloAsistencia = $this->cargarModelo('Asistencia');
+        $rawAsist = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
+        $voluntariados = [];
+        $today = date('Y-m-d');
+        foreach ($rawAsist as $asist) {
+            $campId = (int)$asist['campania_id'];
+            $camp = $modeloCampania->obtenerCampaniaPorID($campId);
+            if ($camp) {
+                $causes = $modeloCampania->obtenerCausasDeCampania($campId);
+                $images = $modeloCampania->obtenerArchivosDeCampania($campId);
+                $voluntariados[] = [
+                    'id' => $campId,
+                    'title' => $camp['titulo'],
+                    'desc' => $camp['descripcion'],
+                    'category' => !empty($causes) ? $causes[0] : 'Solidario',
+                    'startDate' => $camp['fecha_inicio'],
+                    'endDate' => $camp['fecha_finalizacion'],
+                    'location' => $camp['ubicacion'],
+                    'status' => $camp['fecha_finalizacion'] >= $today ? 'activa' : 'finalizada',
+                    'images' => $images
+                ];
+            }
+        }
+
         $nombreCompleto = $usuario['nombre completo'];
         $datos = [
             'nombre_completo' => $nombreCompleto,
@@ -847,6 +859,7 @@ class perfilCtrl extends Controlador {
             'insignias' => $insignias,
             'campanias' => $campanias,
             'campaniasDetails' => $campaniasDetails,
+            'voluntariados' => $voluntariados,
             'cssPropio' => 'perfil_voluntario_vista.css',
             'jsPropio' => 'perfil_voluntario_vista.js'
         ];
@@ -860,10 +873,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $modeloInvitacion = $this->cargarModelo('Invitacion');
         $modeloCampania = $this->cargarModelo('Campania');
@@ -898,10 +907,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $modeloInvitacion = $this->cargarModelo('Invitacion');
         $modeloCampania = $this->cargarModelo('Campania');
@@ -936,10 +941,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $modeloCampania = $this->cargarModelo('Campania');
         $todas = $modeloCampania->obtenerCampaniasDeUsuario($_SESSION['id_usuario']);
@@ -963,10 +964,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $idCampania = filter_input(INPUT_POST, 'id_campania', FILTER_VALIDATE_INT);
         $destinatarioId = filter_input(INPUT_POST, 'destinatario_id', FILTER_VALIDATE_INT);
@@ -991,10 +988,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $idInvitacion = filter_input(INPUT_POST, 'id_invitacion', FILTER_VALIDATE_INT);
         $estado = filter_input(INPUT_POST, 'estado', FILTER_DEFAULT);
@@ -1019,10 +1012,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $idInvitacion = filter_input(INPUT_POST, 'id_invitacion', FILTER_VALIDATE_INT);
 
@@ -1046,10 +1035,6 @@ class perfilCtrl extends Controlador {
             session_start();
         }
         header('Content-Type: application/json');
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $modeloInvitacion = $this->cargarModelo('Invitacion');
         $modeloCampania = $this->cargarModelo('Campania');
@@ -1086,10 +1071,6 @@ class perfilCtrl extends Controlador {
         }
         header('Content-Type: application/json');
 
-        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
-            echo json_encode(['success' => false, 'message' => 'Sesión no válida.']);
-            return;
-        }
 
         $idCampania = isset($_GET['id']) ? (int)$_GET['id'] : 0;
         if ($idCampania <= 0) {
@@ -1141,6 +1122,61 @@ class perfilCtrl extends Controlador {
             }
         }
 
+        $modeloAsistencia = $this->cargarModelo('Asistencia');
+        $codigoActivo = null;
+        $segundosRestantes = 0;
+        
+        $db = new BaseDatos();
+        $db->consulta("SELECT codigo, fecha_vencimiento FROM codigos_asistencia WHERE campania_id = :id_camp AND fecha_vencimiento > NOW() ORDER BY id DESC LIMIT 1;");
+        $db->asignar(":id_camp", $idCampania);
+        $db->ejecutar();
+        $codRes = $db->resultado();
+        if ($codRes) {
+            $codigoActivo = $codRes['codigo'];
+            $venc = strtotime($codRes['fecha_vencimiento']);
+            $segundosRestantes = max(0, $venc - time());
+        }
+
+        $asistenciaRegistrada = false;
+        $esVoluntarioAceptado = false;
+        if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'voluntario') {
+            $modeloVol = $this->cargarModelo('Voluntario');
+            $idVol = $modeloVol->obtenerIDVoluntario($_SESSION['id_usuario']);
+            if (!$idVol) {
+                $idVol = null;
+            }
+            // Verificar si la postulación está aceptada usando el usuario_id del postulante
+            $modeloPost = $this->cargarModelo('Postulacion');
+            $postulaciones = $modeloPost->obtenerPostulacionesPorCampania($idCampania);
+            foreach ($postulaciones as $post) {
+                if ((int)$post['usuario_id'] === (int)$_SESSION['id_usuario'] && strtolower($post['estado']) === 'aceptado') {
+                    $esVoluntarioAceptado = true;
+                    break;
+                }
+            }
+
+            // Si no, verificar si la invitación está aceptada
+            if (!$esVoluntarioAceptado) {
+                $modeloInvitacion = $this->cargarModelo('Invitacion');
+                $invitaciones = $modeloInvitacion->obtenerInvitacionesPorDestinatario($_SESSION['id_usuario']);
+                foreach ($invitaciones as $inv) {
+                    if ((int)$inv['campania_id'] === $idCampania && strtolower($inv['estado']) === 'aceptado') {
+                        $esVoluntarioAceptado = true;
+                        break;
+                    }
+                }
+            }
+
+            $asistencias = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
+            foreach ($asistencias as $asist) {
+                if ((int)$asist['campania_id'] === $idCampania) {
+                    $asistenciaRegistrada = true;
+                    break;
+                }
+            }
+        }
+    
+
         $campaniaMapeada = [
             'id'                => $idCampania,
             'title'             => $camp['titulo'],
@@ -1157,7 +1193,11 @@ class perfilCtrl extends Controlador {
             'usuario_nombre'    => $creatorName,
             'usuario_rol'       => $creatorRole,
             'usuario_img_perfil'=> $creatorImg,
-            'info_adicional'    => $camp['info_adicional'] ?? ''
+            'info_adicional'    => $camp['info_adicional'] ?? '',
+            'asistencia_registrada' => $asistenciaRegistrada,
+            'es_voluntario_aceptado' => $esVoluntarioAceptado,
+            'codigo_activo'     => $codigoActivo,
+            'segundos_restantes'=> $segundosRestantes
         ];
 
         echo json_encode(['success' => true, 'data' => $campaniaMapeada]);
@@ -1273,6 +1313,162 @@ class perfilCtrl extends Controlador {
         } else {
             echo json_encode(['success' => false, 'message' => 'Error al dar de baja.']);
         }
+    }
+
+    public function generarCodigoAsistencia() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        $idCampania = isset($_POST['id_campania']) ? (int)$_POST['id_campania'] : 0;
+        if ($idCampania <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Campaña no válida.']);
+            return;
+        }
+
+        $modeloCampania = $this->cargarModelo('Campania');
+        $camp = $modeloCampania->obtenerCampaniaPorID($idCampania);
+        if (!$camp) {
+            echo json_encode(['success' => false, 'message' => 'Campaña no encontrada.']);
+            return;
+        }
+
+        if ((int)$camp['usuario_id'] !== (int)$_SESSION['id_usuario']) {
+            echo json_encode(['success' => false, 'message' => 'No tienes permiso para generar códigos para esta campaña.']);
+            return;
+        }
+
+        $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $codigo = '';
+        for ($i = 0; $i < 7; $i++) {
+            $codigo .= $chars[rand(0, strlen($chars) - 1)];
+        }
+
+        $modeloAsistencia = $this->cargarModelo('Asistencia');
+        $ok = $modeloAsistencia->insertarCodigoAsistencia($idCampania, $codigo);
+
+        if ($ok) {
+            echo json_encode(['success' => true, 'codigo' => $codigo, 'vence_en' => 300]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No se pudo generar el código.']);
+        }
+    }
+
+    public function validarCodigoAsistencia() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'voluntario') {
+            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
+            return;
+        }
+
+        $idCampania = isset($_POST['id_campania']) ? (int)$_POST['id_campania'] : 0;
+        $codigo = isset($_POST['codigo']) ? strtoupper(trim($_POST['codigo'])) : '';
+
+        if ($idCampania <= 0 || empty($codigo)) {
+            echo json_encode(['success' => false, 'message' => 'Parámetros inválidos.']);
+            return;
+        }
+
+        $modeloVol = $this->cargarModelo('Voluntario');
+        $idVol = $modeloVol->obtenerIDVoluntario($_SESSION['id_usuario']);
+        if (!$idVol) {
+            echo json_encode(['success' => false, 'message' => 'Voluntario no encontrado.']);
+            return;
+        }
+
+        $modeloPost = $this->cargarModelo('Postulacion');
+        $postulaciones = $modeloPost->obtenerPostulacionesPorCampania($idCampania);
+        $esAceptado = false;
+        foreach ($postulaciones as $post) {
+            if ((int)$post['usuario_id'] === (int)$_SESSION['id_usuario'] && strtolower($post['estado']) === 'aceptado') {
+                $esAceptado = true;
+                break;
+            }
+        }
+
+        if (!$esAceptado) {
+            $modeloInvitacion = $this->cargarModelo('Invitacion');
+            $invitaciones = $modeloInvitacion->obtenerInvitacionesPorDestinatario($_SESSION['id_usuario']);
+            foreach ($invitaciones as $inv) {
+                if ((int)$inv['campania_id'] === $idCampania && strtolower($inv['estado']) === 'aceptado') {
+                    $esAceptado = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$esAceptado) {
+            echo json_encode(['success' => false, 'message' => 'No estás aceptado en esta campaña para registrar asistencia.']);
+            return;
+        }
+
+        $modeloAsistencia = $this->cargarModelo('Asistencia');
+
+        $asistencias = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
+        foreach ($asistencias as $asist) {
+            if ((int)$asist['campania_id'] === $idCampania) {
+                echo json_encode(['success' => false, 'message' => 'Ya registraste tu asistencia en esta campaña.']);
+                return;
+            }
+        }
+
+        $coincide = $modeloAsistencia->verificaCoincidencia($codigo, $idCampania);
+
+        if ($coincide) {
+            $ok = $modeloAsistencia->registrarAsistencia($idVol, $idCampania);
+            if ($ok) {
+                echo json_encode(['success' => true, 'message' => 'Asistencia registrada correctamente.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al registrar la asistencia.']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Código de asistencia inválido o vencido.']);
+        }
+    }
+
+    public function obtenerMisVoluntariados() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_rol'] !== 'voluntario') {
+            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
+            return;
+        }
+
+        $modeloAsistencia = $this->cargarModelo('Asistencia');
+        $modeloVol = $this->cargarModelo('Voluntario');
+        $modeloCampania = $this->cargarModelo('Campania');
+        $idVol = $modeloVol->obtenerIDVoluntario($_SESSION['id_usuario']);
+        if (!$idVol) {
+             echo json_encode(['success' => true, 'data' => []]);
+             return;
+         }
+
+        $raw = $modeloAsistencia->obtenerAsistenciasPorVoluntario($idVol);
+        $voluntariados = [];
+        $today = date('Y-m-d');
+
+        foreach ($raw as $asist) {
+            $campId = (int)$asist['campania_id'];
+            $camp = $modeloCampania->obtenerCampaniaPorID($campId);
+            if ($camp) {
+                $causes = $modeloCampania->obtenerCausasDeCampania($campId);
+                $images = $modeloCampania->obtenerArchivosDeCampania($campId);
+
+                $voluntariados[] = [
+                    'id' => $campId,
+                    'title' => $camp['titulo'],
+                    'desc' => $camp['descripcion'],
+                    'category' => !empty($causes) ? $causes[0] : 'Solidario',
+                    'startDate' => $camp['fecha_inicio'],
+                    'endDate' => $camp['fecha_finalizacion'],
+                    'location' => $camp['ubicacion'],
+                    'status' => $camp['fecha_finalizacion'] >= $today ? 'activa' : 'finalizada',
+                    'images' => $images
+                ];
+            }
+        }
+
+        echo json_encode(['success' => true, 'data' => $voluntariados]);
     }
 
 }

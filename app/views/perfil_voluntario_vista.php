@@ -141,38 +141,36 @@
           </div>
         </div>
 
-        <!-- PANE: VOLUNTARIADOS (Mockup Mold) -->
-        <div class="profile-pane" id="pane-voluntariados" role="tabpanel">
+        <!-- PANE: VOLUNTARIADOS -->
+        <div class="profile-pane" id="pane-voluntariados" role="tabpanel" style="display: none;">
           <div class="alternating-grid">
-            
-            <!-- Card 1 (Image Left) -->
-            <article class="alt-card">
-              <div class="alt-card-img-col">
-                <div class="alt-card-img-placeholder">
-                  <i data-lucide="image"></i>
+            <?php if (empty($voluntariados)): ?>
+              <div class="volunteer-empty-state">No ha participado en ningún voluntariado todavía.</div>
+            <?php else: ?>
+              <?php foreach ($voluntariados as $index => $camp): 
+                $isReverse = ($index % 2 !== 0);
+                $cardClass = $isReverse ? 'alt-card alt-card-reverse' : 'alt-card';
+                $imgHTML = '<i data-lucide="image"></i>';
+                if (!empty($camp['images'])) {
+                    $imgHTML = '<img src="' . BASE_URL . htmlspecialchars($camp['images'][0]) . '" alt="' . htmlspecialchars($camp['title']) . '" style="width:100%; height:100%; object-fit:cover;">';
+                }
+              ?>
+              <article class="<?= $cardClass ?>" onclick="openCampaignDetailsModal(<?= $camp['id'] ?>)" style="cursor: pointer;">
+                <div class="alt-card-img-col">
+                  <div class="alt-card-img-placeholder">
+                    <?= $imgHTML ?>
+                  </div>
                 </div>
-              </div>
-              <div class="alt-card-content-col">
-                <h3 class="alt-card-title">Reforestación Parque Central (Molde)</h3>
-                <p class="alt-card-desc">Ejemplo de voluntariado realizado. En el futuro, aquí se listarán de forma dinámica las asistencias computadas.</p>
-                <button class="btn btn-primary btn-info" onclick="openCampaignDetailsModal(1)">+ Más información</button>
-              </div>
-            </article>
-
-            <!-- Card 2 (Image Right) -->
-            <article class="alt-card alt-card-reverse">
-              <div class="alt-card-img-col">
-                <div class="alt-card-img-placeholder">
-                  <i data-lucide="image"></i>
+                <div class="alt-card-content-col">
+                  <h3 class="alt-card-title"><?= htmlspecialchars($camp['title']) ?></h3>
+                  <div class="profile-tags-wrapper" style="margin-top: 4px; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; display: flex;">
+                    <span class="tag-badge" style="padding: 4px 12px; font-size: 11px; height: auto;"><i data-lucide="tag" style="width:10px; height:10px;"></i> <?= htmlspecialchars($camp['category'] ?? 'Solidario') ?></span>
+                  </div>
+                  <p class="alt-card-desc"><?= htmlspecialchars($camp['desc'] ?? '') ?></p>
                 </div>
-              </div>
-              <div class="alt-card-content-col">
-                <h3 class="alt-card-title">Colecta de Alimentos San Martín (Molde)</h3>
-                <p class="alt-card-desc">Colaboré en la distribución, clasificación de stock y logística de donaciones destinadas a comedores.</p>
-                <button class="btn btn-primary btn-info" onclick="openCampaignDetailsModal(3)">+ Más información</button>
-              </div>
-            </article>
-
+              </article>
+              <?php endforeach; ?>
+            <?php endif; ?>
           </div>
         </div>
 

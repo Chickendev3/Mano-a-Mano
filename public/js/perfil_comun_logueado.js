@@ -268,6 +268,7 @@ function renderPagination(totalPages) {
 // =========================================================================
 // Variable para trackear la campaña visualizada en el modal
 let currentViewedCampaignId = null;
+let attendanceInterval = null;
 
 function openCampaignDetailsView(campaignId, options = {}) {
   const campLocal = campaigns.find(c => c.id === campaignId);
@@ -406,8 +407,41 @@ function _renderCampaignModal(camp, options = {}) {
     }
   }
 
-  if (mBadge) mBadge.style.display = "none";
-    // Lógica de visualización de información de coordinación (adicional)
+  if (mBadge) {
+    mBadge.style.display = "none";
+    if (typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "voluntario") {
+      // 1. Si existe postulación en el perfil privado
+      if (typeof postulations !== 'undefined') {
+        const post = postulations.find(p => p.campaignId === camp.id);
+        if (post) {
+          const statusLabels = {
+            pendiente: "PENDIENTE",
+            aceptado: "ACEPTADO",
+            rechazado: "RECHAZADO"
+          };
+          mBadge.textContent = statusLabels[post.status] || "PENDIENTE";
+          mBadge.className = `modal-status-badge ${post.status === "aceptado" ? "accepted-pill" : (post.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+          mBadge.style.display = "inline-block";
+        }
+      }
+      // 2. Si existe invitación recibida en el listado
+      if (typeof receivedInvitations !== 'undefined') {
+        const inv = receivedInvitations.find(i => i.campaignId === camp.id);
+        if (inv) {
+          const statusLabels = {
+            pendiente: "PENDIENTE",
+            aceptado: "ACEPTADO",
+            rechazado: "RECHAZADO"
+          };
+          mBadge.textContent = statusLabels[inv.status] || "PENDIENTE";
+          mBadge.className = `modal-status-badge ${inv.status === "aceptado" ? "accepted-pill" : (inv.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+          mBadge.style.display = "inline-block";
+        }
+      }
+    }
+  }
+
+  // Lógica de visualización de información de coordinación (adicional)
   let showAdditionalInfo = false;
   if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID) {
     const isOwner = camp.usuario_id == SESSION_USER_ID;
@@ -450,6 +484,164 @@ function _renderCampaignModal(camp, options = {}) {
       const isOwner = camp.usuario_id == SESSION_USER_ID;
       const isOrg = SESSION_USER_ROL === "organizacion";
       mPostulateBtn.style.display = (camp.type === "convocatoria" && !isOwner && !isOrg) ? "inline-flex" : "none";
+    }
+  }
+
+  // Lógica de validación de asistencia
+  const attendanceSec = document.getElementById("m-camp-attendance-sec");
+  if (attendanceSec) {
+    attendanceSec.style.display = "none";
+    attendanceSec.innerHTML = "";
+    
+    if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID && camp.type === 'convocatoria') {
+      const isOwner = camp.usuario_id == SESSION_USER_ID;
+      const isAcceptedVol = camp.es_voluntario_aceptado || false;
+
+      if (isOwner) {
+        attendanceSec.style.display = "block";
+        
+        let codeAreaHTML = "";
+        if (camp.codigo_activo) {
+          codeAreaHTML = `
+            <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <span>Código activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${camp.codigo_activo}</strong></span>
+            </div>
+          `;
+        }
+
+        attendanceSec.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+              Validación de Asistencia
+              <span class="info-tooltip-trigger" title="Compartí el código generado con los voluntarios que participaron de la campaña. El código vence pasados 5 minutos (puedes generar nuevos si los necesitas)." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
+            </h4>
+          </div>
+          <button class="btn btn-primary" id="btn-generate-attendance-code" style="width: 100%; justify-content: center; gap: 8px;">
+            <i data-lucide="key" style="width: 16px; height: 16px;"></i> Generar Código
+          </button>
+          <div id="attendance-code-result-area">${codeAreaHTML}</div>
+        `;
+
+        const genBtn = document.getElementById("btn-generate-attendance-code");
+        if (genBtn) {
+          genBtn.addEventListener("click", () => {
+            genBtn.disabled = true;
+            const formData = new FormData();
+            formData.append("id_campania", camp.id);
+
+            fetch(`${BASE_URL}generar-codigo-asistencia`, {
+              method: "POST",
+              body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+              genBtn.disabled = false;
+              if (res.success) {
+                camp.codigo_activo = res.codigo;
+                
+                document.getElementById("attendance-code-result-area").innerHTML = `
+                  <div style="margin-top: 12px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Código activo: <strong style="font-size: 16px; color: var(--color-primary); letter-spacing: 1px;">${res.codigo}</strong></span>
+                  </div>
+                `;
+                if (typeof lucide !== "undefined") lucide.createIcons();
+              } else {
+                alert(res.message || "Error al generar código.");
+              }
+            })
+            .catch(err => {
+              genBtn.disabled = false;
+              console.error(err);
+            });
+          });
+        }
+      } 
+      else if (isAcceptedVol) {
+        attendanceSec.style.display = "block";
+
+        if (camp.asistencia_registrada) {
+          attendanceSec.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
+              <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
+            </div>
+          `;
+        } else {
+          attendanceSec.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <h4 style="font-size: 14px; font-weight: 600; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                Validar Asistencia
+                <span class="info-tooltip-trigger" title="Ingresá el código provisto por la organización de la campaña para registrar tu participación y que figure en tu perfil." style="cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#e0e7ff; color:#4f46e5; border-radius:50%; font-size:10px; font-weight:bold;">?</span>
+              </h4>
+            </div>
+            <div id="attendance-input-area">
+              <button class="btn btn-primary" id="btn-show-attendance-input" style="width: 100%; justify-content: center; gap: 8px;">
+                <i data-lucide="key" style="width: 16px; height: 16px;"></i> Ingresar Código
+              </button>
+            </div>
+          `;
+
+          const showInputBtn = document.getElementById("btn-show-attendance-input");
+          if (showInputBtn) {
+            showInputBtn.addEventListener("click", () => {
+              document.getElementById("attendance-input-area").innerHTML = `
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                  <input type="text" id="attendance-code-val" class="edit-input" placeholder="Ej: ABC1234" maxlength="10" style="text-transform: uppercase; flex: 1;">
+                  <button class="btn btn-primary" id="btn-validate-attendance-code" style="padding: 10px 20px;">Validar</button>
+                </div>
+                <div id="attendance-validation-error" style="color: #EF4444; font-size: 12px; margin-top: 4px; display: none;"></div>
+              `;
+              
+              const valBtn = document.getElementById("btn-validate-attendance-code");
+              const valInput = document.getElementById("attendance-code-val");
+              if (valBtn && valInput) {
+                valBtn.addEventListener("click", () => {
+                  const codeVal = valInput.value.trim().toUpperCase();
+                  if (!codeVal) return;
+
+                  valBtn.disabled = true;
+                  const formData = new FormData();
+                  formData.append("id_campania", camp.id);
+                  formData.append("codigo", codeVal);
+
+                  fetch(`${BASE_URL}validar-codigo-asistencia`, {
+                    method: "POST",
+                    body: formData
+                  })
+                  .then(res => res.json())
+                  .then(res => {
+                    valBtn.disabled = false;
+                    if (res.success) {
+                      camp.asistencia_registrada = true;
+                      attendanceSec.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--color-success); font-weight: 600; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px;">
+                          <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i> Asistencia Confirmada
+                        </div>
+                      `;
+                      if (typeof lucide !== "undefined") lucide.createIcons();
+                      if (typeof showToast !== "undefined") {
+                        showToast("Asistencia Confirmada", res.message, true);
+                      }
+                      if (typeof loadVolunteeringFromBD === "function") {
+                        loadVolunteeringFromBD();
+                      }
+                    } else {
+                      const errDiv = document.getElementById("attendance-validation-error");
+                      if (errDiv) {
+                        errDiv.textContent = res.message;
+                        errDiv.style.display = "block";
+                      }
+                    }
+                  })
+                  .catch(err => {
+                    valBtn.disabled = false;
+                    console.error(err);
+                  });
+                });
+              }
+            });
+          }
+        }
+      }
     }
   }
 

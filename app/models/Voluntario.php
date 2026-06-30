@@ -67,16 +67,22 @@ class Voluntario extends Usuario{
         return $this->bd->resultado();
     }
 
-    public function obtenerIDVoluntario ( int $idUsuario ) :array|bool {
+    public function obtenerIDVoluntario ( int $idUsuario ) : int|bool {
         $consulta = "SELECT v.id 
                         FROM voluntarios v JOIN usuarios u ON u.id = v.usuario_id
                         WHERE u.id = :id_usuario";
-    
+
         $this->bd->consulta($consulta);
         $this->bd->asignar(":id_usuario", $idUsuario);
         $this->bd->ejecutar();
 
-        return $this->bd->resultado();
+        $resultado = $this->bd->resultado();
+        // Si no se encontró, devolver false
+        if (!$resultado) {
+            return false;
+        }
+        // $resultado es un array con la columna 'id'
+        return (int)$resultado['id'];
     }
 
     public function obtenerVoluntarioPorEmail( string $email ) :array|bool {
@@ -107,7 +113,7 @@ class Voluntario extends Usuario{
     public function obtenerInsignias ( int $idUsuario ) : array {
         $idVol = $this->obtenerIDVoluntario( $idUsuario );
 
-        if ($idVol == false){
+        if ($idVol === false){
             return [];     // Falló o no hay voluntario con ese ID
         }
 
@@ -118,7 +124,7 @@ class Voluntario extends Usuario{
                         WHERE vf.activo = true AND v.id = :id_vol;";
     
         $this->bd->consulta($consulta);
-        $this->bd->asignar(":id_vol", (int) $idVol['id']);
+        $this->bd->asignar(":id_vol", $idVol);
         $this->bd->ejecutar();
 
         return $this->bd->resultados();
@@ -127,7 +133,7 @@ class Voluntario extends Usuario{
     public function obtenerOficiosVoluntario (int $idUsuario) :array {
         $idVol = $this->obtenerIDVoluntario( $idUsuario );
 
-        if (!$idVol){
+        if ($idVol === false){
             return [];     // Falló o no hay voluntario con ese ID
         }
 
@@ -137,7 +143,7 @@ class Voluntario extends Usuario{
                         WHERE v.id = :id_vol;";
 
         $this->bd->consulta($consulta);
-        $this->bd->asignar(":id_vol", (int) $idVol['id']);
+        $this->bd->asignar(":id_vol", $idVol);
         $this->bd->ejecutar();
 
         return $this->bd->resultados();
@@ -200,10 +206,10 @@ class Voluntario extends Usuario{
     public function actualizarOficiosVoluntario(int $idUsuario, array $oficios) : bool {
         $idVol = $this->obtenerIDVoluntario($idUsuario);
 
-        if (!$idVol) {
+        if ($idVol === false) {
             return false;
         }
-        $idVoluntario = (int)$idVol['id'];
+        $idVoluntario = $idVol;
 
         // Se eliminan relaciones anteriores
         $sqlDelete = "DELETE FROM voluntarios_oficios WHERE voluntario_id = :id_voluntario";

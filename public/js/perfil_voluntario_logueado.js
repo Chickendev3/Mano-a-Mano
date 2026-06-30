@@ -35,68 +35,7 @@ let currentVolunteeringPage = 1;
 let postulations = [];
 
 // Base de Datos Simulada para Voluntariados (Historial de participación)
-let volunteering = [
-  {
-    id: 901,
-    title: "Reforestación Parque Central",
-    desc: "Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad.",
-    category: "Medio Ambiente",
-    startDate: "2026-06-14",
-    endDate: "2026-06-21",
-    location: "Parque Central, Buenos Aires",
-    status: "activa",
-    ownerName: "Techo Verde",
-    ownerType: "organizacion",
-    images: ["img/campaign_park.png"],
-    details: "Actividades de plantación, riego y tutorado de 50 plantines autóctonos. Se proveen herramientas y guantes.",
-    additionalInfo: "Dirección: Av. Sarmiento 2300 (junto al lago). Coordinador: Martín Silva (+54 11 9876-5432)."
-  },
-  {
-    id: 902,
-    title: "Apoyo Escolar Primario",
-    desc: "Clases de apoyo escolar para niños en situación de vulnerabilidad en la biblioteca popular.",
-    category: "Educacion",
-    startDate: "2026-06-20",
-    endDate: "2026-12-20",
-    location: "San Martín, Buenos Aires",
-    status: "activa",
-    ownerName: "Mentes Brillantes",
-    ownerType: "organizacion",
-    images: ["img/campaign_tutoring.png"],
-    details: "Buscamos voluntarios con disposición pedagógica para guiar y motivar a niños de escuela primaria en sus tareas de matemáticas y lengua.",
-    additionalInfo: "Dirección exacta: Belgrano 456, San Martín. Coordinador: Lucas Gómez (+54 11 5555-1234). Traer cartuchera y cuaderno."
-  },
-  {
-    id: 903,
-    title: "Taller de RCP y Primeros Auxilios",
-    desc: "Taller teórico-práctico de reanimación cardiopulmonar y primeros auxilios básicos para la comunidad.",
-    category: "Salud",
-    startDate: "2026-03-01",
-    endDate: "2026-03-15",
-    location: "Salguero 120, CABA",
-    status: "finalizada",
-    ownerName: "Juan Pérez",
-    ownerType: "voluntario",
-    images: ["img/camp_placeholder.png"],
-    details: "Taller interactivo abierto a la comunidad sobre maniobras básicas de reanimación y primeros auxilios.",
-    additionalInfo: "Dirección: Salguero 120, CABA. Coordinador: Juan Pérez (+54 11 3333-7777). Se entrega certificado de asistencia."
-  },
-  {
-    id: 904,
-    title: "Colecta Navideña",
-    desc: "Recepción y empaquetado de juguetes y alimentos navideños para familias necesitadas.",
-    category: "Accion Social",
-    startDate: "2025-12-01",
-    endDate: "2025-12-25",
-    location: "Mansilla 2900, CABA",
-    status: "finalizada",
-    ownerName: "Cáritas",
-    ownerType: "organizacion",
-    images: ["img/campaign_food.png"],
-    details: "Campaña para recolectar y clasificar alimentos no perecederos y juguetes para la mesa navideña.",
-    additionalInfo: "Dirección: Mansilla 2900, CABA. Coordinadora: Hermana Teresa (+54 11 2222-1111)."
-  }
-];
+let volunteering = [];
 
 // =========================================================================
 // INICIALIZACIÓN ESPECÍFICA DEL VOLUNTARIO
@@ -667,7 +606,7 @@ function openPostulationDetailsView(postulationId) {
   const post = postulations.find(p => p.id === postulationId);
   if (!post) return;
 
-  const mTitle = document.getElementById("m-camp-title");
+  /* const mTitle = document.getElementById("m-camp-title");
   const mDesc = document.getElementById("m-camp-desc");
   const mLocation = document.getElementById("m-camp-location");
   const mStartDate = document.getElementById("m-camp-start-date");
@@ -792,6 +731,10 @@ function openPostulationDetailsView(postulationId) {
 
   if (typeof lucide !== "undefined") {
     lucide.createIcons();
+  } */
+
+  if (typeof openCampaignDetailsView === 'function') {
+    openCampaignDetailsView(post.campaignId);
   }
 }
 
@@ -814,7 +757,21 @@ function setupVolunteeringGrid() {
       renderVolunteering();
     });
   }
+
+  loadVolunteeringFromBD();
 }
+
+window.loadVolunteeringFromBD = function() {
+  fetch(`${BASE_URL}obtener-mis-voluntariados`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        volunteering = res.data;
+        renderVolunteering();
+      }
+    })
+    .catch(err => console.error("Error al cargar voluntariados:", err));
+};
 
 function renderVolunteering() {
   const grid = document.getElementById("my-volunteering-grid");
@@ -865,7 +822,7 @@ function renderVolunteering() {
 
     const article = document.createElement("article");
     article.className = cardClass;
-    article.addEventListener("click", () => openVolunteeringDetailsView(item.id));
+    article.addEventListener("click", () => openCampaignDetailsView(item.id));
 
     article.innerHTML = `
       <div class="alt-card-img-col">
@@ -949,109 +906,6 @@ function renderVolunteeringPagination(totalPages) {
   container.appendChild(nextBtn);
 }
 
-function openVolunteeringDetailsView(volunteeringId) {
-  const item = volunteering.find(v => v.id === volunteeringId);
-  if (!item) return;
-  
-  const mTitle = document.getElementById("m-camp-title");
-  const mDesc = document.getElementById("m-camp-desc");
-  const mLocation = document.getElementById("m-camp-location");
-  const mStartDate = document.getElementById("m-camp-start-date");
-  const mEndDate = document.getElementById("m-camp-end-date");
-  const mTags = document.getElementById("m-camp-tags");
-  const mBadge = document.getElementById("m-camp-accepted-badge");
-  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
-  const mSensitive = document.getElementById("m-camp-sensitive-info");
-
-  const ownerSection = document.getElementById("m-camp-owner-postulations-sec");
-  if (ownerSection) ownerSection.style.display = "none";
-
-  const mCreatorLink = document.getElementById("m-camp-creator-link");
-  if (mCreatorLink) {
-    mCreatorLink.style.display = "none";
-  }
-
-  if (mTitle) mTitle.textContent = item.title;
-  if (mDesc) mDesc.textContent = item.desc;
-  
-  if (mLocation) {
-    mLocation.innerHTML = `<i data-lucide="map-pin" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.location}</span>`;
-  }
-  if (mStartDate) {
-    mStartDate.innerHTML = `<i data-lucide="calendar" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.startDate}</span>`;
-  }
-  if (mEndDate) {
-    mEndDate.innerHTML = `<i data-lucide="calendar-check" style="width:16px; height:16px; color: var(--color-primary);"></i> <span>${item.endDate}</span>`;
-  }
-
-  if (mTags) {
-    mTags.innerHTML = "";
-    const span = document.createElement("span");
-    span.className = "tag-badge";
-    span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${item.category || "Solidario"}`;
-    mTags.appendChild(span);
-
-    const typeSpan = document.createElement("span");
-    typeSpan.className = "tag-badge";
-    typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
-    typeSpan.style.color = "var(--color-primary)";
-    typeSpan.style.fontWeight = "600";
-    typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> Convocatoria`;
-    mTags.appendChild(typeSpan);
-  }
-
-  if (mBadge) {
-    mBadge.textContent = "ACTIVA";
-    mBadge.className = "modal-status-badge accepted-pill";
-    mBadge.style.display = "inline-block";
-  }
-
-  if (mSensitive) {
-    mSensitive.innerHTML = `
-      <h4>Información de coordinación</h4>
-      <div class="info-alert-content">
-        <p>${item.additionalInfo || "No hay información adicional registrada."}</p>
-      </div>
-    `;
-    mSensitive.style.display = "block";
-  }
-
-  const devStateCard = document.querySelector(".dev-state-selector-card");
-  if (devStateCard) devStateCard.style.display = "none";
-
-  if (mPostulateBtn) mPostulateBtn.style.display = "none";
-
-  const gallerySec = document.getElementById("m-camp-gallery-sec");
-  const galleryGrid = document.getElementById("m-camp-gallery-grid");
-  if (gallerySec && galleryGrid) {
-    galleryGrid.innerHTML = "";
-    if (item.images && item.images.length > 0) {
-      item.images.forEach(imgUrl => {
-        const div = document.createElement("div");
-        div.className = "gallery-img-wrapper";
-        div.style.borderRadius = "var(--radius-md)";
-        div.style.overflow = "hidden";
-        div.style.aspectRatio = "1 / 1";
-        div.style.backgroundColor = "var(--color-surface-hover)";
-        div.style.border = "1px solid var(--color-border)";
-        div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
-        galleryGrid.appendChild(div);
-      });
-      gallerySec.style.display = "block";
-    } else {
-      gallerySec.style.display = "none";
-    }
-  }
-
-  const assocSec = document.getElementById("m-camp-associations-sec");
-  if (assocSec) assocSec.style.display = "none";
-
-  openModal("modal-profile-camp-detail");
-
-  if (typeof lucide !== "undefined") {
-    lucide.createIcons();
-  }
-}
 
 // =========================================================================
 // SIMULADOR DE ESTADOS EN EL MODAL DE DETALLE (EXCLUSIVO VOLUNTARIO)
