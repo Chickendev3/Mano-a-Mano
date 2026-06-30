@@ -36,7 +36,7 @@
         </div>
 
         <?php if (isset($_SESSION['id_usuario']) && $_SESSION['id_usuario'] != $usuario['id']): ?>
-          <button class="btn btn-primary" id="btn-open-invite-modal" style="background-color: #6366F1; border-color: #6366F1; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px;">
+          <button class="btn btn-primary" id="btn-open-invite-modal" style="background-color: #87b189; border-color: #87b189; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; align-self: flex-end;">
             <i data-lucide="send" style="width: 16px; height: 16px;"></i> Invitar
           </button>
         <?php endif; ?>
@@ -115,38 +115,33 @@
           </div>
         </div>
 
-        <!-- PANE: ASOCIACIONES (Mockup Mold) -->
-        <div class="profile-pane" id="pane-asociaciones" role="tabpanel">
-          <div class="alternating-grid">
-            
-            <!-- Association 1 (Image Left) -->
-            <article class="alt-card">
-              <div class="alt-card-img-col">
-                <div class="alt-card-img-placeholder">
-                  <i data-lucide="image"></i>
+        <!-- PANE: ASOCIACIONES -->
+        <div class="profile-pane" id="pane-asociaciones" role="tabpanel" style="display: none;">
+          <div class="invites-list-container alternating-grid" id="associations-list">
+            <?php if (empty($asociaciones)): ?>
+              <div class="volunteer-empty-state" style="grid-column: 1/-1;">No hay asociaciones registradas todavía.</div>
+            <?php else: ?>
+              <?php foreach ($asociaciones as $assoc): 
+                $partnerImg = !empty($assoc['partnerImg']) 
+                  ? '<img src="' . BASE_URL . htmlspecialchars($assoc['partnerImg']) . '" alt="' . htmlspecialchars($assoc['partnerName']) . '">'
+                  : '<i data-lucide="' . ($assoc['partnerRole'] === 'voluntario' ? 'user' : 'building') . '"></i>';
+              ?>
+              <article class="invite-card" onclick="openCampaignDetailsModal(<?= $assoc['id'] ?>)" style="cursor: pointer; grid-column: 1/-1;">
+                <div class="invite-card-img-col user-avatar">
+                  <?= $partnerImg ?>
                 </div>
-              </div>
-              <div class="alt-card-content-col">
-                <h3 class="alt-card-title">Asociación Civil Soles (Molde)</h3>
-                <p class="alt-card-desc">Soles nos provee el espacio físico en su comedor comunitario los días de semana y coordina el contacto con las familias del barrio.</p>
-                <button class="btn btn-primary btn-info" onclick="openAssociationDetailsModal(201)">+ Más información</button>
-              </div>
-            </article>
-
-            <!-- Association 2 (Image Right) -->
-            <article class="alt-card alt-card-reverse">
-              <div class="alt-card-img-col">
-                <div class="alt-card-img-placeholder">
-                  <i data-lucide="image"></i>
+                <div class="invite-card-content-col">
+                  <h3 class="alt-card-title" style="margin-bottom: 2px;"><?= htmlspecialchars($assoc['partnerName']) ?></h3>
+                  <span style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">
+                    <?= $assoc['partnerRole'] === 'voluntario' ? 'Particular' : 'Organización' ?>
+                  </span>
+                  <div style="margin-top: 8px; font-size: 13px; color: var(--color-text-secondary);">
+                    Colaborando en la campaña: <strong><?= htmlspecialchars($assoc['title']) ?></strong>
+                  </div>
                 </div>
-              </div>
-              <div class="alt-card-content-col">
-                <h3 class="alt-card-title">Red Alimentaria Solidaria (Molde)</h3>
-                <p class="alt-card-desc">Colaboramos en la clasificación y logística de insumos frescos para garantizar la merienda saludable de los chicos en los talleres.</p>
-                <button class="btn btn-primary btn-info" onclick="openAssociationDetailsModal(202)">+ Más información</button>
-              </div>
-            </article>
-
+              </article>
+              <?php endforeach; ?>
+            <?php endif; ?>
           </div>
         </div>
 
@@ -209,52 +204,6 @@
 
 </main>
 
-<!-- ASSOCIATION DETAIL MODAL (Reuses same structure) -->
-<div class="modal-overlay" id="modal-profile-assoc-detail" role="dialog" aria-modal="true" aria-labelledby="m-assoc-title">
-  <div class="modal-box modal-box-large">
-    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeProfileModal('modal-profile-assoc-detail')">
-      <i data-lucide="x"></i>
-    </button>
-    
-    <div class="modal-header-with-badge">
-      <h3 class="modal-title" id="m-assoc-title">Nombre de la organización asociada</h3>
-    </div>
-    
-    <div class="modal-main-content">
-      <p class="modal-desc-para" id="m-assoc-desc">
-        Descripción corta de la asociación y los lazos colaborativos con la organización actual.
-      </p>
-      
-      <div class="modal-tags-row">
-        <span class="tag-badge"><i data-lucide="tag"></i> Comunidad</span>
-        <span class="tag-badge">Logística</span>
-      </div>
-
-      <div class="modal-gallery-sec">
-        <h4>Trabajo colaborativo realizado</h4>
-        <div class="modal-gallery-grid">
-          <div class="gallery-placeholder-img"><i data-lucide="image"></i></div>
-          <div class="gallery-placeholder-img"><i data-lucide="image"></i></div>
-          <div class="gallery-placeholder-img"><i data-lucide="image"></i></div>
-        </div>
-      </div>
-      
-      <div class="modal-associations-sec">
-        <h4>Otras ONGs vinculadas</h4>
-        <div class="modal-associations-circles">
-          <div class="assoc-circle-item">
-            <div class="assoc-circle"><i data-lucide="image"></i></div>
-            <span>Fundación Huellas</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="modal-footer-actions">
-      <button class="btn btn-ghost" onclick="closeProfileModal('modal-profile-assoc-detail')">Cerrar</button>
-    </div>
-  </div>
-</div>
 
 <div class="modal-overlay" id="modal-invite-user" role="dialog" aria-modal="true" aria-labelledby="invite-modal-title">
   <div class="modal-box" style="max-width: 450px;">
@@ -276,7 +225,7 @@
       
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
         <button class="btn btn-ghost" onclick="closeModal('modal-invite-user')">Cancelar</button>
-        <button class="btn btn-primary" id="btn-confirm-invite" style="background-color: #6366F1; border-color: #6366F1;">Confirmar invitación</button>
+        <button class="btn btn-primary" id="btn-confirm-invite" style="background-color: #87b189; border-color: #87b189;">Confirmar invitación</button>
       </div>
     </div>
   </div>

@@ -159,108 +159,191 @@ window.campaignsDetailsData = window.campaignsDetailsData || {
   }
 };
 
-// ASSOCIATIONS DETAIL DATA
-const associationsDetailsData = {
-  201: {
-    title: 'Asociación Civil Soles',
-    desc: 'Institución comunitaria aliada que facilita las instalaciones edilicias de su comedor comunitario. Proveen la base logística y el nexo directo con las familias receptoras del programa de apoyo escolar.'
-  },
-  202: {
-    title: 'Red Alimentaria Solidaria',
-    desc: 'Banco de alimentos que provee raciones frescas semanales. Colaboramos compartiendo voluntarios para campañas de recolección y clasificación de mercadería.'
-  }
-};
 
 // OPEN MODAL FOR CAMPAIGNS
 window.openCampaignDetailsModal = function(id) {
   currentCampaignId = id;
-  const camp = campaignsDetailsData[id] || {
-    title: 'Campaña Solidaria',
-    desc: 'Información de la campaña solidaria.',
-    tags: ['Solidaridad']
-  };
   
-  // Set content
-  const mTitle = document.getElementById('m-camp-title');
-  const mDesc = document.getElementById('m-camp-desc');
-  const mTags = document.getElementById('m-camp-tags');
-  const mBadge = document.getElementById('m-camp-accepted-badge');
-  const mPostulateBtn = document.getElementById('m-camp-postulate-btn');
-  const mSensitive = document.getElementById('m-camp-sensitive-info');
-  
-  if (mTitle) mTitle.textContent = camp.title;
-  if (mDesc) mDesc.textContent = camp.desc;
-  
-  if (mTags) {
-    mTags.innerHTML = '';
-    camp.tags.forEach(tag => {
-      const span = document.createElement('span');
-      span.className = 'tag-badge';
-      span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
-      mTags.appendChild(span);
-    });
-  }
-  
-  if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
-
-  const isOrg = typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "organizacion";
-  
-  if (mPostulateBtn) {
-    if (isOrg) {
-      mPostulateBtn.style.display = "none";
-    } else {
-      mPostulateBtn.style.display = "inline-flex";
-      
-      const app = appliedCampaignsMap.get(id);
-      if (app) {
-        mPostulateBtn.disabled = true;
-        mPostulateBtn.textContent = "Ya postulado";
+  fetch(`${BASE_URL}obtener-campania-por-id?id=${id}`)
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        const camp = res.data;
         
-        if (mBadge) {
-          mBadge.textContent = app.status.toUpperCase();
-          mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
-          mBadge.style.display = "inline-block";
-        }
+        const mTitle = document.getElementById('m-camp-title');
+        const mDesc = document.getElementById('m-camp-desc');
+        const mTags = document.getElementById('m-camp-tags');
+        const mBadge = document.getElementById('m-camp-accepted-badge');
+        const mPostulateBtn = document.getElementById('m-camp-postulate-btn');
+        const mSensitive = document.getElementById('m-camp-sensitive-info');
         
-        if (app.status === "aceptado" && mSensitive) {
-          mSensitive.innerHTML = `
-            <h4>Información de coordinación</h4>
-            <div class="info-alert-content">
-              <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
-            </div>
+        if (mTitle) mTitle.textContent = camp.title;
+        if (mDesc) {
+          mDesc.innerHTML = `
+            <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.desc}</p>
+            <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.location}</p>
+            <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.startDate}</p>
+            <p><strong>Fecha de finalización:</strong> ${camp.endDate}</p>
           `;
-          mSensitive.style.display = "block";
         }
-      } else {
-        mPostulateBtn.disabled = false;
-        mPostulateBtn.textContent = "Postularme";
-      }
-    }
-  }
-  
-  // Re-trigger icons
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-  }
-  
-  openModal('modal-profile-camp-detail');
-};
+        
+        if (mTags) {
+          mTags.innerHTML = '';
+          (camp.causes || []).forEach(tag => {
+            const span = document.createElement('span');
+            span.className = 'tag-badge';
+            span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${tag}`;
+            mTags.appendChild(span);
+          });
+          
+          const typeSpan = document.createElement('span');
+          typeSpan.className = 'tag-badge';
+          typeSpan.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+          typeSpan.style.color = 'var(--color-primary)';
+          typeSpan.style.fontWeight = '600';
+          const typeLabel = camp.type === 'convocatoria' ? 'Convocatoria' : 'Informativa';
+          typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
+          mTags.appendChild(typeSpan);
+        }
 
-// OPEN MODAL FOR ASSOCIATIONS
-window.openAssociationDetailsModal = function(id) {
-  const assoc = associationsDetailsData[id] || {
-    title: 'Organización Asociada',
-    desc: 'Detalles sobre la asociación.'
-  };
-  
-  const mTitle = document.getElementById('m-assoc-title');
-  const mDesc = document.getElementById('m-assoc-desc');
-  
-  if (mTitle) mTitle.textContent = assoc.title;
-  if (mDesc) mDesc.textContent = assoc.desc;
-  
-  openModal('modal-profile-assoc-detail');
+        const mCreatorLink = document.getElementById("m-camp-creator-link");
+        if (mCreatorLink) {
+          if (camp.usuario_id) {
+            const creatorProfileUrl = camp.usuario_rol === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
+            mCreatorLink.href = `${BASE_URL}${creatorProfileUrl}?id=${camp.usuario_id}`;
+            mCreatorLink.style.display = "flex";
+            
+            const mCreatorName = document.getElementById("m-camp-creator-name");
+            if (mCreatorName) mCreatorName.textContent = camp.usuario_nombre || "Creador";
+            
+            const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
+            if (mCreatorAvatar) {
+              mCreatorAvatar.innerHTML = camp.usuario_img_perfil 
+                ? `<img src="${BASE_URL + camp.usuario_img_perfil}" alt="Logo creador" class="creator-avatar-img">`
+                : `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
+            }
+          } else {
+            mCreatorLink.style.display = "none";
+          }
+        }
+
+        const gallerySec = document.getElementById("m-camp-gallery-sec");
+        const galleryGrid = document.getElementById("m-camp-gallery-grid");
+        if (gallerySec && galleryGrid) {
+          galleryGrid.innerHTML = "";
+          if (camp.images && camp.images.length > 0) {
+            camp.images.forEach(imgUrl => {
+              const div = document.createElement("div");
+              div.className = "gallery-placeholder-img";
+              div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campaña" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
+              galleryGrid.appendChild(div);
+            });
+            gallerySec.style.display = "block";
+          } else {
+            gallerySec.style.display = "none";
+          }
+        }
+
+        const assocSec = document.getElementById("m-camp-associations-sec");
+        const assocList = document.getElementById("m-camp-associations-list");
+        if (assocSec && assocList) {
+          assocList.innerHTML = "";
+          if (camp.associations && camp.associations.length > 0) {
+            camp.associations.forEach(org => {
+              const a = document.createElement("a");
+              a.href = `${BASE_URL}perfil/organizacion?id=${org.id}`;
+              a.className = "association-circle";
+              a.title = org.nombre;
+              a.innerHTML = org.img_perfil 
+                ? `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`
+                : `<div class="association-logo-placeholder" style="width:40px; height:40px; border-radius:50%; background-color:var(--color-border); display:flex; align-items:center; justify-content:center; color:var(--color-text-light);"><i data-lucide="building" style="width:16px; height:16px;"></i></div>`;
+              assocList.appendChild(a);
+            });
+            assocSec.style.display = "block";
+          } else {
+            assocSec.style.display = "none";
+          }
+        }
+        
+        if (mBadge) mBadge.style.display = "none";
+        
+        // Lógica de visualización de información de coordinación (adicional)
+        let showAdditionalInfo = false;
+        if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID) {
+          const isOwner = camp.usuario_id == SESSION_USER_ID;
+          if (isOwner) {
+            showAdditionalInfo = true;
+          } else if (SESSION_USER_ROL === "voluntario") {
+            const app = appliedCampaignsMap.get(id);
+            if (app && app.status === "aceptado") {
+              showAdditionalInfo = true;
+            }
+          } else if (SESSION_USER_ROL === "organizacion" && camp.associations) {
+            const isAssociated = camp.associations.some(org => org.id == SESSION_USER_ID);
+            if (isAssociated) {
+              showAdditionalInfo = true;
+            }
+          }
+        }
+
+        if (mSensitive) {
+          if (showAdditionalInfo) {
+            mSensitive.innerHTML = `
+              <h4>Información de coordinación</h4>
+              <div class="info-alert-content">
+                <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
+              </div>
+            `;
+            mSensitive.style.display = "block";
+          } else {
+            mSensitive.style.display = "none";
+          }
+        }
+
+        const isOrg = typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "organizacion";
+        const isOwner = camp.usuario_id == (typeof SESSION_USER_ID !== 'undefined' ? SESSION_USER_ID : null);
+        
+        if (mPostulateBtn) {
+          if (isOrg || isOwner) {
+            mPostulateBtn.style.display = "none";
+          } else {
+            mPostulateBtn.style.display = "inline-flex";
+            
+            const app = appliedCampaignsMap.get(id);
+            if (app) {
+              mPostulateBtn.disabled = true;
+              mPostulateBtn.textContent = "Ya postulado";
+              
+              if (mBadge) {
+                mBadge.textContent = app.status.toUpperCase();
+                mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+                mBadge.style.display = "inline-block";
+              }
+              
+              if (app.status === "aceptado" && mSensitive) {
+                mSensitive.innerHTML = `
+                  <h4>Información de coordinación</h4>
+                  <div class="info-alert-content">
+                    <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
+                  </div>
+                `;
+                mSensitive.style.display = "block";
+              }
+            } else {
+              mPostulateBtn.disabled = false;
+              mPostulateBtn.textContent = "Postularme";
+            }
+          }
+        }
+        
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+        
+        openModal('modal-profile-camp-detail');
+      }
+    })
+    .catch(err => console.error("Error al cargar detalle de campaña:", err));
 };
 
 // CLOSE MODAL UTILITY FOR PROFILE

@@ -1879,3 +1879,36 @@ select:focus-visible {
   border-radius: var(--radius-md);
   width: 100%;
 }
+
+
+/* UNLOCKED ALERT INFO */
+.unlocked-info-box {
+  background-color: var(--color-primary-light);
+  border-left: 5px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+  animation: slideDown var(--transition-normal);
+}
+
+.unlocked-info-box h4 {
+  font-size: 16px;
+  color: var(--color-primary-dark);
+  margin-bottom: 12px;
+}
+
+.info-alert-content ul {
+  list-style: disc;
+  margin-left: 20px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-alert-content p {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}

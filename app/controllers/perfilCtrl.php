@@ -750,12 +750,32 @@ class perfilCtrl extends Controlador {
 
         $miembros = $modeloOrg->obtenerMiembrosOrganizacion($id);
 
+        $modeloInvitacion = $this->cargarModelo('Invitacion');
+        $rawAsoc = $modeloInvitacion->obtenerAsociacionesPorOrganizacion($id);
+        $asociaciones = [];
+        foreach ($rawAsoc as $assoc) {
+            $causes = $modeloCampania->obtenerCausasDeCampania($assoc['id']);
+            $esCreador = $assoc['creator_id'] == $id;
+
+            $asociaciones[] = [
+                'id' => (int)$assoc['id'],
+                'title' => $assoc['titulo'],
+                'desc' => $assoc['descripcion'],
+                'category' => !empty($causes) ? $causes[0] : 'Solidario',
+                'partnerName' => $esCreador ? $assoc['invited_name'] : $assoc['creator_name'],
+                'partnerImg' => $esCreador ? $assoc['invited_img'] : $assoc['creator_img'],
+                'partnerId' => $esCreador ? $assoc['invited_id'] : $assoc['creator_id'],
+                'partnerRole' => $esCreador ? $assoc['invited_role'] : $assoc['creator_role']
+            ];
+        }
+
         $datos = [
             'usuario' => $usuario,
             'causas_organizacion' => $causas_organizacion,
             'campanias' => $campanias,
             'campaniasDetails' => $campaniasDetails,
             'miembros' => $miembros,
+            'asociaciones' => $asociaciones,
             'cssPropio' => 'perfil_organizacion_vista.css',
             'jsPropio' => 'perfil_organizacion_vista.js'
         ];

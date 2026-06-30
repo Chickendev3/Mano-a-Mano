@@ -62,11 +62,10 @@
         </div>
         
         <?php if (isset($_SESSION['id_usuario']) && $_SESSION['id_usuario'] != $usuario['id']): ?>
-          <button class="btn btn-primary" id="btn-open-invite-modal" style="background-color: #6366F1; border-color: #6366F1; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px;">
+          <button class="btn btn-primary" id="btn-open-invite-modal" style="background-color: #87b189; border-color: #87b189; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; align-self: flex-end;">
             <i data-lucide="send" style="width: 16px; height: 16px;"></i> Invitar
           </button>
         <?php endif; ?>
-
       </div>
     </div>
   </section>
@@ -214,7 +213,7 @@
       
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
         <button class="btn btn-ghost" onclick="closeModal('modal-invite-user')">Cancelar</button>
-        <button class="btn btn-primary" id="btn-confirm-invite" style="background-color: #6366F1; border-color: #6366F1;">Confirmar invitación</button>
+        <button class="btn btn-primary" id="btn-confirm-invite" style="background-color: #87b189; border-color: #87b189;">Confirmar invitación</button>
       </div>
     </div>
   </div>

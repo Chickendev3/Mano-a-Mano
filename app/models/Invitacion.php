@@ -72,15 +72,21 @@ class Invitacion {
 
     /* Obtener asociaciones de una organización */
     public function obtenerAsociacionesPorOrganizacion ( int $idUsuario ) :array {
-        $consulta = "SELECT c.id, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion as endDate, c.ubicacion, c.info_adicional,
-                            u_creator.id as creator_id, u_creator.nombre as creator_name, u_creator.img_perfil as creator_img,
-                            u_invited.id as invited_id, u_invited.nombre as invited_name, u_invited.img_perfil as invited_img
-                     FROM campanias c
-                     JOIN usuarios u_creator ON c.usuario_id = u_creator.id
-                     JOIN invitaciones i ON c.id = i.campania_id AND i.estado_id = 1
-                     JOIN usuarios u_invited ON i.destinatario_id = u_invited.id
-                     JOIN organizaciones o_invited ON u_invited.id = o_invited.usuario_id
-                     WHERE c.usuario_id = :usuario_id OR i.destinatario_id = :usuario_id;";
+        $consulta = "SELECT c.id, c.titulo, c.descripcion, c.fecha_inicio, c.fecha_finalizacion as endDate, c.ubicacion, c.info_adicional, u_creator.id as creator_id, 
+                        CASE WHEN v_creator.id IS NOT NULL THEN CONCAT(u_creator.nombre, ' ', v_creator.apellido) ELSE u_creator.nombre END as creator_name, 
+                        u_creator.img_perfil as creator_img,
+                        CASE WHEN v_creator.id IS NOT NULL THEN 'voluntario' ELSE 'organizacion' END as creator_role,
+                        u_invited.id as invited_id, 
+                        u_invited.nombre as invited_name, 
+                        u_invited.img_perfil as invited_img,
+                        'organizacion' as invited_role
+                            FROM campanias c
+                            JOIN usuarios u_creator ON c.usuario_id = u_creator.id
+                            LEFT JOIN voluntarios v_creator ON u_creator.id = v_creator.usuario_id
+                            JOIN invitaciones i ON c.id = i.campania_id AND i.estado_id = 1
+                            JOIN usuarios u_invited ON i.destinatario_id = u_invited.id
+                            JOIN organizaciones o_invited ON u_invited.id = o_invited.usuario_id
+                            WHERE c.usuario_id = :usuario_id OR i.destinatario_id = :usuario_id;";
         
         $this->bd->consulta($consulta);
         $this->bd->asignar(":usuario_id", $idUsuario);

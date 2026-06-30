@@ -407,7 +407,38 @@ function _renderCampaignModal(camp, options = {}) {
   }
 
   if (mBadge) mBadge.style.display = "none";
-  if (mSensitive) mSensitive.style.display = "none";
+    // Lógica de visualización de información de coordinación (adicional)
+  let showAdditionalInfo = false;
+  if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID) {
+    const isOwner = camp.usuario_id == SESSION_USER_ID;
+    if (isOwner) {
+      showAdditionalInfo = true;
+    } else if (SESSION_USER_ROL === "voluntario" && typeof postulations !== 'undefined') {
+      const post = postulations.find(p => p.campaignId === camp.id);
+      if (post && post.status === "aceptado") {
+        showAdditionalInfo = true;
+      }
+    } else if (SESSION_USER_ROL === "organizacion" && camp.associations) {
+      const isAssociated = camp.associations.some(org => org.id == SESSION_USER_ID);
+      if (isAssociated) {
+        showAdditionalInfo = true;
+      }
+    }
+  }
+
+  if (mSensitive) {
+    if (showAdditionalInfo) {
+      mSensitive.innerHTML = `
+        <h4>Información de coordinación</h4>
+        <div class="info-alert-content">
+          <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
+        </div>
+      `;
+      mSensitive.style.display = "block";
+    } else {
+      mSensitive.style.display = "none";
+    }
+  }
 
   const devStateCard = document.querySelector(".dev-state-selector-card");
   if (devStateCard) devStateCard.style.display = "none";
