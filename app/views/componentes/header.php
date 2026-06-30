@@ -34,6 +34,12 @@
     
     <!-- Actions with Icons & Custom CTAs -->
     <div class="nav-actions">
+      <!-- Theme Switcher Toggle -->
+      <!--<button id="theme-toggle-btn" class="btn-theme-toggle" aria-label="Cambiar tema de color">
+        <i data-lucide="sun" class="theme-icon-light"></i>
+        <i data-lucide="moon" class="theme-icon-dark"></i>
+      </button>-->
+      
       <?php if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === true): ?>
         <!-- Logged In: Dropdown menu "Mi cuenta" -->
         <div class="nav-dropdown" id="nav-user-dropdown">

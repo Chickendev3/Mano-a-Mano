@@ -153,7 +153,7 @@
 .action-card {
   display: flex;
   align-items: center;
-  background-color: var(--color-bg-dark); /* Color más oscuro */
+  background-color: var(--color-surface-dark); /* Color más oscuro */
   border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--radius-lg);
   padding: 24px 32px;
@@ -442,7 +442,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 44px;
   font-weight: 800;
-  color: var(--color-border);
+  color: var(--color-text-primary);
   line-height: 1;
   transition: color var(--transition-normal);
 }

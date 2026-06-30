@@ -1,5 +1,5 @@
 <!-- HERO SECTION -->
-<section class="hero" id="inicio" style="background-image: url('<?= BASE_URL ?>img/hero.png');">
+<section class="hero" id="inicio" style="background-image: url('<?= BASE_URL ?>img/hero.png?v=2.0');">
   <div class="hero-overlay"></div>
   
   <div class="container hero-container">
@@ -79,7 +79,7 @@
 <section class="section" id="quienes-somos" style="background-color: var(--color-surface);">
   <div class="container about-grid">
     <div class="about-img-wrapper">
-      <img src="<?= BASE_URL ?>img/about.png" alt="Grupo de voluntarios de diversas edades trabajando felices en equipo" class="about-img">
+      <img src="<?= BASE_URL ?>img/trabajo_en_equipo.png" alt="Grupo de voluntarios de diversas edades trabajando felices en equipo" class="about-img">
       <div class="about-badge-card">
         <h4>Nuestra Filosofía</h4>
         <p>Creemos en el poder transformador de la acción colectiva. Pequeñas manos hacen grandes puentes.</p>

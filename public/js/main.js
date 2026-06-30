@@ -5,7 +5,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   initializeMobileMenu();
   initializeHeaderScroll();
+  initializeThemeToggle();
 });
+
+// THEME SWITCHER TOGGLE
+function initializeThemeToggle() {
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('light-theme');
+      
+      // Save choice to localStorage
+      if (document.documentElement.classList.contains('light-theme')) {
+        localStorage.setItem('theme', 'light');
+      } else {
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  }
+}
 
 // HEADER SCROLL EFFECT
 function initializeHeaderScroll() {

@@ -9,6 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($titulo); ?></title>
 
+    <!-- Pre-load theme preference to prevent visual flash -->
+    <script>
+      if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.add('light-theme');
+      }
+    </script>
+
     <!-- Global CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=2.0">
 
