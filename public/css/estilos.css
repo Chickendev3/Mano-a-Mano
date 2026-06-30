@@ -3,41 +3,51 @@
 
 /* CSS Variables */
 :root {
-  /* Color Palette */
-  --color-primary: #4C7F6B; /* Verde secundario para botones y acentos */
-  --color-primary-dark: #2F4F4B; /* Verde oscuro principal para headings y hovers */
-  --color-primary-light: rgba(76, 127, 107, 0.08); /* Verde claro muy suave translúcido */
-  --color-secondary: #7E72B8; /* Acento violeta de la paleta oficial */
-  --color-secondary-light: rgba(126, 114, 184, 0.08);
-  --color-success: #4C7F6B;
-  --color-success-dark: #2F4F4B;
-  --color-success-light: rgba(76, 127, 107, 0.08);
-  --color-background: #E6E9E4; /* Fondo principal */
-  --color-background-warm: #E9E2D6; /* Fondo cálido */
-  --color-surface: #FFFFFF;
-  --color-surface-hover: #CFE0D6; /* Verde muy suave */
-  --color-text-primary: #2D3B45; /* Texto oscuro */
-  --color-text-secondary: #4C7F6B;
-  --color-text-muted: #7FAE9E; /* Verde claro */
-  --color-border: #CFE0D6; /* Verde muy suave para bordes */
-  --color-accent-yellow: #F2B24C; /* Acento amarillo */
+  /* Color Palette - NUEVA PALETA DE COLORES (Mockup) */
+  --color-bg-dark: #0d1a17;
+  --color-bg-dark-sec: #1E2A2E;
+  --color-primary-dark: #264B43;
+  --color-primary: #3BA37A;
+  --color-primary-light: rgba(59, 163, 122, 0.08);
+  --color-primary-muted: #7FAE9D;
+  --color-light: #E6EDE8;
+  --color-secondary: #7E72BB;
+  --color-secondary-light: rgba(126, 114, 187, 0.08);
+  --color-success: #3BA37A;
+  --color-success-dark: #264B43;
+  --color-success-light: rgba(59, 163, 122, 0.08);
+  --color-accent-orange: #F2524C;
+  --color-accent-beige: #D9C7A3;
   
+  /* Textos y Superficies */
+  --color-background: #0d1a17;
+  --color-background-warm: #132521;
+  --color-surface: #1E2A2E;
+  --color-surface-light: #FFFFFF;
+  --color-surface-dark: rgba(30, 42, 46, 0.85);
+  --color-text-primary: #E6EDE8;
+  --color-text-secondary: #3BA37A;
+  --color-text-dark: #0F172A;
+  --color-text-muted: rgba(230, 237, 232, 0.7);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-accent-yellow: #D9C7A3;
+
   /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(45, 59, 69, 0.04);
-  --shadow-md: 0 8px 24px rgba(45, 59, 69, 0.06);
-  --shadow-lg: 0 16px 40px rgba(45, 59, 69, 0.08);
-  --shadow-xl: 0 24px 60px rgba(45, 59, 69, 0.12);
-  --shadow-primary: 0 8px 20px rgba(76, 127, 107, 0.2);
-  --shadow-secondary: 0 8px 20px rgba(126, 114, 184, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --shadow-primary: 0 8px 20px rgba(59, 163, 122, 0.2);
+  --shadow-secondary: 0 8px 20px rgba(126, 114, 187, 0.2);
 
   /* Borders & Spacing */
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-full: 9999px;
-  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-lg: 20px;
+  --radius-full: 999px;
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.35s ease;
 }
 
 /* Reset & Base Styles */
@@ -197,79 +207,21 @@ button, input, textarea, select {
   color: var(--color-primary);
 }
 
-/* HEADER & CONTINUOUS WAVY BACKGROUND */
+/* HEADER / NAVBAR REDISEÑADO (Estilo pastilla flotante) */
 .header {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 90px;
-  background-color: transparent;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 1400px;
+  height: 80px;
+  background-color: rgba(13, 26, 23, 0.9); /* var(--color-bg-dark) with transparency */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
   z-index: 1000;
-  transition: all var(--transition-normal);
-}
-
-.header-bg-left {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: calc(50% - 250px);
-  height: 90px;
-  background-color: #FFFFFF;
-  z-index: 1;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.02));
-  transition: all var(--transition-normal);
-}
-
-.header-bg-left::after {
-  content: "";
-  position: absolute;
-  right: -80px;
-  top: 0;
-  width: 80px;
-  height: 90px;
-  z-index: 1;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 90' preserveAspectRatio='none'><path fill='%23FFFFFF' d='M0,0 L80,0 L80,60 C50,60 30,75 0,90 Z'></path></svg>");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  transition: all var(--transition-normal);
-}
-
-.header-bg-center {
-  position: absolute;
-  top: 0;
-  left: calc(50% - 170px);
-  width: 340px;
-  height: 60px;
-  background-color: #FFFFFF;
-  z-index: 1;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.01));
-  transition: all var(--transition-normal);
-}
-
-.header-bg-right {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: calc(50% - 250px);
-  height: 90px;
-  background-color: #FFFFFF;
-  z-index: 1;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.02));
-  transition: all var(--transition-normal);
-}
-
-.header-bg-right::before {
-  content: "";
-  position: absolute;
-  left: -80px;
-  top: 0;
-  width: 80px;
-  height: 90px;
-  z-index: 1;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 90' preserveAspectRatio='none'><path fill='%23FFFFFF' d='M0,0 L80,0 L80,90 C50,75 30,60 0,60 Z'></path></svg>");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   transition: all var(--transition-normal);
 }
 
@@ -311,25 +263,24 @@ button, input, textarea, select {
   font-family: 'Outfit', sans-serif;
   font-size: 20px;
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: var(--color-light);
   letter-spacing: -0.3px;
 }
 
 .logo-subtitle {
   font-size: 10px;
   font-weight: 500;
-  color: var(--color-text-muted);
+  color: var(--color-primary-muted);
 }
 
 /* NAV LINKS (CENTERED IN THE CURVED SECTION) */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 32px;
   list-style: none;
   margin: 0;
   padding: 0;
-  height: 60px;
 }
 
 .nav-link {
@@ -337,11 +288,12 @@ button, input, textarea, select {
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-weight: 500;
+  color: var(--color-text-muted);
   text-decoration: none;
+  position: relative;
   padding: 8px 16px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   transition: all var(--transition-fast);
 }
 
@@ -353,60 +305,75 @@ button, input, textarea, select {
 }
 
 .nav-link:hover {
-  color: var(--color-primary);
+  color: var(--color-light);
 }
 
 .nav-link:hover i {
-  color: var(--color-primary);
+  color: var(--color-light);
 }
 
-/* Active State Capsule */
+/* Active State Capsule & Subrayado */
 .nav-link.active {
-  background-color: var(--color-background-warm); /* Soft warm beige background */
-  color: var(--color-primary-dark);
-  box-shadow: var(--shadow-sm);
+  color: var(--color-primary);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .nav-link.active i {
-  color: var(--color-primary-dark);
+  color: var(--color-primary);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: 4px;
 }
 
 /* ACTIONS */
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  padding-right: 10px;
 }
 
 .nav-login-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text-primary);
-  font-weight: 600;
+  color: var(--color-light);
+  font-weight: 500;
+  font-size: 14px;
 }
 
 .nav-login-btn i {
   width: 16px;
   height: 16px;
-  color: var(--color-text-muted);
+  color: var(--color-light);
 }
 
 .nav-cta-register {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--color-primary);
-  color: var(--color-surface);
+  background-color: var(--color-primary-muted) !important;
+  color: var(--color-text-dark) !important;
   padding: 10px 20px !important;
   border-radius: var(--radius-full) !important;
-  box-shadow: var(--shadow-primary);
   border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 14px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
 }
 
 .nav-cta-register:hover {
-  background-color: var(--color-primary-dark);
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-dark) !important;
   transform: translateY(-1px);
 }
 

@@ -1,8 +1,5 @@
 <!-- FIXED HEADER / NAVBAR -->
 <header class="header" id="header">
-  <div class="header-bg-left"></div>
-  <div class="header-bg-center"></div>
-  <div class="header-bg-right"></div>
   
   <div class="container nav-container">
     <!-- Wavy Logo Brand Group -->

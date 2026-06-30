@@ -10,7 +10,7 @@
     <title><?= htmlspecialchars($titulo); ?></title>
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=2.0">
 
     <!-- Dynamic CSS load based on the view -->
     <?php 
@@ -18,7 +18,7 @@
         if ($rutaVista === 'registro_voluntario' || $rutaVista === 'registro_organizacion') {
             $base_css = 'registro';
         }
-        echo '<link rel="stylesheet" href="' . BASE_URL . 'css/' . $base_css . '.css">';
+        echo '<link rel="stylesheet" href="' . BASE_URL . 'css/' . $base_css . '.css?v=2.0">';
     ?>
 
     <!-- Lucide Icons -->

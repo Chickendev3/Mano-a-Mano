@@ -1,19 +1,23 @@
 <!-- HERO SECTION -->
-<section class="hero" id="inicio">
-  <div class="dots-grid-pattern"></div>
-  <div class="hero-blob hero-blob-1"></div>
-  <div class="hero-blob hero-blob-2"></div>
+<section class="hero" id="inicio" style="background-image: url('<?= BASE_URL ?>img/hero.png');">
+  <div class="hero-overlay"></div>
   
-  <div class="container hero-grid">
+  <div class="container hero-container">
     <div class="hero-content">
       <div class="hero-badge">
-        <span class="hero-badge-pulse" aria-hidden="true"></span>
-        <i data-lucide="users"></i>
-        <span>+1,400 Voluntarios activos hoy</span>
+        <i data-lucide="users"></i> +1.400 Voluntarios activos hoy
       </div>
       
-      <h1 class="hero-title">Conectamos personas con causas que <span class="highlight">generan impacto</span></h1>
-      <p class="hero-subtitle">Encontrá oportunidades de voluntariado o publicá campañas para sumar personas comprometidas con tu misión.</p>
+      <h1 class="hero-title">
+        Conectamos personas<br>
+        con causas que<br>
+        <span class="highlight">generan impacto</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        Encontrá oportunidades de voluntariado o publicá campañas<br>
+        para sumar personas comprometidas con tu misión.
+      </p>
       
       <?php if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true): ?>
       <div class="hero-buttons">
@@ -25,59 +29,46 @@
         </a>
       </div>
       <?php endif; ?>
-      
-      <!-- Stats Floating Card (Bottom Left of Hero Grid) -->
-      <div class="hero-stats-card">
-        <div class="stat-card-item">
-          <div class="stat-card-icon"><i data-lucide="sparkles"></i></div>
-          <div class="stat-card-info">
-            <h4 id="stat-campaigns">+180</h4>
+    </div>
+
+    <!-- TARJETAS FLOTANTES INFERIORES -->
+    <div class="hero-bottom-grid">
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-icon icon-green"><i data-lucide="users"></i></div>
+          <div class="stat-text">
+            <h4 id="stat-campaigns">180+</h4>
             <p>Campañas activas</p>
           </div>
         </div>
-        <div class="stat-card-divider"></div>
-        <div class="stat-card-item">
-          <div class="stat-card-icon"><i data-lucide="building-2"></i></div>
-          <div class="stat-card-info">
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-icon icon-purple"><i data-lucide="building"></i></div>
+          <div class="stat-text">
             <h4 id="stat-orgs">95</h4>
             <p>ONGs registradas</p>
           </div>
         </div>
-        <div class="stat-card-divider"></div>
-        <div class="stat-card-item">
-          <div class="stat-card-icon"><i data-lucide="heart"></i></div>
-          <div class="stat-card-info">
-            <h4 id="stat-impact">+12k</h4>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-icon icon-gold"><i data-lucide="heart"></i></div>
+          <div class="stat-text">
+            <h4 id="stat-impact">12k+</h4>
             <p>Horas de impacto</p>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Right Photo Hero with Organic Wave Crop and Quote Card -->
-    <!--<div class="hero-image-wrapper">
-      <div class="hero-photo-container">
-        <img src="<?= BASE_URL ?>img/hero_new.png" alt="Voluntarios felices colaborando mano a mano" class="hero-photo">
-        
-        <div class="hero-organic-mask">
-          <svg viewBox="0 0 100 800" preserveAspectRatio="none" width="100%" height="100%">
-            <path fill="#E9E2D6" d="M100,0 C60,150 100,300 40,450 C0,580 80,700 100,800 L0,800 L0,0 Z"></path>
-          </svg>
-        </div>
-      </div> -->
       
-      <!-- Floating Quote Card over the photo -->
-      <div class="hero-quote-floating-card">
-        <div class="quote-header">
-          <i data-lucide="leaf" class="quote-icon"></i>
-          <span class="quote-tag">Nuestro Lema</span>
-        </div>
-        <div class="quote-body">
-          <p>"Pequeñas acciones, grandes cambios."</p>
-          <!-- Purple wave line accent -->
-          <svg class="quote-wave-line" viewBox="0 0 120 10" preserveAspectRatio="none" width="120" height="10">
-            <path d="M0,5 Q30,0 60,5 T120,5" fill="none" stroke="#7E72B8" stroke-width="3" stroke-linecap="round"></path>
-          </svg>
+      <div class="action-card">
+        <div class="action-icon"><i data-lucide="leaf"></i></div>
+        <div class="action-text">
+          <h4>Pequeñas acciones,</h4>
+          <h4>grandes cambios.</h4>
+          <div class="wave-decoration">
+            <svg width="40" height="10" viewBox="0 0 40 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 5C5 5 5 1 10 1C15 1 15 9 20 9C25 9 25 1 30 1C35 1 35 5 40 5" stroke="#7E72BB" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
