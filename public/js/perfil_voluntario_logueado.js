@@ -830,24 +830,14 @@ function renderVolunteering() {
           ${imgHTML}
         </div>
       </div>
-      <div class="alt-card-content-col" style="position: relative;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <h3 class="alt-card-title">${item.title}</h3>
-          
-          <!-- Imprime la causa directamente -->
-          <span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">
-            ${item.category || "Solidario"}
+      <div class="alt-card-content-col">
+        <h3 class="alt-card-title">${item.title}</h3>
+        <div class="profile-tags-wrapper" style="margin-top: 4px; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; display: flex;">
+          <span class="tag-badge" style="padding: 4px 12px; font-size: 11px; height: auto;">
+            <i data-lucide="tag" style="width:10px; height:10px;"></i> ${item.category || "Solidario"}
           </span>
         </div>
         <p class="alt-card-desc">${item.desc}</p>
-        
-        <div class="camp-card-actions" style="margin-top: auto;">
-          <button class="btn btn-primary btn-info" style="margin-right: auto; pointer-events: none;">+ Ver detalles</button>
-          
-          <span class="modal-status-badge accepted-pill" style="font-size:11px; padding: 6px 12px; text-transform:uppercase;">
-            ${item.status}
-          </span>
-        </div>
       </div>
     `;
     grid.appendChild(article);
