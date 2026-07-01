@@ -17,18 +17,18 @@
 
           <div class="form-group">
             <label for="reg-org-name" class="form-label">Nombre de la Organización *</label>
-            <input type="text" id="reg-org-name" name="nombre" class="form-input" placeholder="Placeholder" required>
+            <input type="text" id="reg-org-name" name="nombre" class="form-input" placeholder="Nombre Completo" required>
           </div>
           
           <div class="form-group">
             <label for="reg-email" class="form-label">Email *</label>
-            <input type="email" id="reg-email" name="email" class="form-input" placeholder="organizacion@correo.com" required autocomplete="username">
+            <input type="email" id="reg-email" name="email" class="form-input" placeholder="organizacion@ejemplo.com" required autocomplete="username">
           </div>
           
           <div class="form-group">
             <label for="reg-password" class="form-label">Contraseña *</label>
             <div class="password-input-container">
-              <input type="password" id="reg-password" name="password" class="form-input" placeholder="****************" required autocomplete="new-password">
+              <input type="password" id="reg-password" name="password" class="form-input" placeholder="**********" required autocomplete="new-password">
               <button type="button" class="password-toggle-btn" aria-label="Mostrar u ocultar contraseña">
                 <i data-lucide="eye"></i>
               </button>
@@ -37,14 +37,14 @@
           </div>
 
           <div class="form-group" style="margin-bottom: 32px;">
-            <label for="reg-org-address" class="form-label">Dirección de la organización *</label>
-            <input type="text" id="reg-org-address" name="ubicacion" class="form-input" placeholder="Calle nombre 1234" required>
+            <label for="reg-org-address" class="form-label">Ubicación de la organización *</label>
+            <input type="text" id="reg-org-address" name="ubicacion" class="form-input" placeholder="Provincia, Localidad, Ciudad" required>
             <input type="hidden" name="action" value="organizacion">
           </div>
 
           <div class="form-group">
             <label for="reg-telefono" class="form-label">Teléfono *</label>
-            <input type="text" id="reg-telefono" name="telefono" class="form-input" placeholder="011 - xxxx - xxxx" required>
+            <input type="text" id="reg-telefono" name="telefono" class="form-input" placeholder="011 0000-0000" required>
           </div>
           
           <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 16px; padding: 14px;">

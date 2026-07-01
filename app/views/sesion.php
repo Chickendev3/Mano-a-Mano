@@ -41,13 +41,9 @@
                   <i data-lucide="eye"></i>
                 </button>
               </div>
-              <span class="form-help-text">Debe ser una combinación de mínimo 8 letras, números y símbolos.</span>
+              <!-- <span class="form-help-text">Debe ser una combinación de mínimo 8 letras, números y símbolos.</span> -->
             </div>
             
-            <div class="form-group" style="margin-bottom: 28px; display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="remember-me" class="form-checkbox" style="width: 16px; height: 16px; accent-color: var(--color-primary);">
-              <label for="remember-me" class="form-label" style="margin-bottom: 0; font-weight: 500; font-size: 14px; color: var(--color-text-secondary); cursor: pointer;">Recordar mi cuenta en esta PC</label>
-            </div>
             
             <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 16px; padding: 14px; margin-bottom: 24px;">
               Iniciar Sesión

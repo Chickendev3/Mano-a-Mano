@@ -89,12 +89,12 @@
       <div class="tabs-filters-bar">
         <div class="filter-group">
           <select class="filter-select" aria-label="Filtrar por">
-            <option value="">Filtrar por</option>
+            <option value="">Filtrar por(Todas) </option>
             <option value="activo">Activas</option>
             <option value="finalizado">Finalizadas</option>
           </select>
           <select class="filter-select" aria-label="Ordenar por">
-            <option value="">Ordenar por</option>
+            <option value="">Ordenar por (Defecto)</option>
             <option value="reciente">Más recientes</option>
             <option value="antiguas">Más antiguas</option>
           </select>

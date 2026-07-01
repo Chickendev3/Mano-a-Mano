@@ -18,28 +18,28 @@
           <div class="form-row">
             <div class="form-group">
               <label for="reg-name" class="form-label">Nombre/s *</label>
-              <input type="text" id="reg-name" name="nombre" class="form-input" placeholder="Placeholder" required>
+              <input type="text" id="reg-name" name="nombre" class="form-input" placeholder="Nombre" required>
             </div>
             <div class="form-group">
               <label for="reg-lastname" class="form-label">Apellido/s *</label>
-              <input type="text" id="reg-lastname" name="apellido" class="form-input" placeholder="Placeholder" required>
+              <input type="text" id="reg-lastname" name="apellido" class="form-input" placeholder="Apellido" required>
             </div>
           </div>
 
           <div class="form-group">
             <label for="reg-telefono" class="form-label">Teléfono *</label>
-            <input type="text" id="reg-telefono" name="telefono" class="form-input" placeholder="011 - xxxx - xxxx" required>
+            <input type="text" id="reg-telefono" name="telefono" class="form-input" placeholder="011 0000-0000" required>
           </div>
           
           <div class="form-group">
             <label for="reg-email" class="form-label">Email *</label>
-            <input type="email" id="reg-email" name="email" class="form-input" placeholder="voluntario@correo.com" required autocomplete="username">
+            <input type="email" id="reg-email" name="email" class="form-input" placeholder="voluntario@ejemplo.com" required autocomplete="username">
           </div>
           
           <div class="form-group" style="margin-bottom: 32px;">
             <label for="reg-password" class="form-label">Contraseña *</label>
             <div class="password-input-container">
-              <input type="password" id="reg-password" name="password" class="form-input" placeholder="****************" required autocomplete="new-password">
+              <input type="password" id="reg-password" name="password" class="form-input" placeholder="**********" required autocomplete="new-password">
               <button type="button" class="password-toggle-btn" aria-label="Mostrar u ocultar contraseña">
                 <i data-lucide="eye"></i>
               </button>

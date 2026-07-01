@@ -67,7 +67,7 @@ class perfilCtrl extends Controlador {
                   'campaniasUsuario' => $campaniasUsuario ?? [],
 
                   'insignias' => $listaInsignias ?? [],
-                  'cantVolutariados' => $cantidadVolunts,
+                  'cantVolutariados' => $cantidadVolunts ?? null,
                   'oficios_voluntario' => $listaOficiosVol ?? [],
                   'oficios' => $listaOficios ?? [],
                   'causas_organizacion' => $listaCausasOrg ?? []

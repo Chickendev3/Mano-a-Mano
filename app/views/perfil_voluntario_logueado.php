@@ -247,7 +247,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
                 <option value="rechazado">Rechazadas</option>
               </select>
               <select class="filter-select" id="sort-postulations-select" aria-label="Ordenar por">
-                <option value="">Ordenar por (Por defecto)</option>
+                <option value="">Ordenar por (Defecto)</option>
                 <option value="reciente">Más recientes</option>
                 <option value="antiguas">Más antiguas</option>
               </select>
@@ -281,7 +281,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
                 <option value="finalizada">Finalizadas</option>
               </select>
               <select class="filter-select" id="sort-volunteering-select" aria-label="Ordenar por">
-                <option value="">Ordenar por (Por defecto)</option>
+                <option value="">Ordenar por (Defecto)</option>
                 <option value="reciente">Más recientes</option>
                 <option value="antiguas">Más antiguas</option>
               </select>

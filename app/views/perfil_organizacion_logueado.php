@@ -149,11 +149,11 @@ include '../app/views/componentes/perfil_comun_logueado.php';
             <div class="filter-group">
               <select class="filter-select" id="filter-campaigns-select" aria-label="Filtrar por">
                 <option value="">Filtrar por (Todas)</option>
-                <option value="convocatoria">Campaña con postulaciones (Convocatorias)</option>
-                <option value="informativa">Campaña informativa (sin postulaciones)</option>
+                <option value="convocatoria">Campañas Convocatorias</option>
+                <option value="informativa">Campañas Informativas</option>
               </select>
               <select class="filter-select" id="sort-campaigns-select" aria-label="Ordenar por">
-                <option value="">Ordenar por (Por defecto)</option>
+                <option value="">Ordenar por (Defecto)</option>
                 <option value="reciente">Mas recientes</option>
                 <option value="antiguas">Mas antiguas</option>
               </select>
@@ -227,7 +227,7 @@ include '../app/views/componentes/perfil_comun_logueado.php';
                 <option value="finalizadas">Campañas Finalizadas</option>
               </select>
               <select class="filter-select" id="sort-associations-select" aria-label="Ordenar por">
-                <option value="">Ordenar por (Por defecto)</option>
+                <option value="">Ordenar por (Defecto)</option>
                 <option value="reciente">Mas recientes (Descendente)</option>
                 <option value="antiguas">Mas antiguas (Ascendente)</option>
               </select>
