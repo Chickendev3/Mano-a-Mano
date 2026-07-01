@@ -18,8 +18,8 @@ let existingCampaignImages = [];         // Rutas de imágenes guardadas previam
 
 // Campañas e Invitaciones (Inicializadas con datos del servidor o fallback vacío)
 let campaigns = window.campaigns || [];
-let receivedInvitations = [];             // Se completará dinámicamente o vía simulación
-let sentInvitations = [];                 // Se completará dinámicamente o vía simulación
+let receivedInvitations = [];             
+let sentInvitations = [];                 
 
 // Variables de paginación común
 let currentPage = 1;

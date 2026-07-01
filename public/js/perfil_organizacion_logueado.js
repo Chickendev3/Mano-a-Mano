@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupProfileEditEvents();
   setupTabs();
   setupCampaignsGrid();
-  setupMockUploads();
   setupVolunteersSection();
   setupInvitationsGrid();
   setupAssociationsGrid();
@@ -429,24 +428,6 @@ window.removeUploadedImage = function(index, gridId) {
   uploadedImagesForForm.splice(index, 1);
   renderFormImagesPreview(gridId);
 };
-
-// ==========================================
-// 8. DELETE CAMPAIGN CONFIRM DIALOG
-// ==========================================
-function setupMockUploads() {
-  // Setup radio choice change simulation inside modal details if present
-  const radios = document.querySelectorAll('input[name="dev-state-choice"]');
-  radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      const selectedState = radio.value;
-      const badge = document.getElementById('m-camp-accepted-badge');
-      const infoBox = document.getElementById('m-camp-sensitive-info');
-      
-      if (badge) badge.style.display = (selectedState === 'registrado-aceptado') ? 'inline-block' : 'none';
-      if (infoBox) infoBox.style.display = (selectedState === 'registrado-aceptado') ? 'block' : 'none';
-    });
-  });
-}
 
 // ==========================================
 // 9. GESTIONAR VOLUNTARIOS FIJOS LÓGICA

@@ -7,9 +7,6 @@
  * a otras campañas e historial de voluntariado).
  */
 
-// =========================================================================
-// VARIABLES DE ESTADO Y SIMULACIÓN (MOCK DATA) EN PROCESO DE REEMPLAZARSE POR DATOS TRAIDOS DE BD
-// =========================================================================
 // Ubicación: public/js/perfil_voluntario_logueado.js (Líneas 13-23)
 let userProfile = {
   nombre: (window.initialUserProfile && window.initialUserProfile.nombre) || "",
@@ -33,8 +30,6 @@ let currentCancelPostulationId = null;
 let currentVolunteeringPage = 1;
 
 let postulations = [];
-
-// Base de Datos Simulada para Voluntariados (Historial de participación)
 let volunteering = [];
 
 // =========================================================================
@@ -917,10 +912,6 @@ function renderVolunteeringPagination(totalPages) {
   container.appendChild(nextBtn);
 }
 
-
-// =========================================================================
-// SIMULADOR DE ESTADOS EN EL MODAL DE DETALLE (EXCLUSIVO VOLUNTARIO)
-// =========================================================================
 
 function loadVolunteerPostulations() {
   fetch(`${BASE_URL}obtener-mis-postulaciones`)
