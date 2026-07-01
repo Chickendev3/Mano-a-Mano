@@ -733,7 +733,7 @@ function openPostulationDetailsView(postulationId) {
   } */
 
   if (typeof openCampaignDetailsView === 'function') {
-    openCampaignDetailsView(post.campaignId);
+    openCampaignDetailsView(post.campaignId, { hidePostulateBtn: true });
   }
 }
 

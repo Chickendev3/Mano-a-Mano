@@ -13,7 +13,22 @@ class conectarCtrl extends Controlador {
             'location' => $_GET['location'] ?? ''
         ];
 
-        $campanias = $modeloCampania->obtenerCampanias( $filtros );
+        $campaniasRaw = $modeloCampania->obtenerCampanias( $filtros );
+        $campanias = [];
+        $today = date('Y-m-d');
+        /* Campañas activas */
+        foreach ($campaniasRaw as $camp) {
+            $startDate = $camp['fecha_inicio'];
+            $endDate = $camp['fecha_finalizacion'];
+            
+            // Filtrar sólo activas: hoy mayor a inicio y menor a finalización
+            if ($today > $startDate && $today < $endDate) {
+                $campanias[] = $camp;
+            }
+        }
+        /* Campañas aleatorias */
+        shuffle($campanias);
+
         $voluntarios = $modeloVoluntario->obtenerVoluntarios( $filtros );
         $organizaciones = $modeloOrganizacion->obtenerOrganizaciones( $filtros );
         $causas = $modeloCampania->obtenerCausas();
