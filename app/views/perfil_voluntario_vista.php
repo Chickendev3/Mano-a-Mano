@@ -6,6 +6,16 @@
 /** @var array $campaniasDetails */
 /** @var array $usuario */
 /** @var int $cantVolutariados */
+
+if (!function_exists('truncateDescription')) {
+    function truncateDescription($text, $limit = 200) {
+        if (empty($text)) return "";
+        if (mb_strlen($text) > $limit) {
+            return mb_substr($text, 0, $limit) . "...";
+        }
+        return $text;
+    }
+}
 ?>
 <main class="profile-view-container">
   
@@ -135,7 +145,7 @@
                     <?php endif; ?>
                   </div>
 
-                  <p class="alt-card-desc"><?= htmlspecialchars($camp['descripcion'] ?? '') ?></p>
+                  <p class="alt-card-desc"><?= htmlspecialchars(truncateDescription($camp['descripcion'] ?? '')) ?></p>
                   
                   <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; width: 100%;">
                     <?php
@@ -184,7 +194,7 @@
                   <div class="profile-tags-wrapper" style="margin-top: 4px; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; display: flex;">
                     <span class="tag-badge" style="padding: 4px 12px; font-size: 11px; height: auto;"><i data-lucide="tag" style="width:10px; height:10px;"></i> <?= htmlspecialchars($camp['category'] ?? 'Solidario') ?></span>
                   </div>
-                  <p class="alt-card-desc"><?= htmlspecialchars($camp['desc'] ?? '') ?></p>
+                  <p class="alt-card-desc"><?= htmlspecialchars(truncateDescription($camp['desc'] ?? '')) ?></p>
                   
                   <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; width: 100%;">
                     <?php

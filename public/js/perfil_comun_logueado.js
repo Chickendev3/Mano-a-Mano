@@ -21,6 +21,14 @@ let campaigns = window.campaigns || [];
 let receivedInvitations = [];             
 let sentInvitations = [];                 
 
+function truncateDescription(text, limit = 200) {
+  if (!text) return "";
+  if (text.length > limit) {
+    return text.substring(0, limit) + "...";
+  }
+  return text;
+}
+
 // Variables de paginación común
 let currentPage = 1;
 const itemsPerPage = 5;
@@ -254,7 +262,7 @@ function renderCampaigns() {
             ${causesHTML || `<span class="tag-badge" style="background-color: var(--color-surface); font-size:11px;">Solidario</span>`}
           </div>
         </div>
-        <p class="alt-card-desc">${camp.desc}</p>
+        <p class="alt-card-desc">${truncateDescription(camp.desc)}</p>
         
         <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <span class="modal-status-badge ${statusPillClass}" style="font-size: 12px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase;">
@@ -1514,7 +1522,7 @@ function renderReceivedInvitations() {
           <i data-lucide="mail" style="width:12px; height:12px;"></i> ¡Te invitaron a una campaña!
         </span>
         <h3 class="alt-card-title">${inv.title}</h3>
-        <p class="alt-card-desc">${inv.desc}</p>
+        <p class="alt-card-desc">${truncateDescription(inv.desc)}</p>
         <span style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px; display: block;">
           <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 2px;"></i> ${inv.location || "Sin ubicación"}
         </span>

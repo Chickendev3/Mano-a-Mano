@@ -1,5 +1,15 @@
 <?php 
 /** @var array $campanias */
+
+if (!function_exists('truncateDescription')) {
+    function truncateDescription($text, $limit = 150) {
+        if (empty($text)) return "";
+        if (mb_strlen($text) > $limit) {
+            return mb_substr($text, 0, $limit) . "...";
+        }
+        return $text;
+    }
+}
 ?>
 
 <section class="section" style="padding-top: 140px; min-height: calc(100vh - 90px); display: flex; align-items: center;">
@@ -60,7 +70,7 @@
               <div class="camp-content">
                 <span class="camp-org"><?= htmlspecialchars($camp['usuario_nombre']) ?></span>
                 <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
-                <p class="camp-desc"><?= htmlspecialchars($camp['descripcion']) ?></p>
+                <p class="camp-desc"><?= htmlspecialchars(truncateDescription($camp['descripcion'] ?? '', 150)) ?></p>
                 
                 <button class="btn btn-primary" onclick="openCampaignDetails(<?= $camp['id'] ?>)">Ver campaña</button>
               </div>

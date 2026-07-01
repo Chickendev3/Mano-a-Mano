@@ -5,6 +5,16 @@
  */
 /** @var array $campaniasDetails */
 /** @var array $usuario */
+
+if (!function_exists('truncateDescription')) {
+    function truncateDescription($text, $limit = 200) {
+        if (empty($text)) return "";
+        if (mb_strlen($text) > $limit) {
+            return mb_substr($text, 0, $limit) . "...";
+        }
+        return $text;
+    }
+}
 ?>
 <main class="profile-view-container">
   
@@ -106,7 +116,7 @@
                     <?php endif; ?>
                   </div>
 
-                  <p class="alt-card-desc"><?= htmlspecialchars($camp['descripcion'] ?? '') ?></p>
+                  <p class="alt-card-desc"><?= htmlspecialchars(truncateDescription($camp['descripcion'] ?? '')) ?></p>
                   
                   <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; width: 100%;">
                     <?php

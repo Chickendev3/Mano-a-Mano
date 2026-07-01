@@ -8,6 +8,14 @@
  */
 
 // Ubicación: public/js/perfil_voluntario_logueado.js (Líneas 13-23)
+function truncateDescription(text, limit = 200) {
+  if (!text) return "";
+  if (text.length > limit) {
+    return text.substring(0, limit) + "...";
+  }
+  return text;
+}
+
 let userProfile = {
   nombre: (window.initialUserProfile && window.initialUserProfile.nombre) || "",
   apellido: (window.initialUserProfile && window.initialUserProfile.apellido) || "",
@@ -522,7 +530,7 @@ function renderPostulations() {
             ${post.category || "Solidario"}
           </span>
         </div>
-        <p class="alt-card-desc">${post.desc}</p>
+        <p class="alt-card-desc">${truncateDescription(post.desc)}</p>
         
         <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <button class="post-cancel-btn-inline" onclick="event.stopPropagation(); window.openCancelPostulationConfirmModal(${post.id});">
@@ -847,7 +855,7 @@ function renderVolunteering() {
             <i data-lucide="tag" style="width:10px; height:10px;"></i> ${item.category || "Solidario"}
           </span>
         </div>
-        <p class="alt-card-desc">${item.desc}</p>
+        <p class="alt-card-desc">${truncateDescription(item.desc)}</p>
         
         <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; width: 100%;">
           <span class="modal-status-badge ${statusPillClass}" style="font-size: 12px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase;">
