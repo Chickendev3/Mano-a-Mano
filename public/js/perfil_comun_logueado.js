@@ -82,6 +82,49 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  // Lógica del botón de eliminar cuenta
+  const deleteAccountBtn = document.getElementById("btn-delete-account");
+  const confirmDeleteAccountBtn = document.getElementById("confirm-delete-account-btn");
+
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener("click", () => {
+      openModal("modal-delete-account-confirm");
+    });
+  }
+
+  if (confirmDeleteAccountBtn) {
+    confirmDeleteAccountBtn.addEventListener("click", () => {
+      confirmDeleteAccountBtn.disabled = true;
+      confirmDeleteAccountBtn.textContent = "Eliminando...";
+      
+      fetch(`${BASE_URL}eliminar-cuenta`, {
+        method: "POST"
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          if (typeof showToast !== "undefined") {
+            showToast("Cuenta eliminada", "Tu cuenta ha sido eliminada permanentemente.", true);
+          }
+          setTimeout(() => {
+            window.location.href = BASE_URL;
+          }, 1500);
+        } else {
+          confirmDeleteAccountBtn.disabled = false;
+          confirmDeleteAccountBtn.textContent = "Eliminar cuenta";
+          if (typeof showToast !== "undefined") {
+            showToast("Error", data.message || "No se pudo eliminar la cuenta.", false);
+          }
+        }
+      })
+      .catch(err => {
+        confirmDeleteAccountBtn.disabled = false;
+        confirmDeleteAccountBtn.textContent = "Eliminar cuenta";
+        console.error("Error al eliminar la cuenta:", err);
+      });
+    });
+  }
 });
 
 // =========================================================================

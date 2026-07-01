@@ -132,9 +132,14 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             </div>
           </div>
 
-          <button class="btn btn-ghost" id="edit-profile-btn" style="margin-top: 16px;">
-            <i data-lucide="edit-3"></i> Editar perfil
-          </button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; width: 100%; flex-wrap: wrap; gap: 12px;">
+            <button class="btn btn-ghost" id="edit-profile-btn" style="margin-top: 0;">
+              <i data-lucide="edit-3"></i> Editar perfil
+            </button>
+            <button class="btn" id="btn-delete-account" style="background-color: #ffffff; color: #800020; border: 2px solid #800020; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 10px 20px; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease;">
+              <i data-lucide="user-x" style="width: 16px; height: 16px;"></i> Eliminar Cuenta
+            </button>
+          </div>
         </div>
 
         <!-- FORMULARIO DE EDICIÓN DEL PERFIL (Oculto por defecto) -->

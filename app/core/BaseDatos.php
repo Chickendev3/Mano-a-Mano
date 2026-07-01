@@ -90,6 +90,18 @@ class BaseDatos {
         return $this->stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function beginTransaction() : bool {
+        return $this->dbh->beginTransaction();
+    }
+
+    public function commit() : bool {
+        return $this->dbh->commit();
+    }
+
+    public function rollBack() : bool {
+        return $this->dbh->rollBack();
+    }
+
 }
 
 ?>

@@ -57,7 +57,9 @@ $rutas = [
 
     /* Perfiles Públicos */
     'perfil/organizacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarOrganizacionPublico'],
-    'perfil/voluntario' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarVoluntarioPublico']
+    'perfil/voluntario' => ['controlador' => 'perfilCtrl', 'metodo' => 'mostrarVoluntarioPublico'],
 
+    /* Eliminar Cuenta */
+    'eliminar-cuenta' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarCuenta']
 ];
 ?>

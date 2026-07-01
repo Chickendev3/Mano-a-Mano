@@ -1557,5 +1557,30 @@ class perfilCtrl extends Controlador {
         echo json_encode(['success' => true, 'data' => $voluntariados]);
     }
 
+    public function eliminarCuenta() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+        
+        if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true) {
+            echo json_encode(['success' => false, 'message' => 'No autorizado.']);
+            return;
+        }
+
+        $idUsuario = $_SESSION['id_usuario'];
+        $rol = $_SESSION['usuario_rol'];
+
+        $modeloUsuario = $this->cargarModelo('Usuario');
+        $exito = $modeloUsuario->eliminarCuentaCompleta($idUsuario, $rol);
+
+        if ($exito) {
+            // Limpiar y destruir sesión
+            session_unset();
+            session_destroy();
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al procesar la eliminación de la cuenta.']);
+        }
+    }
+
 }
 ?>
