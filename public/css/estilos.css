@@ -73,8 +73,8 @@
   --color-success-dark: #2F4F4B;
   --color-success-light: rgba(76, 127, 107, 0.08);
 
-  --color-background: #E6E9E4;
-  --color-background-warm: #E9E2D6;
+  --color-background: #DFE5E0; /* Fondo principal más definido (menos blanco) */
+  --color-background-warm: #E3D9C9; /* Fondo cálido más definido (menos blanco) */
   --color-surface: #FFFFFF;
   --color-surface-light: #FFFFFF;
   --color-surface-dark: rgba(255, 255, 255, 0.85);
@@ -83,34 +83,35 @@
   --color-text-primary: #2D3B45;
   --color-text-secondary: #4C7F6B;
   --color-text-dark: #0F172A;
-  --color-text-muted: #7FAE9E;
+  --color-text-muted: #5F8A7A; /* Texto secundario más oscuro para legibilidad */
 
-  --color-border: #CFE0D6;
+  --color-border: #BCCEC3; /* Bordes ligeramente más oscuros para separar mejor elementos */
   --color-accent-yellow: #F2B24C;
 
   /* Header en modo claro */
-  --color-header-bg: rgba(255, 255, 255, 0.9);
+  --color-header-bg: rgba(255, 255, 255, 0.92);
   --color-header-border: rgba(0, 0, 0, 0.08);
-  --color-header-shadow: 0 10px 30px rgba(45, 59, 69, 0.08);
+  --color-header-shadow: 0 10px 30px rgba(45, 59, 69, 0.12); /* Sombra más definida */
   --color-nav-active-bg: rgba(0, 0, 0, 0.03);
 
-  /* Sombras */
-  --shadow-sm: 0 2px 8px rgba(45, 59, 69, 0.04);
-  --shadow-md: 0 8px 24px rgba(45, 59, 69, 0.06);
-  --shadow-lg: 0 16px 40px rgba(45, 59, 69, 0.08);
-  --shadow-xl: 0 24px 60px rgba(45, 59, 69, 0.12);
-  --shadow-primary: 0 8px 20px rgba(76, 127, 107, 0.2);
-  --shadow-secondary: 0 8px 20px rgba(126, 114, 184, 0.2);
+  /* Sombras (aumentada la opacidad para dar profundidad sobre fondo claro) */
+  --shadow-sm: 0 2px 8px rgba(45, 59, 69, 0.08);
+  --shadow-md: 0 8px 24px rgba(45, 59, 69, 0.12);
+  --shadow-lg: 0 16px 40px rgba(45, 59, 69, 0.15);
+  --shadow-xl: 0 24px 60px rgba(45, 59, 69, 0.20);
+  --shadow-primary: 0 8px 20px rgba(76, 127, 107, 0.25);
+  --shadow-secondary: 0 8px 20px rgba(126, 114, 184, 0.25);
 }
 
 /* ===========================
    Icono del botón: sol/luna
+   Por defecto: Luna (para ir a oscuro/claro). Si tocas a claro, aparece Sol.
 =========================== */
-.btn-theme-toggle .theme-icon-dark { display: none; }
-.btn-theme-toggle .theme-icon-light { display: inline-flex; }
+.btn-theme-toggle .theme-icon-light { display: none; }
+.btn-theme-toggle .theme-icon-dark { display: inline-flex; }
 
-[data-theme="light"] .btn-theme-toggle .theme-icon-light { display: none; }
-[data-theme="light"] .btn-theme-toggle .theme-icon-dark { display: inline-flex; }
+[data-theme="light"] .btn-theme-toggle .theme-icon-light { display: inline-flex; }
+[data-theme="light"] .btn-theme-toggle .theme-icon-dark { display: none; }
 
 /* Reset & Base Styles */
 * {
@@ -927,53 +928,6 @@ select:focus-visible {
 }
 
 /* ==========================================================================
-   LIGHT MODE VARIABLES OVERRIDES
-   ========================================================================== */
-html.light-theme {
-  /* Color Palette */
-  --color-primary: #4C7F6B; /* Verde secundario para botones y acentos */
-  --color-primary-dark: #2F4F4B; /* Verde oscuro principal para headings y hovers */
-  --color-primary-light: rgba(76, 127, 107, 0.08); /* Verde claro muy suave translúcido */
-  --color-primary-muted: rgba(76, 127, 107, 0.15); /* Registrarse button hover bg */
-  --color-secondary: #7E72B8; /* Acento violeta de la paleta oficial */
-  --color-secondary-light: rgba(126, 114, 184, 0.08);
-  --color-success: #4C7F6B;
-  --color-success-dark: #2F4F4B;
-  --color-success-light: rgba(76, 127, 107, 0.08);
-  --color-background: #E6E9E4; /* Fondo principal */
-  --color-background-warm: #E9E2D6; /* Fondo cálido */
-  --color-surface: #FFFFFF;
-  --color-surface-hover: #CFE0D6; /* Verde muy suave */
-  --color-surface-dark: rgba(255, 255, 255, 0.9); /* Stats bar bg */
-  --color-text-primary: #2D3B45; /* Texto oscuro */
-  --color-text-secondary: #4C7F6B;
-  --color-text-muted: #7FAE9E; /* Verde claro */
-  --color-border: #CFE0D6; /* Verde muy suave para bordes */
-  --color-accent-yellow: #F2B24C; /* Acento amarillo */
-  --color-accent-orange: #F2524C;
-  --color-accent-beige: #D9C7A3;
-
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(45, 59, 69, 0.04);
-  --shadow-md: 0 8px 24px rgba(45, 59, 69, 0.06);
-  --shadow-lg: 0 16px 40px rgba(45, 59, 69, 0.08);
-  --shadow-xl: 0 24px 60px rgba(45, 59, 69, 0.12);
-  --shadow-primary: 0 8px 20px rgba(76, 127, 107, 0.2);
-  --shadow-secondary: 0 8px 20px rgba(126, 114, 184, 0.2);
-
-  /* Specific overrides for light theme layout */
-  --color-bg-dark: #FFFFFF;
-  --color-bg-dark-sec: #E6E9E4;
-  --color-light: #2D3B45; /* Dark text for logo title and login button */
-  --color-text-dark: #2D3B45;
-
-  --color-header-bg: rgba(255, 255, 255, 0.95);
-  --color-header-border: rgba(0, 0, 0, 0.05);
-  --color-header-shadow: 0 10px 30px rgba(45, 59, 69, 0.08);
-  --color-nav-active-bg: rgba(76, 127, 107, 0.05);
-}
-
-/* ==========================================================================
    THEME TOGGLE BUTTON STYLES
    ========================================================================== */
 .btn-theme-toggle {
@@ -1006,20 +960,12 @@ html.light-theme {
   height: 18px;
 }
 
-/* Hide/show icons based on theme */
-.light-theme .theme-icon-light {
-  display: none !important;
-}
-html:not(.light-theme) .theme-icon-dark {
-  display: none !important;
-}
-
-.light-theme .btn-theme-toggle {
+[data-theme="light"] .btn-theme-toggle {
   background: rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.1);
   color: var(--color-text-primary);
 }
-.light-theme .btn-theme-toggle:hover {
+[data-theme="light"] .btn-theme-toggle:hover {
   background: rgba(0, 0, 0, 0.08);
 }
 

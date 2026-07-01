@@ -36,8 +36,8 @@
     <div class="nav-actions">
       <!-- Theme Switcher Toggle -->
       <button id="theme-toggle-btn" class="btn-theme-toggle" aria-label="Cambiar tema de color">
-        <span class="theme-icon-light"><i data-lucide="sun"></i></span>
         <span class="theme-icon-dark"><i data-lucide="moon"></i></span>
+        <span class="theme-icon-light"><i data-lucide="sun"></i></span>
       </button>
       
       <?php if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === true): ?>

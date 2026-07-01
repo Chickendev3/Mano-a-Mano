@@ -1,5 +1,6 @@
 <!-- HERO SECTION -->
 <section class="hero" id="inicio" style="background-image: url('<?= BASE_URL ?>img/hero.png?v=3.0');">
+  <div class="dots-grid-pattern"></div>
   <div class="hero-overlay"></div>
   
   <div class="container hero-container">
