@@ -35,10 +35,10 @@
     <!-- Actions with Icons & Custom CTAs -->
     <div class="nav-actions">
       <!-- Theme Switcher Toggle -->
-      <!--<button id="theme-toggle-btn" class="btn-theme-toggle" aria-label="Cambiar tema de color">
-        <i data-lucide="sun" class="theme-icon-light"></i>
-        <i data-lucide="moon" class="theme-icon-dark"></i>
-      </button>-->
+      <button id="theme-toggle-btn" class="btn-theme-toggle" aria-label="Cambiar tema de color">
+        <span class="theme-icon-light"><i data-lucide="sun"></i></span>
+        <span class="theme-icon-dark"><i data-lucide="moon"></i></span>
+      </button>
       
       <?php if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === true): ?>
         <!-- Logged In: Dropdown menu "Mi cuenta" -->

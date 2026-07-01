@@ -9,15 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($titulo); ?></title>
 
-    <!-- Pre-load theme preference to prevent visual flash -->
-    <script>
-      if (localStorage.getItem('theme') === 'light') {
-        document.documentElement.classList.add('light-theme');
-      }
-    </script>
+    
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=2.0">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=3.0">
 
     <!-- Dynamic CSS load based on the view -->
     <?php 
@@ -25,7 +20,7 @@
         if ($rutaVista === 'registro_voluntario' || $rutaVista === 'registro_organizacion') {
             $base_css = 'registro';
         }
-        echo '<link rel="stylesheet" href="' . BASE_URL . 'css/' . $base_css . '.css?v=2.0">';
+        echo '<link rel="stylesheet" href="' . BASE_URL . 'css/' . $base_css . '.css?v=3.0">';
     ?>
 
     <!-- Lucide Icons -->
@@ -36,6 +31,14 @@
         const BASE_URL = '<?= BASE_URL ?>';
         const IS_LOGGED_IN = <?= (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === true) ? 'true' : 'false' ?>;
     </script>
+
+    <script>
+  (function() {
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
 </head>
 <body>
 
@@ -50,7 +53,7 @@
 
     <!-- Global JS Script -->
     <script src="<?= BASE_URL ?>js/main.js"></script>
-
+    <script src="<?= BASE_URL ?>js/theme-toggle.js"></script> 
     <!-- Dynamic JS load based on the view -->
     <?php 
         $base_js = $rutaVista;
@@ -67,6 +70,6 @@
         <p id="toast-message"></p>
       </div>
     </div>
-
+    
 </body>
 </html>

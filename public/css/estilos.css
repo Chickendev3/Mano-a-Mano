@@ -32,6 +32,12 @@
   --color-border: rgba(255, 255, 255, 0.1);
   --color-accent-yellow: #D9C7A3;
 
+  /* Header specific variables */
+  --color-header-bg: rgba(13, 26, 23, 0.9);
+  --color-header-border: rgba(255, 255, 255, 0.05);
+  --color-header-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --color-nav-active-bg: rgba(255, 255, 255, 0.03);
+
   /* Shadows */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -49,6 +55,62 @@
   --transition-normal: 0.3s ease;
   --transition-slow: 0.35s ease;
 }
+
+/* ===========================
+   MODO CLARO (paleta secundaria)
+   Se activa cuando <html data-theme="light">
+=========================== */
+[data-theme="light"] {
+  --color-primary: #4C7F6B;
+  --color-primary-dark: #2F4F4B;
+  --color-primary-light: rgba(76, 127, 107, 0.08);
+  --color-primary-muted: #7FAE9E;
+
+  --color-secondary: #7E72B8;
+  --color-secondary-light: rgba(126, 114, 184, 0.08);
+
+  --color-success: #4C7F6B;
+  --color-success-dark: #2F4F4B;
+  --color-success-light: rgba(76, 127, 107, 0.08);
+
+  --color-background: #E6E9E4;
+  --color-background-warm: #E9E2D6;
+  --color-surface: #FFFFFF;
+  --color-surface-light: #FFFFFF;
+  --color-surface-dark: rgba(255, 255, 255, 0.85);
+
+  --color-light: #2D3B45;
+  --color-text-primary: #2D3B45;
+  --color-text-secondary: #4C7F6B;
+  --color-text-dark: #0F172A;
+  --color-text-muted: #7FAE9E;
+
+  --color-border: #CFE0D6;
+  --color-accent-yellow: #F2B24C;
+
+  /* Header en modo claro */
+  --color-header-bg: rgba(255, 255, 255, 0.9);
+  --color-header-border: rgba(0, 0, 0, 0.08);
+  --color-header-shadow: 0 10px 30px rgba(45, 59, 69, 0.08);
+  --color-nav-active-bg: rgba(0, 0, 0, 0.03);
+
+  /* Sombras */
+  --shadow-sm: 0 2px 8px rgba(45, 59, 69, 0.04);
+  --shadow-md: 0 8px 24px rgba(45, 59, 69, 0.06);
+  --shadow-lg: 0 16px 40px rgba(45, 59, 69, 0.08);
+  --shadow-xl: 0 24px 60px rgba(45, 59, 69, 0.12);
+  --shadow-primary: 0 8px 20px rgba(76, 127, 107, 0.2);
+  --shadow-secondary: 0 8px 20px rgba(126, 114, 184, 0.2);
+}
+
+/* ===========================
+   Icono del botón: sol/luna
+=========================== */
+.btn-theme-toggle .theme-icon-dark { display: none; }
+.btn-theme-toggle .theme-icon-light { display: inline-flex; }
+
+[data-theme="light"] .btn-theme-toggle .theme-icon-light { display: none; }
+[data-theme="light"] .btn-theme-toggle .theme-icon-dark { display: inline-flex; }
 
 /* Reset & Base Styles */
 * {
@@ -216,12 +278,12 @@ button, input, textarea, select {
   width: 95%;
   max-width: 1400px;
   height: 80px;
-  background-color: rgba(13, 26, 23, 0.9); /* var(--color-bg-dark) with transparency */
+  background-color: var(--color-header-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-header-border);
   border-radius: var(--radius-full);
   z-index: 1000;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: var(--color-header-shadow);
   transition: all var(--transition-normal);
 }
 
@@ -315,7 +377,7 @@ button, input, textarea, select {
 /* Active State Capsule & Subrayado */
 .nav-link.active {
   color: var(--color-primary);
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: var(--color-nav-active-bg);
 }
 
 .nav-link.active i {
@@ -862,5 +924,102 @@ select:focus-visible {
   .modal-box {
     padding: 24px;
   }
+}
+
+/* ==========================================================================
+   LIGHT MODE VARIABLES OVERRIDES
+   ========================================================================== */
+html.light-theme {
+  /* Color Palette */
+  --color-primary: #4C7F6B; /* Verde secundario para botones y acentos */
+  --color-primary-dark: #2F4F4B; /* Verde oscuro principal para headings y hovers */
+  --color-primary-light: rgba(76, 127, 107, 0.08); /* Verde claro muy suave translúcido */
+  --color-primary-muted: rgba(76, 127, 107, 0.15); /* Registrarse button hover bg */
+  --color-secondary: #7E72B8; /* Acento violeta de la paleta oficial */
+  --color-secondary-light: rgba(126, 114, 184, 0.08);
+  --color-success: #4C7F6B;
+  --color-success-dark: #2F4F4B;
+  --color-success-light: rgba(76, 127, 107, 0.08);
+  --color-background: #E6E9E4; /* Fondo principal */
+  --color-background-warm: #E9E2D6; /* Fondo cálido */
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #CFE0D6; /* Verde muy suave */
+  --color-surface-dark: rgba(255, 255, 255, 0.9); /* Stats bar bg */
+  --color-text-primary: #2D3B45; /* Texto oscuro */
+  --color-text-secondary: #4C7F6B;
+  --color-text-muted: #7FAE9E; /* Verde claro */
+  --color-border: #CFE0D6; /* Verde muy suave para bordes */
+  --color-accent-yellow: #F2B24C; /* Acento amarillo */
+  --color-accent-orange: #F2524C;
+  --color-accent-beige: #D9C7A3;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(45, 59, 69, 0.04);
+  --shadow-md: 0 8px 24px rgba(45, 59, 69, 0.06);
+  --shadow-lg: 0 16px 40px rgba(45, 59, 69, 0.08);
+  --shadow-xl: 0 24px 60px rgba(45, 59, 69, 0.12);
+  --shadow-primary: 0 8px 20px rgba(76, 127, 107, 0.2);
+  --shadow-secondary: 0 8px 20px rgba(126, 114, 184, 0.2);
+
+  /* Specific overrides for light theme layout */
+  --color-bg-dark: #FFFFFF;
+  --color-bg-dark-sec: #E6E9E4;
+  --color-light: #2D3B45; /* Dark text for logo title and login button */
+  --color-text-dark: #2D3B45;
+
+  --color-header-bg: rgba(255, 255, 255, 0.95);
+  --color-header-border: rgba(0, 0, 0, 0.05);
+  --color-header-shadow: 0 10px 30px rgba(45, 59, 69, 0.08);
+  --color-nav-active-bg: rgba(76, 127, 107, 0.05);
+}
+
+/* ==========================================================================
+   THEME TOGGLE BUTTON STYLES
+   ========================================================================== */
+.btn-theme-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-light);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.btn-theme-toggle span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-theme-toggle i, .btn-theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Hide/show icons based on theme */
+.light-theme .theme-icon-light {
+  display: none !important;
+}
+html:not(.light-theme) .theme-icon-dark {
+  display: none !important;
+}
+
+.light-theme .btn-theme-toggle {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--color-text-primary);
+}
+.light-theme .btn-theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.08);
 }
 
