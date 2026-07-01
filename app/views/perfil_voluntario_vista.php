@@ -108,8 +108,7 @@
               <div class="volunteer-empty-state">No hay campañas creadas todavía.</div>
             <?php else: ?>
               <?php foreach ($campanias as $index => $camp): 
-                $isReverse = ($index % 2 !== 0);
-                $cardClass = $isReverse ? 'alt-card alt-card-reverse' : 'alt-card';
+                $cardClass = 'alt-card';
                 $imgHTML = '<i data-lucide="image"></i>';
                 if (!empty($camp['imagenes'])) {
                     $imgHTML = '<img src="' . BASE_URL . htmlspecialchars($camp['imagenes'][0]) . '" alt="' . htmlspecialchars($camp['titulo']) . '" style="width:100%; height:100%; object-fit:cover;">';
@@ -165,8 +164,7 @@
               <div class="volunteer-empty-state">No ha participado en ningún voluntariado todavía.</div>
             <?php else: ?>
               <?php foreach ($voluntariados as $index => $camp): 
-                $isReverse = ($index % 2 !== 0);
-                $cardClass = $isReverse ? 'alt-card alt-card-reverse' : 'alt-card';
+                $cardClass = 'alt-card';
                 $imgHTML = '<i data-lucide="image"></i>';
                 if (!empty($camp['images'])) {
                     $imgHTML = '<img src="' . BASE_URL . htmlspecialchars($camp['images'][0]) . '" alt="' . htmlspecialchars($camp['title']) . '" style="width:100%; height:100%; object-fit:cover;">';

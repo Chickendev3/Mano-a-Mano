@@ -23,7 +23,7 @@ let sentInvitations = [];                 // Se completará dinámicamente o ví
 
 // Variables de paginación común
 let currentPage = 1;
-const itemsPerPage = 2;
+const itemsPerPage = 5;
 let currentReceivedPage = 1;
 let currentSentPage = 1;
 
@@ -166,8 +166,7 @@ function renderCampaigns() {
   }
   
   paginated.forEach((camp, index) => {
-    const isReverse = index % 2 !== 0;
-    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
+    const cardClass = "alt-card";
     const imgUrl = camp.images && camp.images.length > 0 ? camp.images[0] : "";
     const imgHTML = imgUrl 
       ? `<img src="${BASE_URL + imgUrl}" alt="${camp.title}" style="width:100%; height:100%; object-fit:cover;">` 

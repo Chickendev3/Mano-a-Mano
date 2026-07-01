@@ -4,7 +4,7 @@ let attendanceInterval = null;
 const appliedCampaignsMap = new Map();
 
 // Pagination State
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 5;
 let currentPage = 1;
 
 document.addEventListener('DOMContentLoaded', () => {

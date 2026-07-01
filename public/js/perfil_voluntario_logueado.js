@@ -493,8 +493,7 @@ function renderPostulations() {
   }
 
   paginated.forEach((post, index) => {
-    const isReverse = index % 2 !== 0;
-    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
+    const cardClass = "alt-card";
     const imgUrl = post.images && post.images.length > 0 ? post.images[0] : "";
     const imgHTML = imgUrl 
       ? `<img src="${BASE_URL + imgUrl}" alt="${post.title}" style="width:100%; height:100%; object-fit:cover;">` 
@@ -813,8 +812,7 @@ function renderVolunteering() {
   }
 
   paginated.forEach((item, index) => {
-    const isReverse = index % 2 !== 0;
-    const cardClass = isReverse ? "alt-card alt-card-reverse" : "alt-card";
+    const cardClass = "alt-card";
     const imgUrl = item.images && item.images.length > 0 ? item.images[0] : "";
     const imgHTML = imgUrl 
       ? `<img src="${BASE_URL + imgUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;">` 
