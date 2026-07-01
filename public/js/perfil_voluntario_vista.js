@@ -233,8 +233,7 @@ window.openCampaignDetailsModal = function(id) {
           if (isOwner) {
             showAdditionalInfo = true;
           } else if (typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "voluntario") {
-            const app = appliedCampaignsMap.get(id);
-            if (app && app.status === "aceptado") {
+            if (camp.es_voluntario_aceptado) {
               showAdditionalInfo = true;
             }
           } else if (SESSION_USER_ROL === "organizacion" && camp.associations) {
@@ -246,11 +245,11 @@ window.openCampaignDetailsModal = function(id) {
         }
 
         if (mSensitive) {
-          if (showAdditionalInfo) {
+          if (showAdditionalInfo && camp.info_adicional && camp.info_adicional.trim() !== "") {
             mSensitive.innerHTML = `
               <h4>Información de coordinación</h4>
               <div class="info-alert-content">
-                <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
+                <p>${camp.info_adicional}</p>
               </div>
             `;
             mSensitive.style.display = "block";
@@ -268,29 +267,46 @@ window.openCampaignDetailsModal = function(id) {
           } else {
             mPostulateBtn.style.display = "inline-flex";
             
-            const app = appliedCampaignsMap.get(id);
-            if (app) {
+            if (camp.es_voluntario_aceptado) {
               mPostulateBtn.disabled = true;
-              mPostulateBtn.textContent = "Ya postulado";
+              mPostulateBtn.textContent = "Postulado";
+              mPostulateBtn.style.backgroundColor = "#c0c0c0";
+              mPostulateBtn.style.color = "#666666";
+              mPostulateBtn.style.cursor = "default";
               
               if (mBadge) {
-                mBadge.textContent = app.status.toUpperCase();
-                mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+                mBadge.textContent = "ACEPTADO";
+                mBadge.className = `modal-status-badge accepted-pill`;
                 mBadge.style.display = "inline-block";
               }
-              
-              if (app.status === "aceptado" && mSensitive) {
-                mSensitive.innerHTML = `
-                  <h4>Información de coordinación</h4>
-                  <div class="info-alert-content">
-                    <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
-                  </div>
-                `;
-                mSensitive.style.display = "block";
-              }
             } else {
-              mPostulateBtn.disabled = false;
-              mPostulateBtn.textContent = "Postularme";
+              const app = appliedCampaignsMap.get(id);
+              if (app) {
+                mPostulateBtn.disabled = true;
+                if (app.status === "aceptado") {
+                  mPostulateBtn.textContent = "Postulado";
+                  mPostulateBtn.style.backgroundColor = "#c0c0c0";
+                  mPostulateBtn.style.color = "#666666";
+                  mPostulateBtn.style.cursor = "default";
+                } else {
+                  mPostulateBtn.textContent = "Ya postulado";
+                  mPostulateBtn.style.backgroundColor = "";
+                  mPostulateBtn.style.color = "";
+                  mPostulateBtn.style.cursor = "";
+                }
+                
+                if (mBadge) {
+                  mBadge.textContent = app.status.toUpperCase();
+                  mBadge.className = `modal-status-badge ${app.status === "aceptado" ? "accepted-pill" : (app.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
+                  mBadge.style.display = "inline-block";
+                }
+              } else {
+                mPostulateBtn.disabled = false;
+                mPostulateBtn.textContent = "Postularme";
+                mPostulateBtn.style.backgroundColor = "";
+                mPostulateBtn.style.color = "";
+                mPostulateBtn.style.cursor = "";
+              }
             }
           }
         }

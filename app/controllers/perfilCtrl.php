@@ -583,6 +583,34 @@ class perfilCtrl extends Controlador {
         echo json_encode(['success' => true, 'data' => $postulantes]);
     }
 
+    public function obtenerParticipantesAceptados() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        $idCampania = filter_input(INPUT_POST, 'id_campania', FILTER_VALIDATE_INT);
+        if (!$idCampania) {
+            $idCampania = filter_input(INPUT_GET, 'id_campania', FILTER_VALIDATE_INT);
+        }
+
+        if (!$idCampania) {
+            echo json_encode(['success' => false, 'message' => 'Parámetro no válido.']);
+            return;
+        }
+
+        $modeloCampania = $this->cargarModelo('Campania');
+        $camp = $modeloCampania->obtenerCampaniaPorId($idCampania);
+        if (!$camp || $camp['usuario_id'] != $_SESSION['id_usuario']) {
+            echo json_encode(['success' => false, 'message' => 'No tienes permisos sobre esta campaña.']);
+            return;
+        }
+
+        $participantes = $modeloCampania->obtenerParticipantesAceptados($idCampania);
+
+        echo json_encode(['success' => true, 'data' => $participantes]);
+    }
+
     public function actualizarEstadoPostulacion() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -1180,11 +1208,17 @@ class perfilCtrl extends Controlador {
         $campaniaMapeada = [
             'id'                => $idCampania,
             'title'             => $camp['titulo'],
+            'titulo'            => $camp['titulo'],
             'desc'              => $camp['descripcion'],
+            'descripcion'       => $camp['descripcion'],
             'location'          => $camp['ubicacion'],
+            'ubicacion'         => $camp['ubicacion'],
             'startDate'         => $camp['fecha_inicio'],
+            'fecha_inicio'      => $camp['fecha_inicio'],
             'endDate'           => $camp['fecha_finalizacion'],
+            'fecha_finalizacion'=> $camp['fecha_finalizacion'],
             'type'              => strtolower($tipo) === 'convocatoria' ? 'convocatoria' : 'informativa',
+            'tipo'              => strtolower($tipo) === 'convocatoria' ? 'convocatoria' : 'informativa',
             'causes'            => $causes,
             'category'          => !empty($causes) ? $causes[0] : '',
             'images'            => $images,

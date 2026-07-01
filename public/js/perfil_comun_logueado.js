@@ -447,11 +447,8 @@ function _renderCampaignModal(camp, options = {}) {
     const isOwner = camp.usuario_id == SESSION_USER_ID;
     if (isOwner) {
       showAdditionalInfo = true;
-    } else if (SESSION_USER_ROL === "voluntario" && typeof postulations !== 'undefined') {
-      const post = postulations.find(p => p.campaignId === camp.id);
-      if (post && post.status === "aceptado") {
-        showAdditionalInfo = true;
-      }
+    } else if (SESSION_USER_ROL === "voluntario" && camp.es_voluntario_aceptado) {
+      showAdditionalInfo = true;
     } else if (SESSION_USER_ROL === "organizacion" && camp.associations) {
       const isAssociated = camp.associations.some(org => org.id == SESSION_USER_ID);
       if (isAssociated) {
@@ -461,11 +458,11 @@ function _renderCampaignModal(camp, options = {}) {
   }
 
   if (mSensitive) {
-    if (showAdditionalInfo) {
+    if (showAdditionalInfo && camp.info_adicional && camp.info_adicional.trim() !== "") {
       mSensitive.innerHTML = `
         <h4>Información de coordinación</h4>
         <div class="info-alert-content">
-          <p>${camp.info_adicional || "No hay información adicional registrada."}</p>
+          <p>${camp.info_adicional}</p>
         </div>
       `;
       mSensitive.style.display = "block";
@@ -666,22 +663,27 @@ function loadCampaignPostulations(campaignId) {
   const formData = new FormData();
   formData.append("id_campania", campaignId);
 
-  fetch(`${BASE_URL}obtener-postulantes`, {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(res => {
-    if (res.success) {
-      renderPostulationsList(campaignId, res.data);
+  Promise.all([
+    fetch(`${BASE_URL}obtener-postulantes`, {
+      method: "POST",
+      body: formData
+    }).then(res => res.json()),
+    fetch(`${BASE_URL}obtener-participantes-aceptados`, {
+      method: "POST",
+      body: formData
+    }).then(res => res.json())
+  ])
+  .then(([postulantesRes, participantesRes]) => {
+    if (postulantesRes.success && participantesRes.success) {
+      renderPostulationsList(campaignId, postulantesRes.data, participantesRes.data);
     }
   });
 }
 
-function renderPostulationsList(campaignId, list) {
-  const pendingList = list.filter(p => p.estado.toLowerCase().includes("pend"));
-  const acceptedList = list.filter(p => p.estado.toLowerCase().includes("acep"));
-  const rejectedList = list.filter(p => p.estado.toLowerCase().includes("rech"));
+function renderPostulationsList(campaignId, postulantesList, participantesList) {
+  const pendingList = postulantesList.filter(p => p.estado.toLowerCase().includes("pend"));
+  const rejectedList = postulantesList.filter(p => p.estado.toLowerCase().includes("rech"));
+  const acceptedList = participantesList;
 
   document.getElementById("count-pending").textContent = pendingList.length;
   document.getElementById("count-accepted").textContent = acceptedList.length;
@@ -696,12 +698,45 @@ function renderPostulationsList(campaignId, list) {
 
   renderAccordionCategory("list-accepted", acceptedList, (item) => `
     <div class="postulant-actions">
-      <button class="btn btn-ghost btn-sm" style="color: #EF4444;" onclick="deletePostulation(${campaignId}, ${item.id})">Eliminar</button>
+      <button class="btn btn-ghost btn-sm" style="color: #EF4444;" onclick="deleteParticipant(${campaignId}, ${item.asociacion_id}, '${item.tipo_asociacion}')">Eliminar</button>
     </div>
   `);
 
   renderAccordionCategory("list-rejected", rejectedList, () => "");
 }
+
+window.deleteParticipant = function(campaignId, asociacionId, tipoAsociacion) {
+  if (!confirm("¿Seguro que deseas eliminar a este participante?")) return;
+
+  const formData = new FormData();
+  if (tipoAsociacion === 'postulacion') {
+    formData.append("id_postulacion", asociacionId);
+    fetch(`${BASE_URL}eliminar-postulacion`, {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast("Participante eliminado", data.message, true);
+        loadCampaignPostulations(campaignId);
+      }
+    });
+  } else if (tipoAsociacion === 'invitacion') {
+    formData.append("id_invitacion", asociacionId);
+    fetch(`${BASE_URL}cancelar-invitacion`, {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast("Participante eliminado", data.message, true);
+        loadCampaignPostulations(campaignId);
+      }
+    });
+  }
+};
 
 function renderAccordionCategory(containerId, list, actionRenderer) {
   const container = document.getElementById(containerId);

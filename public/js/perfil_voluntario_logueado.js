@@ -684,11 +684,11 @@ function openPostulationDetailsView(postulationId) {
   }
 
   if (mSensitive) {
-    if (post.status === "aceptado") {
+    if (post.status === "aceptado" && post.additionalInfo && post.additionalInfo.trim() !== "") {
       mSensitive.innerHTML = `
         <h4>Información de coordinación</h4>
         <div class="info-alert-content">
-          <p>${post.additionalInfo || "No hay información adicional registrada."}</p>
+          <p>${post.additionalInfo}</p>
         </div>
       `;
       mSensitive.style.display = "block";

@@ -201,7 +201,7 @@ function renderModalesComunesPerfil( $causas = [], $campaniasUsuario = [] ) {
 
       <!-- Información Adicional (Condicional para Convocatorias) -->
       <div class="edit-row" id="create-additional-info-group">
-        <label for="create-additional">Información adicional (Solo visible para postulantes aceptados)</label>
+        <label for="create-additional">Información adicional (Solo visible para participantes aceptados)</label>
         <textarea id="create-additional" name="info_adicional" class="edit-input" rows="3" placeholder="Ej: Dirección exacta, teléfono del coordinador, herramientas a traer..."></textarea>
       </div>
 
@@ -306,7 +306,7 @@ function renderModalesComunesPerfil( $causas = [], $campaniasUsuario = [] ) {
 
       <!-- Información Adicional (Condicional para Convocatorias) -->
       <div class="edit-row" id="modify-additional-info-group">
-        <label for="modify-additional">Información adicional (Solo visible para postulantes aceptados)</label>
+        <label for="modify-additional">Información adicional (Solo visible para participantes aceptados)</label>
         <textarea name="info_adicional" id="modify-additional" class="edit-input" rows="3"></textarea>
       </div>
 
@@ -452,7 +452,7 @@ function renderModalDetalleCampania() {
       <!-- Desplegable 2: Aceptados -->
       <details class="postulations-accordion" id="acc-accepted">
         <summary style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span>Postulantes Aceptados</span>
+          <span>Participantes Aceptados</span>
           <span class="count-badge" id="count-accepted" style="background-color: var(--color-success-light); color: var(--color-success); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">0</span>
         </summary>
         <div class="accordion-content" id="list-accepted" style="padding: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">

@@ -284,6 +284,27 @@ class Campania {
         return $campaniasMapeadas;
     }
 
+    public function obtenerParticipantesAceptados (int $campaniaId) : array {
+        $consulta = "SELECT v.usuario_id, v.id, CONCAT(u.nombre, ' ', v.apellido) AS nombre_completo, u.email, u.telefono, v.telefono_emergencia, u.img_perfil, p.id AS asociacion_id, 'postulacion' AS tipo_asociacion
+                        FROM `campanias` c
+                        JOIN postulaciones p on c.id = p.campania_id
+                        JOIN voluntarios v on v.id = p.voluntario_id
+                        JOIN usuarios u on v.usuario_id = u.id
+                        WHERE p.estado_id = 1 AND c.id = :id_camp
+                    UNION ALL
+                    SELECT v.usuario_id, v.id, CONCAT(u.nombre, ' ', v.apellido) AS nombre_completo, u.email, u.telefono, v.telefono_emergencia, u.img_perfil, i.id AS asociacion_id, 'invitacion' AS tipo_asociacion
+                        FROM `campanias` c
+                        JOIN invitaciones i on c.id = i.campania_id
+                        JOIN usuarios u on u.id = i.destinatario_id
+                        JOIN voluntarios v on v.usuario_id = u.id
+                        WHERE i.estado_id = 1 AND c.id = :id_camp;";
+        
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_camp", $campaniaId);
+        $this->bd->ejecutar();
+        
+        return $this->bd->resultados();
+    }
 
     /* ------------------------ INSERTAR DATOS ------------------------ */
     public function crearNuevaCampania (int $idUsuario, string $tipoConvocatoria, string $titulo, string $fechaFinalizacion, string $fechaInicio, string $ubicacion, ?string $descripcion = null, ?string $infoAdicional = null ) :bool {

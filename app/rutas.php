@@ -31,6 +31,7 @@ $rutas = [
     'eliminar-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarCampania'],
     'postular-campania' => ['controlador' => 'perfilCtrl', 'metodo' => 'postularCampania'],
     'obtener-postulantes' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerPostulantes'],
+    'obtener-participantes-aceptados' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerParticipantesAceptados'],
     'actualizar-estado-postulacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'actualizarEstadoPostulacion'],
     'eliminar-postulacion' => ['controlador' => 'perfilCtrl', 'metodo' => 'eliminarPostulacion'],
     'obtener-mis-postulaciones' => ['controlador' => 'perfilCtrl', 'metodo' => 'obtenerMisPostulaciones'],

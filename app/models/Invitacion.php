@@ -156,70 +156,11 @@ class Invitacion {
         $this->bd->asignar(":id_invitacion", $idInvitacion);
         $ok = $this->bd->ejecutar();
 
-        if ($ok && $estadoUpper === 'ACEPTADO') {
-            // Obtener datos de la invitación para ver si el destinatario es voluntario
-            $queryInfo = "SELECT campania_id, destinatario_id FROM invitaciones WHERE id = :id_inv;";
-            $this->bd->consulta($queryInfo);
-            $this->bd->asignar(":id_inv", $idInvitacion);
-            $this->bd->ejecutar();
-            $info = $this->bd->resultado();
-
-            if ($info) {
-                // Verificar si el destinatario es un voluntario
-                $queryVol = "SELECT id FROM voluntarios WHERE usuario_id = :dest_id;";
-                $this->bd->consulta($queryVol);
-                $this->bd->asignar(":dest_id", $info['destinatario_id']);
-                $this->bd->ejecutar();
-                $vol = $this->bd->resultado();
-
-                if ($vol) {
-                    // Es voluntario, insertar en postulaciones como aceptado si no existe
-                    $checkPost = "SELECT id FROM postulaciones WHERE voluntario_id = :vol_id AND campania_id = :camp_id;";
-                    $this->bd->consulta($checkPost);
-                    $this->bd->asignar(":vol_id", $vol['id']);
-                    $this->bd->asignar(":camp_id", $info['campania_id']);
-                    $this->bd->ejecutar();
-
-                    if (!$this->bd->resultado()) {
-                        $insertPost = "INSERT INTO postulaciones (voluntario_id, campania_id, estado_id) VALUES (:vol_id, :camp_id, 1);";
-                        $this->bd->consulta($insertPost);
-                        $this->bd->asignar(":vol_id", $vol['id']);
-                        $this->bd->asignar(":camp_id", $info['campania_id']);
-                        $this->bd->ejecutar();
-                    }
-                }
-            }
-        }
         return $ok;
     }
 
     /* ------------------------ ELIMINAR ------------------------ */
     public function cancelarInvitacion( int $idInvitacion ) :bool {
-        // Obtener la información de la invitación antes de borrarla
-        $queryInfo = "SELECT campania_id, destinatario_id FROM invitaciones WHERE id = :id_inv;";
-        $this->bd->consulta($queryInfo);
-        $this->bd->asignar(":id_inv", $idInvitacion);
-        $this->bd->ejecutar();
-        $info = $this->bd->resultado();
-
-        if ($info) {
-            // Verificar si el destinatario es un voluntario
-            $queryVol = "SELECT id FROM voluntarios WHERE usuario_id = :dest_id;";
-            $this->bd->consulta($queryVol);
-            $this->bd->asignar(":dest_id", $info['destinatario_id']);
-            $this->bd->ejecutar();
-            $vol = $this->bd->resultado();
-
-            if ($vol) {
-                // Eliminar la postulación automática asociada
-                $deletePost = "DELETE FROM postulaciones WHERE voluntario_id = :vol_id AND campania_id = :camp_id;";
-                $this->bd->consulta($deletePost);
-                $this->bd->asignar(":vol_id", $vol['id']);
-                $this->bd->asignar(":camp_id", $info['campania_id']);
-                $this->bd->ejecutar();
-            }
-        }
-
         $consulta = "DELETE FROM invitaciones WHERE id = :id_inv;";
         $this->bd->consulta($consulta);
         $this->bd->asignar(":id_inv", $idInvitacion);
