@@ -1439,6 +1439,11 @@ select:focus-visible {
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
 }
+.scheduled-pill {
+  background-color: rgba(71, 85, 105, 0.1);
+  color: #475569;
+  border: 1px solid rgba(71, 85, 105, 0.2);
+}
 
 /* Enlace Cancelar Postulación en Tarjeta */
 .post-cancel-btn-inline {

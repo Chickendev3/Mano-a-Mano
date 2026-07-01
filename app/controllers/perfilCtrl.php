@@ -748,17 +748,29 @@ class perfilCtrl extends Controlador {
         $campaniasRaw = $modeloCampania->obtenerCampaniasDeUsuario($id);
         $campanias = [];
         $campaniasDetails = [];
+        $today = date('Y-m-d');
         foreach ($campaniasRaw as $camp) {
             $causasCamp = $modeloCampania->obtenerCausasDeCampania($camp['id']);
             $images = $modeloCampania->obtenerArchivosDeCampania($camp['id']);
             $tags = $causasCamp;
             
+            $startDate = $camp['startDate'];
+            $endDate = $camp['endDate'];
+            if ($today > $endDate) {
+                $status = 'finalizada';
+            } elseif ($today < $startDate) {
+                $status = 'programada';
+            } else {
+                $status = 'activa';
+            }
+
             $campanias[] = [
                 'id' => (int)$camp['id'],
                 'titulo' => $camp['title'],
                 'descripcion' => $camp['desc'],
                 'imagenes' => $images,
-                'tags' => $tags
+                'tags' => $tags,
+                'status' => $status
             ];
 
             $campaniasDetails[$camp['id']] = [
@@ -834,17 +846,29 @@ class perfilCtrl extends Controlador {
         $campaniasRaw = $modeloCampania->obtenerCampaniasDeUsuario($id);
         $campanias = [];
         $campaniasDetails = [];
+        $today = date('Y-m-d');
         foreach ($campaniasRaw as $camp) {
             $causasCamp = $modeloCampania->obtenerCausasDeCampania($camp['id']);
             $images = $modeloCampania->obtenerArchivosDeCampania($camp['id']);
             $tags = $causasCamp;
             
+            $startDate = $camp['startDate'];
+            $endDate = $camp['endDate'];
+            if ($today > $endDate) {
+                $status = 'finalizada';
+            } elseif ($today < $startDate) {
+                $status = 'programada';
+            } else {
+                $status = 'activa';
+            }
+
             $campanias[] = [
                 'id' => (int)$camp['id'],
                 'titulo' => $camp['title'],
                 'descripcion' => $camp['desc'],
                 'imagenes' => $images,
-                'tags' => $tags
+                'tags' => $tags,
+                'status' => $status
             ];
 
             $campaniasDetails[$camp['id']] = [
@@ -865,6 +889,16 @@ class perfilCtrl extends Controlador {
             if ($camp) {
                 $causes = $modeloCampania->obtenerCausasDeCampania($campId);
                 $images = $modeloCampania->obtenerArchivosDeCampania($campId);
+                $startDate = $camp['fecha_inicio'];
+                $endDate = $camp['fecha_finalizacion'];
+                if ($today > $endDate) {
+                    $status = 'finalizada';
+                } elseif ($today < $startDate) {
+                    $status = 'programada';
+                } else {
+                    $status = 'activa';
+                }
+
                 $voluntariados[] = [
                     'id' => $campId,
                     'title' => $camp['titulo'],
@@ -873,7 +907,7 @@ class perfilCtrl extends Controlador {
                     'startDate' => $camp['fecha_inicio'],
                     'endDate' => $camp['fecha_finalizacion'],
                     'location' => $camp['ubicacion'],
-                    'status' => $camp['fecha_finalizacion'] >= $today ? 'activa' : 'finalizada',
+                    'status' => $status,
                     'images' => $images
                 ];
             }
@@ -1488,6 +1522,16 @@ class perfilCtrl extends Controlador {
                 $causes = $modeloCampania->obtenerCausasDeCampania($campId);
                 $images = $modeloCampania->obtenerArchivosDeCampania($campId);
 
+                $startDate = $camp['fecha_inicio'];
+                $endDate = $camp['fecha_finalizacion'];
+                if ($today > $endDate) {
+                    $status = 'finalizada';
+                } elseif ($today < $startDate) {
+                    $status = 'programada';
+                } else {
+                    $status = 'activa';
+                }
+
                 $voluntariados[] = [
                     'id' => $campId,
                     'title' => $camp['titulo'],
@@ -1496,7 +1540,7 @@ class perfilCtrl extends Controlador {
                     'startDate' => $camp['fecha_inicio'],
                     'endDate' => $camp['fecha_finalizacion'],
                     'location' => $camp['ubicacion'],
-                    'status' => $camp['fecha_finalizacion'] >= $today ? 'activa' : 'finalizada',
+                    'status' => $status,
                     'images' => $images
                 ];
             }

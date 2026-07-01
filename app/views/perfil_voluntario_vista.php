@@ -134,6 +134,23 @@
                   </div>
 
                   <p class="alt-card-desc"><?= htmlspecialchars($camp['descripcion'] ?? '') ?></p>
+                  
+                  <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; width: 100%;">
+                    <?php
+                    $statusLabel = 'Activa';
+                    $statusPillClass = 'accepted-pill';
+                    if ($camp['status'] === 'finalizada') {
+                        $statusLabel = 'Finalizada';
+                        $statusPillClass = 'rejected-pill';
+                    } elseif ($camp['status'] === 'programada') {
+                        $statusLabel = 'Programada';
+                        $statusPillClass = 'scheduled-pill';
+                    }
+                    ?>
+                    <span class="modal-status-badge <?= $statusPillClass ?>" style="font-size: 12px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase;">
+                      <?= $statusLabel ?>
+                    </span>
+                  </div>
                 </div>
               </article>
               <?php endforeach; ?>
@@ -167,6 +184,23 @@
                     <span class="tag-badge" style="padding: 4px 12px; font-size: 11px; height: auto;"><i data-lucide="tag" style="width:10px; height:10px;"></i> <?= htmlspecialchars($camp['category'] ?? 'Solidario') ?></span>
                   </div>
                   <p class="alt-card-desc"><?= htmlspecialchars($camp['desc'] ?? '') ?></p>
+                  
+                  <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; width: 100%;">
+                    <?php
+                    $statusLabel = 'Activa';
+                    $statusPillClass = 'accepted-pill';
+                    if ($camp['status'] === 'finalizada') {
+                        $statusLabel = 'Finalizada';
+                        $statusPillClass = 'rejected-pill';
+                    } elseif ($camp['status'] === 'programada') {
+                        $statusLabel = 'Programada';
+                        $statusPillClass = 'scheduled-pill';
+                    }
+                    ?>
+                    <span class="modal-status-badge <?= $statusPillClass ?>" style="font-size: 12px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase;">
+                      <?= $statusLabel ?>
+                    </span>
+                  </div>
                 </div>
               </article>
               <?php endforeach; ?>

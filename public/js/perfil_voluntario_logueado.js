@@ -824,6 +824,23 @@ function renderVolunteering() {
     article.className = cardClass;
     article.addEventListener("click", () => openCampaignDetailsView(item.id));
 
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const start = new Date(item.startDate);
+    start.setHours(0,0,0,0);
+    const end = new Date(item.endDate);
+    end.setHours(0,0,0,0);
+
+    let statusLabel = "Activa";
+    let statusPillClass = "accepted-pill";
+    if (today > end) {
+      statusLabel = "Finalizada";
+      statusPillClass = "rejected-pill";
+    } else if (today < start) {
+      statusLabel = "Programada";
+      statusPillClass = "scheduled-pill";
+    }
+
     article.innerHTML = `
       <div class="alt-card-img-col">
         <div class="alt-card-img-placeholder">
@@ -838,6 +855,12 @@ function renderVolunteering() {
           </span>
         </div>
         <p class="alt-card-desc">${item.desc}</p>
+        
+        <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; width: 100%;">
+          <span class="modal-status-badge ${statusPillClass}" style="font-size: 12px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase;">
+            ${statusLabel}
+          </span>
+        </div>
       </div>
     `;
     grid.appendChild(article);

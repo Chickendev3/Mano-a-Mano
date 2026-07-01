@@ -182,7 +182,24 @@ function renderCampaigns() {
     const article = document.createElement("article");
     article.className = cardClass;
     article.addEventListener("click", () => openCampaignDetailsView(camp.id));
-        article.innerHTML = `
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const start = new Date(camp.startDate);
+    start.setHours(0,0,0,0);
+    const end = new Date(camp.endDate);
+    end.setHours(0,0,0,0);
+
+    let statusLabel = "Activa";
+    let statusPillClass = "accepted-pill";
+    if (today > end) {
+      statusLabel = "Finalizada";
+      statusPillClass = "rejected-pill";
+    } else if (today < start) {
+      statusLabel = "Programada";
+      statusPillClass = "scheduled-pill";
+    }
+
+    article.innerHTML = `
       <div class="alt-card-img-col">
         <div class="alt-card-img-placeholder">
           ${imgHTML}
@@ -197,14 +214,19 @@ function renderCampaigns() {
         </div>
         <p class="alt-card-desc">${camp.desc}</p>
         
-        <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: flex-end; gap: 8px;">
-          <button class="camp-action-btn edit" title="Modificar campaña" onclick="event.stopPropagation(); openModifyCampaignModal(${camp.id});">
-            <i data-lucide="edit-2" style="width:18px; height:18px;"></i>
-          </button>
-          
-          <button class="camp-action-btn delete" title="Eliminar campaña" onclick="event.stopPropagation(); openDeleteConfirmModal(${camp.id});">
-            <i data-lucide="trash-2" style="width:18px; height:18px;"></i>
-          </button>
+        <div class="camp-card-actions" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span class="modal-status-badge ${statusPillClass}" style="font-size: 12px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase;">
+            ${statusLabel}
+          </span>
+          <div style="display: flex; gap: 8px;">
+            <button class="camp-action-btn edit" title="Modificar campaña" onclick="event.stopPropagation(); openModifyCampaignModal(${camp.id});">
+              <i data-lucide="edit-2" style="width:18px; height:18px;"></i>
+            </button>
+            
+            <button class="camp-action-btn delete" title="Eliminar campaña" onclick="event.stopPropagation(); openDeleteConfirmModal(${camp.id});">
+              <i data-lucide="trash-2" style="width:18px; height:18px;"></i>
+            </button>
+          </div>
         </div>
       </div>
     `;
