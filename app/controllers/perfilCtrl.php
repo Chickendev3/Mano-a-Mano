@@ -6,7 +6,7 @@ class perfilCtrl extends Controlador {
         $js = [];
         $msj = null;
         
-        /* Cargas de Modelos */
+        /* Cargas de Modelos para PERFIL PRIVADO */
         //$modeloUsuario = $this->cargarModelo('Usuario');
         if ($_SESSION['usuario_rol'] == 'voluntario') {
             $modeloRol = $this->cargarModelo('Voluntario');
@@ -24,6 +24,9 @@ class perfilCtrl extends Controlador {
             $listaOficios = array_map(function($item) {
                 return $item['oficio'];
             }, $todosOficios);
+
+            $modeloAsistencia = $this->cargarModelo('Asistencia');
+            $cantidadVolunts = $modeloAsistencia->cantidadAsistenciasPorVoluntario($_SESSION['id_voluntario']);
 
             $css = ['perfil_voluntario_logueado.css'];
             $js = ['perfil_comun_logueado.js', 'perfil_voluntario_logueado.js'];
@@ -64,6 +67,7 @@ class perfilCtrl extends Controlador {
                   'campaniasUsuario' => $campaniasUsuario ?? [],
 
                   'insignias' => $listaInsignias ?? [],
+                  'cantVolutariados' => $cantidadVolunts,
                   'oficios_voluntario' => $listaOficiosVol ?? [],
                   'oficios' => $listaOficios ?? [],
                   'causas_organizacion' => $listaCausasOrg ?? []
@@ -839,6 +843,9 @@ class perfilCtrl extends Controlador {
         }
         $modeloCampania = $this->cargarModelo('Campania');
 
+        $modeloAsistencia = $this->cargarModelo('Asistencia');
+        $cantidadVolunts = $modeloAsistencia->cantidadAsistenciasPorVoluntario($idVol);
+
         $oficios = $modeloVol->obtenerOficiosVoluntario($id);
         $insignias = $modeloVol->obtenerInsignias($id);
 
@@ -919,6 +926,7 @@ class perfilCtrl extends Controlador {
             'usuario' => $usuario,
             'oficios' => $oficios,
             'insignias' => $insignias,
+            'cantVolutariados' => $cantidadVolunts,
             'campanias' => $campanias,
             'campaniasDetails' => $campaniasDetails,
             'voluntariados' => $voluntariados,

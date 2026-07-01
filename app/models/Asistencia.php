@@ -8,14 +8,15 @@ class Asistencia {
 
     /* ------------------------ CONSUTAR DATOS ------------------------ */
     public function cantidadAsistenciasPorVoluntario ( int $idVoluntario ) :int {
-        $consulta = "SELECT COUNT(voluntario_id)  as cantidad_asistencia FROM `asistencias` WHERE voluntario_id = :id_vol";
+        $consulta = "SELECT COUNT(voluntario_id) as cantidad_asistencia FROM `asistencias` WHERE voluntario_id = :id_vol";
 
         $this->bd->consulta($consulta);
 
         $this->bd->asignar(":id_vol", $idVoluntario);
         $this->bd->ejecutar();
 
-        return $this->bd->resultado()['cantidad_asistencia'];
+        $cant = $this->bd->resultado();
+        return (int)$cant['cantidad_asistencia'];
     }
 
     public function verificaCoincidencia ( string $ingreso, int $idCampania ) : bool {

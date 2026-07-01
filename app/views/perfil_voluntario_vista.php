@@ -5,6 +5,7 @@
  */
 /** @var array $campaniasDetails */
 /** @var array $usuario */
+/** @var int $cantVolutariados */
 ?>
 <main class="profile-view-container">
   
@@ -35,16 +36,18 @@
             <?php foreach ($insignias as $badge): ?>
               <div class="badge-row-item">
                 <i data-lucide="award" class="badge-icon-gold"></i>
-                <span>Insignia de Voluntariado Fijo en: <?= htmlspecialchars($badge['nombre']) ?></span>
+                <span>Voluntario en <?= htmlspecialchars($badge['nombre']) ?></span>
               </div>
             <?php endforeach; ?>
           <?php endif; ?>
 
           <!-- Pendiente de DESARROLLO: Contador de Asistencias -->
+          <?php if ((!empty($cantVolutariados)) && ($cantVolutariados > 0)): ?>
           <div class="badge-row-item">
             <i data-lucide="check-square" class="badge-icon-blue"></i>
-            <span>Asistencia a voluntariado: +7</span>
+            <span>Voluntariados asistidos: <?php echo $cantVolutariados ?></span>
           </div>
+          <?php endif; ?>
 
           <!-- Oficios (Skills) -->
           <div class="badge-row-item skills-list-row">

@@ -106,16 +106,18 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
               <?php foreach ($insignias as $ins): ?>
                 <div class="badge-row-item">
                   <i data-lucide="award" class="badge-icon-gold"></i>
-                  <span>Voluntario Fijo en Organización: <?php echo htmlspecialchars($ins); ?></span>
+                  <span>Voluntario en <?php echo htmlspecialchars($ins); ?></span>
                 </div>
               <?php endforeach; ?>
             <?php endif; ?>
             
             <!-- Pendiente de DESARROLLO: Contador de Asistencias -->
+          <?php if (!empty($cantVolutariados) && $cantVolutariados > 0): ?>
             <div class="badge-row-item">
               <i data-lucide="check-square" class="badge-icon-blue"></i>
-              <span>Asistencia a voluntariado: +7</span>
+              <span>Voluntariados asistidos: <?php echo $cantVolutariados ?></span>
             </div>
+          <?php endif; ?>
 
             <!-- Oficios -->
             <div class="badge-row-item skills-list-row" id="view-skills-row" style="align-items: flex-start; <?= empty($oficios_voluntario) ? 'display: none;' : '' ?>">
