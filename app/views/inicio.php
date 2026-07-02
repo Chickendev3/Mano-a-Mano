@@ -2,6 +2,16 @@
 <?php 
 /** @var array $organizaciones */
 /** @var array $campanias */
+
+if (!function_exists('truncateDescription')) {
+    function truncateDescription($text, $limit = 200) {
+        if (empty($text)) return "";
+        if (mb_strlen($text) > $limit) {
+            return mb_substr($text, 0, $limit) . "...";
+        }
+        return $text;
+    }
+}
 ?>
 
 <!-- HERO SECTION -->
@@ -182,32 +192,23 @@
         <?php foreach ($organizaciones as $org): ?>
           <div class="org-card">
             <div class="org-card-header">
-              <?php if (!empty($org['imagen'])): ?>
-                <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0;">
-                  <img src="<?= BASE_URL . $org['imagen'] ?>" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-              <?php else: ?>
-                <div class="org-logo-avatar <?= htmlspecialchars($org['avatar_clase']) ?>" aria-label="Logo de <?= htmlspecialchars($org['nombre']) ?>"><?= htmlspecialchars($org['iniciales']) ?></div>
-              <?php endif; ?>
+              <div class="org-img-wrapper" style="width: 56px; height: 56px; overflow: hidden; border-radius: var(--radius-md); flex-shrink: 0; background-color: var(--color-background); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center;">
+                <?php if (!empty($org['img_perfil'])): ?>
+                  <img src="<?= BASE_URL . htmlspecialchars($org['img_perfil']) ?>" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                <?php else: ?>
+                  <img src="<?= BASE_URL ?>img/org_placeholder.png" alt="Logo de <?= htmlspecialchars($org['nombre']) ?>" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+                <?php endif; ?>
+              </div>
               <div class="org-info">
                 <h4><?= htmlspecialchars($org['nombre']) ?></h4>
-                <span class="org-tag"><?= htmlspecialchars($org['categoria']) ?></span>
-
+                <span class="org-tag"><?= !empty($org['causas']) ? htmlspecialchars($org['causas'][0]) : 'Sin causas' ?></span>
+              </div>
             </div>
-            <p class="org-desc"><?= htmlspecialchars($org['descripcion']) ?></p>
+            <p class="org-desc"><?= htmlspecialchars(truncateDescription($org['descripcion'] ?? '')) ?></p>
             <div class="org-meta">
               <span class="org-meta-item"><i data-lucide="calendar"></i> <?= htmlspecialchars($org['campanas_activas']) ?></span>
-              <span class="org-meta-item"><i data-lucide="map-pin"></i> <?= htmlspecialchars($org['ubicacion']) ?></span>
             </div>
-            <button class="btn btn-outline org-action-btn"
-              onclick="openOrgProfile(
-                <?= $org['id'] ?>,
-                '<?= htmlspecialchars($org['nombre'], ENT_QUOTES) ?>',
-                '<?= htmlspecialchars($org['categoria'], ENT_QUOTES) ?>',
-                '<?= htmlspecialchars($org['descripcion'], ENT_QUOTES) ?>',
-                '<?= htmlspecialchars($org['ubicacion'], ENT_QUOTES) ?>',
-                '<?= htmlspecialchars($org['campanas_activas'], ENT_QUOTES) ?>'
-              )">Ver perfil</button>
+            <a href="<?= BASE_URL ?>perfil/organizacion?id=<?= $org['id'] ?>" class="btn btn-outline org-action-btn" style="width: 100%; text-align: center; justify-content: center; text-decoration: none; display: flex;">Ver perfil</a>
           </div>
         <?php endforeach; ?>
       </div>
@@ -231,41 +232,40 @@
       <p class="section-subtitle">Encontrá el espacio ideal donde tu tiempo e intereses se alineen para generar una gran diferencia.</p>
     </div>
     
-    <!-- Category Filter Tabs -->
-    <div class="camp-filters">
-      <button class="filter-btn active" data-filter="all">Todas</button>
-      <button class="filter-btn" data-filter="medio-ambiente">Medio Ambiente</button>
-      <button class="filter-btn" data-filter="educacion">Educación</button>
-      <button class="filter-btn" data-filter="accion-social">Acción Social</button>
-    </div>
-    
     <!-- Campaigns Carousel with Scroll Snap -->
-    <div class="camps-carousel" id="campaigns-container">
-      <?php foreach ($campanias as $camp): ?>
-        <article class="camp-card" data-category="<?= htmlspecialchars($camp['categoria']) ?>">
-          <div class="camp-img-wrapper">
-            <img src="<?= !empty($camp['imagen']) ? BASE_URL . $camp['imagen'] : BASE_URL . 'img/camp_placeholder.png' ?>" alt="<?= htmlspecialchars($camp['titulo']) ?>" class="camp-img">
-            <span class="camp-cat-badge <?= $camp['badge_clase'] ?>"><?= htmlspecialchars($camp['categoria_label']) ?></span>
-          </div>
-          <div class="camp-content">
-            <span class="camp-org"><?= htmlspecialchars($camp['org']) ?></span>
-            <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
-            <p class="camp-desc"><?= htmlspecialchars($camp['descripcion']) ?></p>
-            
-            
-            
-            <div class="camp-meta-list">
-              <div class="camp-meta-item"><i data-lucide="map-pin"></i> <span><?= htmlspecialchars($camp['ubicacion']) ?></span></div>
-              <div class="camp-meta-item"><i data-lucide="calendar"></i> <span><?= htmlspecialchars($camp['fecha']) ?></span></div>
+    <div class="orgs-carousel-wrapper">
+      <button class="carousel-arrow carousel-arrow-prev" id="camps-prev" aria-label="Anterior">
+        <i data-lucide="chevron-left"></i>
+      </button>
+
+      <div class="camps-carousel" id="campaigns-container">
+        <?php foreach ($campanias as $camp): ?>
+          <article class="camp-card" data-category="<?= htmlspecialchars($camp['causa']) ?>">
+            <div class="camp-img-wrapper">
+              <img src="<?= !empty($camp['imagen']) ? BASE_URL . $camp['imagen'] : BASE_URL . 'img/img_generica.png' ?>" alt="<?= htmlspecialchars($camp['titulo']) ?>" class="camp-img">
+              <span class="camp-cat-badge badge-soc"><?= htmlspecialchars($camp['causa']) ?></span>
             </div>
-            
-            <button class="btn btn-primary" onclick="openCampaignDetails(<?= $camp['id'] ?>)">Ver campaña</button>
-          </div>
-        </article>
-      <?php endforeach; ?>
+            <div class="camp-content">
+              <span class="camp-org"><?= htmlspecialchars($camp['org']) ?></span>
+              <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
+              <p class="camp-desc"><?= htmlspecialchars(truncateDescription($camp['descripcion'] ?? '')) ?></p>
+              
+              <div class="camp-meta-list">
+                <div class="camp-meta-item"><i data-lucide="map-pin"></i> <span><?= htmlspecialchars($camp['ubicacion']) ?></span></div>
+                <div class="camp-meta-item"><i data-lucide="calendar"></i> <span><?= htmlspecialchars($camp['fecha_inicio']) ?></span></div>
+              </div>
+              
+              <button class="btn btn-primary" onclick="openCampaignDetails(<?= $camp['id'] ?>)">Ver campaña</button>
+            </div>
+          </article>
+        <?php endforeach; ?>
+      </div>
+
+      <button class="carousel-arrow carousel-arrow-next" id="camps-next" aria-label="Siguiente">
+        <i data-lucide="chevron-right"></i>
+      </button>
     </div>
-    
-  </div>
+    <div class="carousel-dots" id="camps-dots"></div>
 </section>
 
 <!-- CTA PRINCIPAL -->
@@ -283,38 +283,10 @@
 
 <!-- MODAL OVERLAYS (Home-specific triggers) -->
 
-<!-- Campaign Detail Modal -->
-<div class="modal-overlay" id="modal-camp-detail" role="dialog" aria-modal="true" aria-labelledby="camp-detail-title">
-  <div class="modal-box modal-box-large">
-    <button class="modal-close-btn" aria-label="Cerrar modal" onclick="closeModal('modal-camp-detail')">
-      <i data-lucide="x"></i>
-    </button>
-    
-    <div class="camp-detail-header">
-      <span class="camp-detail-cat" id="detail-cat-badge">Categoría</span>
-      <h3 class="modal-title" id="camp-detail-title">Nombre de la campaña</h3>
-      <p class="camp-org" style="margin-top: 4px;" id="detail-org-name">Publicado por Techo Verde</p>
-    </div>
-    
-    <div class="camp-detail-grid">
-      <div class="camp-detail-desc">
-        <h4>Acerca de la campaña</h4>
-        <p id="detail-desc-text">Descripción larga del proyecto y los objetivos esperados de la jornada solidaria.</p>
-        
-        <h4 style="margin-top: 24px;">Habilidades requeridas</h4>
-        <p id="detail-skills-text">Empatía, trabajo en equipo, buena predisposición física.</p>
-      </div>
-      
-      
-    </div>
-    
-    <!-- Apply Form / Trigger Button -->
-    <div style="border-top: 1px solid var(--color-border); padding-top: 24px; display: flex; justify-content: flex-end; gap: 16px;">
-      <button class="btn btn-ghost" onclick="closeModal('modal-camp-detail')">Cerrar</button>
-      <button class="btn btn-success" id="apply-campaign-btn">Postularme como voluntario <i data-lucide="heart"></i></button>
-    </div>
-  </div>
-</div>
+<?php 
+  require_once '../app/views/componentes/perfil.php'; 
+  renderModalDetalleCampaniaPublico();
+?>
 
 <!-- Create Campaign Modal (Organization mock creation) -->
 <div class="modal-overlay" id="modal-create-campaign" role="dialog" aria-modal="true" aria-labelledby="create-camp-title">

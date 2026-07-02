@@ -44,15 +44,16 @@ const campaignsData = [
 
 const appliedCampaigns = new Set(); // Store campaign IDs user has applied to
 let currentCampaignContext = null;
+let currentViewedCampaignId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeCounters();
   initializeProcessTabs();
-  initializeCampaignFilters();
   initializeCampaignForm();
   initializeOrgProfileContactLink();
-  initializePostulationBtn();
-  initOrgsCarousel(); // 👈 agregá esta línea
+  initOrgsCarousel();
+  initCampsCarousel();
+  setupPostulationHandler();
 });
 
 // COUNTER COUNTING EFFECT IN HERO
@@ -114,318 +115,329 @@ function initializeProcessTabs() {
   }
 }
 
-// CATEGORY FILTERS FOR CAMPAIGNS
-function initializeCampaignFilters() {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  const campaignCards = document.querySelectorAll('.camp-card');
-  
-  if (filterButtons.length > 0) {
-    filterButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Toggle active class on buttons
-        filterButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        const filter = btn.getAttribute('data-filter');
-        const container = document.getElementById('campaigns-container');
-        
-        if (container) {
-          container.style.opacity = '0';
-          container.style.transform = 'translateY(10px)';
-          container.style.transition = 'all 0.2s ease-in-out';
+// INTERACTIVE CAMPAIGN DETAILS & POPULATING MODAL
+window.openCampaignDetails = function(campaignId) {
+  currentViewedCampaignId = campaignId;
+
+  const mTitle = document.getElementById("m-camp-title");
+  const mDesc = document.getElementById("m-camp-desc");
+  const mTags = document.getElementById("m-camp-tags");
+  const mBadge = document.getElementById("m-camp-accepted-badge");
+  const mPostulateBtn = document.getElementById("m-camp-postulate-btn");
+  const mSensitive = document.getElementById("m-camp-sensitive-info");
+
+  fetch(`${BASE_URL}obtener-campania-por-id?id=${campaignId}`)
+    .then(res => res.json())
+    .then(res => {
+      if (!res.success) return;
+      const camp = res.data;
+
+      if (mTitle) mTitle.textContent = camp.title;
+      
+      if (mDesc) {
+        mDesc.innerHTML = `
+          <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.desc}</p>
+          <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.location}</p>
+          <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.startDate}</p>
+          <p><strong>Fecha de finalización:</strong> ${camp.endDate}</p>
+        `;
+      }
+
+      if (mTags) {
+        mTags.innerHTML = "";
+        const causesList = camp.causes || [];
+        causesList.forEach(cause => {
+          const span = document.createElement("span");
+          span.className = "tag-badge";
+          span.innerHTML = `<i data-lucide="tag" style="width:12px; height:12px;"></i> ${cause}`;
+          mTags.appendChild(span);
+        });
+
+        const typeSpan = document.createElement("span");
+        typeSpan.className = "tag-badge";
+        typeSpan.style.backgroundColor = "rgba(99, 102, 241, 0.1)";
+        typeSpan.style.color = "var(--color-primary)";
+        typeSpan.style.fontWeight = "600";
+        const typeLabel = camp.type === "convocatoria" ? "Convocatoria" : "Informativa";
+        typeSpan.innerHTML = `<i data-lucide="info" style="width:12px; height:12px;"></i> ${typeLabel}`;
+        mTags.appendChild(typeSpan);
+      }
+
+      const mCreatorLink = document.getElementById("m-camp-creator-link");
+      if (mCreatorLink) {
+        if (camp.usuario_id) {
+          const creatorProfileUrl = camp.usuario_rol === "voluntario" ? "perfil/voluntario" : "perfil/organizacion";
+          mCreatorLink.href = `${BASE_URL}${creatorProfileUrl}?id=${camp.usuario_id}`;
+          mCreatorLink.style.display = "flex";
           
-          setTimeout(() => {
-            campaignCards.forEach(card => {
-              const category = card.getAttribute('data-category');
-              if (filter === 'all' || category === filter) {
-                card.style.display = 'flex';
-              } else {
-                card.style.display = 'none';
-              }
-            });
-            container.style.opacity = '1';
-            container.style.transform = 'translateY(0)';
-          }, 200);
+          const mCreatorName = document.getElementById("m-camp-creator-name");
+          if (mCreatorName) {
+            mCreatorName.textContent = camp.usuario_nombre || camp.nombre || "Organización";
+          }
+          
+          const mCreatorAvatar = document.getElementById("m-camp-creator-avatar");
+          if (mCreatorAvatar) {
+            if (camp.usuario_img_perfil) {
+              mCreatorAvatar.innerHTML = `<img src="${BASE_URL + camp.usuario_img_perfil}" alt="Logo creador" class="creator-avatar-img">`;
+            } else {
+              mCreatorAvatar.innerHTML = `<i data-lucide="user" class="creator-avatar-icon" style="width:20px; height:20px;"></i>`;
+            }
+          }
+        } else {
+          mCreatorLink.style.display = "none";
         }
+      }
+
+      const gallerySec = document.getElementById("m-camp-gallery-sec");
+      const galleryGrid = document.getElementById("m-camp-gallery-grid");
+      if (gallerySec && galleryGrid) {
+        galleryGrid.innerHTML = "";
+        if (camp.images && camp.images.length > 0) {
+          camp.images.forEach(imgUrl => {
+            const div = document.createElement("div");
+            div.className = "gallery-placeholder-img";
+            div.innerHTML = `<img src="${BASE_URL + imgUrl}" alt="Foto de campaña" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
+            galleryGrid.appendChild(div);
+          });
+          gallerySec.style.display = "block";
+        } else {
+          gallerySec.style.display = "none";
+        }
+      }
+
+      const assocSec = document.getElementById("m-camp-associations-sec");
+      const assocList = document.getElementById("m-camp-associations-list");
+      if (assocSec && assocList) {
+        assocList.innerHTML = "";
+        if (camp.associations && camp.associations.length > 0) {
+          camp.associations.forEach(org => {
+            const a = document.createElement("a");
+            a.href = `${BASE_URL}perfil/organizacion?id=${org.id}`;
+            a.className = "association-circle";
+            a.title = org.nombre;
+            if (org.img_perfil) {
+              a.innerHTML = `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`;
+            } else {
+              a.innerHTML = `<div class="association-logo-placeholder" style="width:40px; height:40px; border-radius:50%; background-color:var(--color-border); display:flex; align-items:center; justify-content:center; color:var(--color-text-light);"><i data-lucide="building" style="width:16px; height:16px;"></i></div>`;
+            }
+            assocList.appendChild(a);
+          });
+          assocSec.style.display = "block";
+        } else {
+          assocSec.style.display = "none";
+        }
+      }
+
+      if (mBadge) mBadge.style.display = "none";
+      
+      let showAdditionalInfo = false;
+      if (typeof SESSION_USER_ID !== 'undefined' && SESSION_USER_ID) {
+        const isOwner = camp.usuario_id == SESSION_USER_ID;
+        if (isOwner) {
+          showAdditionalInfo = true;
+        } else if (typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "voluntario") {
+          if (camp.es_voluntario_aceptado) {
+            showAdditionalInfo = true;
+          }
+        } else if (SESSION_USER_ROL === "organizacion" && camp.associations) {
+          const isAssociated = camp.associations.some(org => org.id == SESSION_USER_ID);
+          if (isAssociated) {
+            showAdditionalInfo = true;
+          }
+        }
+      }
+
+      if (mSensitive) {
+        if (showAdditionalInfo && camp.info_adicional && camp.info_adicional.trim() !== "") {
+          mSensitive.innerHTML = `
+            <h4>Información de coordinación</h4>
+            <div class="info-alert-content">
+              <p>${camp.info_adicional}</p>
+            </div>
+          `;
+          mSensitive.style.display = "block";
+        } else {
+          mSensitive.style.display = "none";
+        }
+      }
+
+      if (mPostulateBtn) {
+        const isOwner = typeof SESSION_USER_ID !== 'undefined' && camp.usuario_id == SESSION_USER_ID;
+        const isOrg = typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "organizacion";
+        
+        if (camp.type === "convocatoria" && !isOwner && !isOrg) {
+          mPostulateBtn.style.display = "inline-flex";
+          
+          if (camp.es_voluntario_aceptado) {
+            mPostulateBtn.disabled = true;
+            mPostulateBtn.textContent = "Postulado";
+            mPostulateBtn.style.backgroundColor = "#c0c0c0";
+            mPostulateBtn.style.color = "#666666";
+            mPostulateBtn.style.cursor = "default";
+            
+            if (mBadge) {
+              mBadge.textContent = "ACEPTADO";
+              mBadge.className = `modal-status-badge accepted-pill`;
+              mBadge.style.display = "inline-block";
+            }
+          } else {
+            mPostulateBtn.disabled = false;
+            mPostulateBtn.className = "btn btn-primary";
+            mPostulateBtn.textContent = "Postularme";
+            mPostulateBtn.style.backgroundColor = "";
+            mPostulateBtn.style.color = "";
+            mPostulateBtn.style.cursor = "pointer";
+          }
+        } else {
+          mPostulateBtn.style.display = "none";
+        }
+      }
+
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      openModal('modal-profile-camp-detail');
+    })
+    .catch(err => {
+      console.error("Error al cargar detalle de campaña:", err);
+    });
+};
+
+function setupPostulationHandler() {
+  const postulateBtn = document.getElementById("m-camp-postulate-btn");
+  if (postulateBtn) {
+    postulateBtn.addEventListener("click", () => {
+      if (!currentViewedCampaignId) return;
+
+      // Si el usuario no está logueado, mostrar toast y redirigir a inicio de sesión
+      if (!SESSION_USER_ID) {
+        if (typeof showToast !== "undefined") {
+          showToast("Inicio de sesión requerido", "Debes iniciar sesión para postularte.", false);
+        }
+        closeModal("modal-profile-camp-detail");
+        setTimeout(() => {
+          window.location.href = `${BASE_URL}sesion`;
+        }, 1500);
+        return;
+      }
+
+      postulateBtn.disabled = true;
+      const formData = new FormData();
+      formData.append("id_campania", currentViewedCampaignId);
+
+      fetch(`${BASE_URL}postular-campania`, {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        postulateBtn.disabled = false;
+        if (data.success) {
+          if (typeof showToast !== "undefined") {
+            showToast("Postulación exitosa", data.message, true);
+          }
+          closeModal("modal-profile-camp-detail");
+        } else {
+          if (typeof showToast !== "undefined") {
+            showToast("No se pudo postular", data.message, false);
+          }
+        }
+      })
+      .catch(err => {
+        postulateBtn.disabled = false;
+        console.error("Error al postularse:", err);
       });
     });
   }
 }
 
-// INTERACTIVE CAMPAIGN DETAILS & POPULATING MODAL
-window.openCampaignDetails = function(campaignId) {
-  const camp = campaignsData.find(c => c.id === campaignId);
-  if (!camp) return;
-  
-  currentCampaignContext = camp;
-  
-  // Set modal texts
-  const detailTitle = document.getElementById('camp-detail-title');
-  const detailOrg = document.getElementById('detail-org-name');
-  const detailDesc = document.getElementById('detail-desc-text');
-  const detailSkills = document.getElementById('detail-skills-text');
-  const detailLocation = document.getElementById('detail-location');
-  const detailDate = document.getElementById('detail-date');
-  const detailTime = document.getElementById('detail-time');
-  const detailVolunteers = document.getElementById('detail-volunteers-stat');
+function initCampsCarousel() {
+  const carousel      = document.getElementById('campaigns-container');
+  const prevBtn       = document.getElementById('camps-prev');
+  const nextBtn       = document.getElementById('camps-next');
+  const dotsContainer = document.getElementById('camps-dots');
 
-  if (detailTitle) detailTitle.textContent = camp.title;
-  if (detailOrg) detailOrg.textContent = `Publicado por ${camp.org}`;
-  if (detailDesc) detailDesc.textContent = camp.desc;
-  if (detailSkills) detailSkills.textContent = camp.skills;
-  if (detailLocation) detailLocation.textContent = camp.location;
-  if (detailDate) detailDate.textContent = camp.date;
-  if (detailTime) detailTime.textContent = camp.time;
-  if (detailVolunteers) detailVolunteers.textContent = `${camp.volunteersRegistered} de ${camp.volunteersRequired} inscriptos`;
-  
-  // Category badge color
-  const catBadge = document.getElementById('detail-cat-badge');
-  if (catBadge) {
-    catBadge.textContent = getCategoryLabel(camp.category);
-    catBadge.className = 'camp-detail-cat';
-    if (camp.category === 'medio-ambiente') catBadge.classList.add('badge-env');
-    else if (camp.category === 'educacion') catBadge.classList.add('badge-edu');
-    else catBadge.classList.add('badge-soc');
+  if (!carousel || !prevBtn || !nextBtn) return;
+
+  const AUTOPLAY_INTERVAL = 5000;
+  let autoplayTimer = null;
+  let currentIndex  = 0;
+
+  function getVisibleCount() {
+    const card = carousel.querySelector('.camp-card');
+    if (!card) return 1;
+    const cardWidth = card.offsetWidth + 24; 
+    return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
   }
-  
-  // Adjust application button state if already applied
-  const applyBtn = document.getElementById('apply-campaign-btn');
-  if (applyBtn) {
-    if (appliedCampaigns.has(campaignId)) {
-      applyBtn.className = 'btn btn-ghost';
-      applyBtn.disabled = true;
-      applyBtn.innerHTML = 'Postulado ✓';
-    } else {
-      applyBtn.className = 'btn btn-success';
-      applyBtn.disabled = false;
-      applyBtn.innerHTML = 'Postularme como voluntario <i data-lucide="heart"></i>';
+
+  function getCards() {
+    return Array.from(carousel.querySelectorAll('.camp-card'));
+  }
+
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    const total = Math.ceil(getCards().length / getVisibleCount());
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Ir al grupo ${i + 1}`);
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
     }
   }
-  
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-  }
-  openModal('modal-camp-detail');
-};
 
-function getCategoryLabel(cat) {
-  switch (cat) {
-    case 'medio-ambiente': return 'Medio Ambiente';
-    case 'educacion': return 'Educación';
-    case 'accion-social': return 'Acción Social';
-    default: return 'Solidario';
-  }
-}
-
-// POSTULATE ACTION
-function initializePostulationBtn() {
-  const applyCampaignBtn = document.getElementById('apply-campaign-btn');
-  if (applyCampaignBtn) {
-    applyCampaignBtn.addEventListener('click', () => {
-      if (!currentCampaignContext) return;
-      
-      // Verification Rule: Must be logged in to postulate!
-      if (!IS_LOGGED_IN) {
-        // Show error warning toast
-        showToast('Inicio de sesión requerido', 'Tenés que iniciar sesión para postularte a esta campaña.', false);
-        // Close modal
-        closeModal('modal-camp-detail');
-        // Redirect to login after a brief delay
-        setTimeout(() => {
-          window.location.href = BASE_URL + 'sesion';
-        }, 1800);
-        return;
-      }
-      
-      const campId = currentCampaignContext.id;
-      if (appliedCampaigns.has(campId)) return;
-      
-      // Mock application update
-      appliedCampaigns.add(campId);
-      currentCampaignContext.volunteersRegistered++;
-      const newProgress = Math.round((currentCampaignContext.volunteersRegistered / currentCampaignContext.volunteersRequired) * 100);
-      currentCampaignContext.progress = newProgress;
-      
-      // Update detail modal
-      const detailVolunteers = document.getElementById('detail-volunteers-stat');
-      if (detailVolunteers) {
-        detailVolunteers.textContent = `${currentCampaignContext.volunteersRegistered} de ${currentCampaignContext.volunteersRequired} inscriptos`;
-      }
-      
-      applyCampaignBtn.className = 'btn btn-ghost';
-      applyCampaignBtn.disabled = true;
-      applyCampaignBtn.innerHTML = 'Postulado ✓';
-      
-      // Dynamic DOM update of card
-      updateCampaignCardInDOM(currentCampaignContext);
-      
-      // Celebrate!
-      showToast('¡Postulación enviada!', `¡Gracias por comprometerte con "${currentCampaignContext.title}"! Estate atento al estado de tus Postulaciones.`, true);
-      
-      // Increment general impact hours
-      const statImpact = document.getElementById('stat-impact');
-      if (statImpact) {
-        const currentImpactText = statImpact.textContent;
-        const currentHoursVal = parseInt(currentImpactText.replace('k+', '')) || 12;
-        statImpact.textContent = `${currentHoursVal}.2k+`;
-      }
+  function updateDots() {
+    if (!dotsContainer) return;
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
     });
   }
-}
 
-function updateCampaignCardInDOM(camp) {
-  const cards = document.querySelectorAll('.camp-card');
-  cards.forEach(card => {
-    const cardTitle = card.querySelector('.camp-title');
-    if (cardTitle && cardTitle.textContent === camp.title) {
-      const volMetaItem = card.querySelector('.camp-meta-item span');
-      if (volMetaItem) {
-        volMetaItem.textContent = `${camp.volunteersRegistered} / ${camp.volunteersRequired} voluntarios`;
-      }
-      
-      const pBar = card.querySelector('.camp-progress-bar');
-      const pText = card.querySelector('.camp-pct-text');
-      if (pBar && pText) {
-        pBar.style.width = `${camp.progress}%`;
-        pText.textContent = `${camp.progress}%`;
-      }
+  function goTo(index) {
+    const cards    = getCards();
+    const visible  = getVisibleCount();
+    const maxIndex = Math.ceil(cards.length / visible) - 1;
+
+    currentIndex = Math.max(0, Math.min(index, maxIndex));
+
+    const targetCard = cards[currentIndex * visible];
+    if (targetCard) {
+      carousel.scrollTo({ left: targetCard.offsetLeft - 4, behavior: 'smooth' });
     }
+
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= maxIndex;
+    updateDots();
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayTimer = setInterval(() => {
+      const maxIndex = Math.ceil(getCards().length / getVisibleCount()) - 1;
+      goTo(currentIndex >= maxIndex ? 0 : currentIndex + 1);
+    }, AUTOPLAY_INTERVAL);
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  }
+
+  prevBtn.addEventListener('click', () => { goTo(currentIndex - 1); stopAutoplay(); startAutoplay(); });
+  nextBtn.addEventListener('click', () => { goTo(currentIndex + 1); stopAutoplay(); startAutoplay(); });
+
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', startAutoplay);
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { buildDots(); goTo(currentIndex); }, 200);
   });
-}
 
-// ORGANIZATION CARD POPULATOR
-window.openOrgProfile = function(id, name, category, desc, location, stats) {
-  const oTitle = document.getElementById('org-profile-title');
-  const oDesc = document.getElementById('org-profile-desc');
-  const oLoc = document.getElementById('org-profile-location');
-  const oStats = document.getElementById('org-profile-stats');
-  const oTag = document.getElementById('org-profile-tag');
-  const oAvatar = document.getElementById('org-profile-avatar');
-
-  if (oTitle) oTitle.textContent = name;
-  if (oDesc) oDesc.textContent = desc;
-  if (oLoc) oLoc.textContent = location;
-  if (oStats) oStats.textContent = stats;
-  if (oTag) oTag.textContent = category;
-  
-  if (oAvatar) {
-    const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-    oAvatar.textContent = initials;
-    oAvatar.className = 'org-logo-avatar';
-    if (category === 'Medio Ambiente') oAvatar.classList.add('avatar-1');
-    else if (category === 'Acción Social') oAvatar.classList.add('avatar-2');
-    else oAvatar.classList.add('avatar-3');
-  }
-
-  const fullBtn = document.getElementById('org-profile-full-btn');
-  if (fullBtn) {
-    fullBtn.href = `${BASE_URL}perfil/organizacion?id=${id}`;
-  }
-  
-  openModal('modal-org-profile');
-};
-
-function initializeOrgProfileContactLink() {
-  const directCreateBtn = document.getElementById('direct-create-campaign-btn');
-  if (directCreateBtn) {
-    directCreateBtn.addEventListener('click', () => openModal('modal-create-campaign'));
-  }
-}
-
-// CREATE CAMPAIGN HANDLER
-function initializeCampaignForm() {
-  const createCampaignForm = document.getElementById('create-campaign-form');
-  if (createCampaignForm) {
-    createCampaignForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const title = document.getElementById('create-title').value;
-      const org = document.getElementById('create-org').value;
-      const category = document.getElementById('create-category').value;
-      const desc = document.getElementById('create-desc').value;
-      const location = document.getElementById('create-location').value;
-      const volNeeded = parseInt(document.getElementById('create-vol-needed').value);
-      const dateInput = document.getElementById('create-date').value;
-      const time = document.getElementById('create-time').value;
-      
-      const dateObj = new Date(dateInput);
-      const options = { day: 'numeric', month: 'short', year: 'numeric' };
-      const formattedDate = dateObj.toLocaleDateString('es-ES', options);
-      
-      const newCampId = campaignsData.length + 1;
-      
-      let imgSrc = 'img/campaign_park.png';
-      if (category === 'educacion') imgSrc = 'img/campaign_tutoring.png';
-      else if (category === 'accion-social') imgSrc = 'img/campaign_food.png';
-      
-      const newCamp = {
-        id: newCampId,
-        title: title,
-        org: org,
-        category: category,
-        desc: desc,
-        skills: 'Buena comunicación, ganas de aportar y colaborar activamente.',
-        location: location,
-        date: formattedDate,
-        time: time,
-        volunteersRequired: volNeeded,
-        volunteersRegistered: 0,
-        progress: 0,
-        img: imgSrc
-      };
-      
-      campaignsData.push(newCamp);
-      appendCampaignCardToDOM(newCamp);
-      closeModal('modal-create-campaign');
-      showToast('Campaña creada con éxito', `"${title}" ya está visible para todos los voluntarios.`, true);
-      
-      const campCount = document.getElementById('stat-campaigns');
-      if (campCount) {
-        const currentVal = parseInt(campCount.textContent.replace('+', '')) || 180;
-        animateValue('stat-campaigns', currentVal, currentVal + 1, 1000, '+');
-      }
-      
-      createCampaignForm.reset();
-    });
-  }
-}
-
-function appendCampaignCardToDOM(camp) {
-  const container = document.getElementById('campaigns-container');
-  if (!container) return;
-  
-  const card = document.createElement('article');
-  card.className = 'camp-card';
-  card.setAttribute('data-category', camp.category);
-  
-  let badgeClass = 'badge-soc';
-  if (camp.category === 'medio-ambiente') badgeClass = 'badge-env';
-  else if (camp.category === 'educacion') badgeClass = 'badge-edu';
-  
-  card.innerHTML = `
-    <div class="camp-img-wrapper">
-      <img src="${BASE_URL + camp.img}" alt="${camp.title}" class="camp-img">
-      <span class="camp-cat-badge ${badgeClass}">${getCategoryLabel(camp.category)}</span>
-    </div>
-    <div class="camp-content">
-      <span class="camp-org">${camp.org}</span>
-      <h3 class="camp-title">${camp.title}</h3>
-      <p class="camp-desc">${camp.desc}</p>
-      
-      <div class="camp-meta-list">
-        <div class="camp-meta-item"><i data-lucide="map-pin"></i> <span>${camp.location}</span></div>
-        <div class="camp-meta-item"><i data-lucide="calendar"></i> <span>${camp.date}</span></div>
-      </div>
-      
-      <button class="btn btn-primary" onclick="openCampaignDetails(${camp.id})">Ver campaña</button>
-    </div>
-  `;
-  
-  container.appendChild(card);
-  
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-  }
+  buildDots();
+  goTo(0);
+  startAutoplay();
 }
 
 // ==========================================================================

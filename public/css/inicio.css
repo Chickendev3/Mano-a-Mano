@@ -718,9 +718,9 @@
   color: white;
 }
 
-.badge-env { background-color: var(--color-success); }
-.badge-edu { background-color: var(--color-secondary); }
-.badge-soc { background-color: var(--color-primary); }
+/* .badge-env { background-color: var(--color-success); }
+.badge-edu { background-color: var(--color-secondary); } */
+.badge-soc { background-color: var(--color-success-dark); }
 
 .camp-content {
   padding: 24px;

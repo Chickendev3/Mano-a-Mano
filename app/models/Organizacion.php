@@ -32,7 +32,7 @@ class Organizacion extends Usuario {
         }
         $where = !empty($condiciones) ? " AND " . implode(" AND ", $condiciones) : "";
         
-        $consulta = "SELECT u.id as 'id', u.nombre as 'nombre', u.email, u.telefono, u.ubicacion, u.img_perfil 
+        $consulta = "SELECT u.id as 'id', u.nombre as 'nombre', u.email, u.descripcion, u.telefono, u.ubicacion, u.img_perfil 
                         FROM usuarios u JOIN organizaciones o ON u.id = o.usuario_id
                         WHERE 1=1 " . $where;
     
