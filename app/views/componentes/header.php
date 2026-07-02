@@ -5,7 +5,7 @@
 <header class="header" id="header">
   <div class="container nav-container">
     <a href="<?= BASE_URL ?>" class="logo-wrapper" id="nav-logo-link">
-      <img src="<?= BASE_URL ?>img/Logo_mano_a_mano (1) (1).png" alt="Logo Mano a Mano" class="logo-img">
+      <img src="<?= BASE_URL ?>img/logo_mano_a_mano-centrado.webp" alt="Logo Mano a Mano" class="logo-img">
     </a>
     
     <!-- Nav Links -->
