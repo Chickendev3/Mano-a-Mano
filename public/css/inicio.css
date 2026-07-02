@@ -491,16 +491,18 @@
    ========================================================================== */
 
 /* Wrapper externo que contiene flechas + carrusel */
-.orgs-carousel-wrapper {
+.orgs-carousel-wrapper,
+.camps-carousel-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  width: 100%;
+  display: block;
 }
 
-/* Flechas de navegación */
+/* Flechas de navegación posicionadas de forma absoluta flotando en los costados */
 .carousel-arrow {
-  flex-shrink: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   width: 40px;
   height: 40px;
   border-radius: var(--radius-full);
@@ -513,7 +515,15 @@
   cursor: pointer;
   transition: all var(--transition-normal);
   box-shadow: var(--shadow-sm);
-  z-index: 2;
+  z-index: 10;
+}
+
+.carousel-arrow-prev {
+  left: 10px !important;
+}
+
+.carousel-arrow-next {
+  right: 10px !important;
 }
 
 .carousel-arrow:hover {
@@ -535,9 +545,20 @@
   stroke-width: 2.5;
 }
 
+/* Ajustes responsivos para las flechas en pantallas chicas para que no queden fuera de la pantalla */
+@media (max-width: 768px) {
+  .carousel-arrow-prev {
+    left: 4px;
+  }
+  .carousel-arrow-next {
+    right: 4px;
+  }
+}
+
 /* Carrusel en sí — overflow oculto para no mostrar scrollbar con flechas */
 .orgs-carousel,
 .camps-carousel {
+  position: relative;
   display: flex;
   gap: 24px;
   overflow-x: auto;

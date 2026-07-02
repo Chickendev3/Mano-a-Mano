@@ -5,7 +5,7 @@ const campaignsData = [
     title: 'Reforestación Parque Central',
     org: 'Techo Verde',
     category: 'medio-ambiente',
-    desc: 'Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia y personas que disfruten del trabajo al aire libre.',
+    desc: 'Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia.',
     skills: 'Empatía, trabajo físico básico, buena predisposición y ganas de trabajar en equipo.',
     location: 'Buenos Aires',
     img: 'img/campaign_park.png'
@@ -15,14 +15,9 @@ const campaignsData = [
     title: 'Clases de Apoyo Digital',
     org: 'Mentes Brillantes',
     category: 'educacion',
-    desc: 'Buscamos tutores para enseñar el uso de herramientas de oficina básicas, navegación segura por internet y programación web inicial a jóvenes y adolescentes del barrio de San Martín.',
+    desc: 'Buscamos tutores para enseñar el uso de herramientas de oficina básicas, navegación segura por internet y programación web inicial a jóvenes del barrio de San Martín.',
     skills: 'Paciencia, conocimientos de informática básica, facilidad para explicar temas a jóvenes.',
     location: 'Rosario',
-    date: '18 Jun, 2026',
-    time: '16:00 - 18:00',
-    volunteersRequired: 10,
-    volunteersRegistered: 4,
-    progress: 40,
     img: 'img/campaign_tutoring.png'
   },
   {
@@ -30,20 +25,106 @@ const campaignsData = [
     title: 'Colecta de Alimentos',
     org: 'Corazones Abiertos',
     category: 'accion-social',
-    desc: 'Ayudanos a clasificar, empaquetar y distribuir las donaciones del banco de alimentos destinadas a 5 comedores comedores comunitarios infantiles que asisten a familias del sector.',
+    desc: 'Ayudanos a clasificar, empaquetar y distribuir las donaciones del banco de alimentos destinadas a 5 comedores comunitarios infantiles.',
     skills: 'Clasificación de stock, organización, trabajo colaborativo dinámico.',
     location: 'Córdoba',
-    date: '21 Jun, 2026',
-    time: '08:30 - 14:00',
-    volunteersRequired: 15,
-    volunteersRegistered: 13,
-    progress: 86,
+    img: 'img/campaign_food.png'
+  },
+  {
+    id: 4,
+    title: 'Limpieza de Río Luján',
+    org: 'EcoRed',
+    category: 'medio-ambiente',
+    desc: 'Limpieza colaborativa de las orillas del Río Luján para remover plásticos y concientizar sobre el cuidado de humedales.',
+    skills: 'Trabajo físico moderado, conciencia ambiental, trabajo en equipo.',
+    location: 'Tigre',
+    img: 'img/campaign_park.png'
+  },
+  {
+    id: 5,
+    title: 'Apoyo de Matemática',
+    org: 'Huellas del Mañana',
+    category: 'educacion',
+    desc: 'Clases grupales de refuerzo de matemáticas y álgebra para estudiantes que están rindiendo sus exámenes de ingreso.',
+    skills: 'Conocimientos de matemática, didáctica, paciencia.',
+    location: 'Tucumán',
+    img: 'img/campaign_tutoring.png'
+  },
+  {
+    id: 6,
+    title: 'Adopción de Mascotas',
+    org: 'Patitas Felices',
+    category: 'accion-social',
+    desc: 'Jornada dominical para incentivar la adopción responsable de animales rescatados y recaudar alimento balanceado.',
+    skills: 'Cuidado animal, empatía, habilidades interpersonales.',
+    location: 'Mendoza',
+    img: 'img/campaign_food.png'
+  },
+  {
+    id: 7,
+    title: 'Taller de Compostaje',
+    org: 'Techo Verde',
+    category: 'medio-ambiente',
+    desc: 'Aprendé las técnicas básicas para compostar residuos orgánicos en casa y reducir tu basura diaria a la mitad.',
+    skills: 'Interés ecológico, paciencia, ganas de aprender.',
+    location: 'Rosario',
+    img: 'img/campaign_park.png'
+  },
+  {
+    id: 8,
+    title: 'Robótica Infantil',
+    org: 'Mentes Brillantes',
+    category: 'educacion',
+    desc: 'Introducción a la lógica y la programación utilizando pequeños kits de robótica educativa para niños en edad escolar.',
+    skills: 'Lógica básica, paciencia, gusto por la docencia.',
+    location: 'Córdoba',
+    img: 'img/campaign_tutoring.png'
+  },
+  {
+    id: 9,
+    title: 'Colecta de Frazadas',
+    org: 'Corazones Abiertos',
+    category: 'accion-social',
+    desc: 'Recepción, clasificación y armado de kits de abrigo invernal para personas que asisten a refugios temporales en épocas frías.',
+    skills: 'Clasificación, empaque, proactividad.',
+    location: 'Buenos Aires',
+    img: 'img/campaign_food.png'
+  },
+  {
+    id: 10,
+    title: 'Huertas Comunitarias',
+    org: 'Techo Verde',
+    category: 'medio-ambiente',
+    desc: 'Colaborá con el mantenimiento y la cosecha de verduras frescas cultivadas en la huerta del centro integrador vecinal.',
+    skills: 'Ganas de cultivar, trabajo manual ligero, cooperación.',
+    location: 'Buenos Aires',
+    img: 'img/campaign_park.png'
+  },
+  {
+    id: 11,
+    title: 'Mentoría Académica',
+    org: 'Huellas del Mañana',
+    category: 'educacion',
+    desc: 'Acompañá el tramo final de la escuela secundaria de un estudiante guiándolo en el armado de su CV y búsqueda de carreras.',
+    skills: 'Empatía, comunicación, orientación vocacional.',
+    location: 'Buenos Aires',
+    img: 'img/campaign_tutoring.png'
+  },
+  {
+    id: 12,
+    title: 'Comedor Solidario',
+    org: 'Corazones Abiertos',
+    category: 'accion-social',
+    desc: 'Buscamos voluntarios para ayudar a cocinar y servir viandas calientes los viernes por la noche en la estación de trenes.',
+    skills: 'Trabajo en cocina, servicio de comida, empatía social.',
+    location: 'Rosario',
     img: 'img/campaign_food.png'
   }
 ];
 
 const appliedCampaigns = new Set(); // Store campaign IDs user has applied to
 let currentCampaignContext = null;
+let campsCarouselInstance = null; // Store camps carousel instance
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeCounters();
@@ -52,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeCampaignForm();
   initializeOrgProfileContactLink();
   initializePostulationBtn();
-  initOrgsCarousel(); // 👈 agregá esta línea
+  initOrgsCarousel();
+  campsCarouselInstance = initCampsCarousel(); // Initialize campaigns carousel
 });
 
 // COUNTER COUNTING EFFECT IN HERO
@@ -145,6 +227,9 @@ function initializeCampaignFilters() {
             });
             container.style.opacity = '1';
             container.style.transform = 'translateY(0)';
+            if (campsCarouselInstance) {
+              campsCarouselInstance.rebuild();
+            }
           }, 200);
         }
       });
@@ -502,6 +587,18 @@ function initOrgsCarousel() {
     return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
   }
 
+  function updateSnapping() {
+    const cards = getCards();
+    const visible = getVisibleCount();
+    cards.forEach((card, i) => {
+      if (i % visible === 0) {
+        card.style.scrollSnapAlign = 'start';
+      } else {
+        card.style.scrollSnapAlign = 'none';
+      }
+    });
+  }
+
   function buildDots() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
@@ -511,6 +608,7 @@ function initOrgsCarousel() {
     // Si solo hay una página, ocultamos los puntitos
     if (total <= 1) {
       dotsContainer.style.display = 'none';
+      updateSnapping();
       return;
     }
     dotsContainer.style.display = 'flex';
@@ -526,6 +624,8 @@ function initOrgsCarousel() {
       });
       dotsContainer.appendChild(dot);
     }
+
+    updateSnapping();
   }
 
   function updateDots() {
@@ -545,7 +645,7 @@ function initOrgsCarousel() {
     const targetCard = cards[currentIndex * visible];
     if (targetCard) {
       isScrolling = true;
-      const targetOffset = targetCard.offsetLeft - carousel.offsetLeft;
+      const targetOffset = targetCard.offsetLeft - 4;
       
       // Desactivamos temporalmente el snap para hacer el desplazamiento suave
       carousel.style.scrollSnapType = 'none';
@@ -632,4 +732,192 @@ function initOrgsCarousel() {
   buildDots();
   goTo(0);
   startAutoplay();
+}
+
+// ==========================================================================
+// CARRUSEL CAMPAÑAS — flechas + autoplay + dots + bucle infinito
+// ==========================================================================
+function initCampsCarousel() {
+  const carousel      = document.getElementById('campaigns-container');
+  const prevBtn       = document.getElementById('camps-prev');
+  const nextBtn       = document.getElementById('camps-next');
+  const dotsContainer = document.getElementById('camps-dots');
+
+  if (!carousel || !prevBtn || !nextBtn) return null;
+
+  const AUTOPLAY_INTERVAL = 6000;
+  let autoplayTimer = null;
+  let currentIndex  = 0;
+  let isScrolling   = false;
+
+  // Solo contamos las tarjetas que están visibles (no ocultas por los filtros)
+  function getCards() {
+    return Array.from(carousel.querySelectorAll('.camp-card')).filter(card => card.style.display !== 'none');
+  }
+
+  function getVisibleCount() {
+    const card = carousel.querySelector('.camp-card');
+    if (!card) return 1;
+    const cardWidth = card.offsetWidth + 24; // card width + gap (24px)
+    return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
+  }
+
+  function updateSnapping() {
+    const cards = getCards();
+    const visible = getVisibleCount();
+    Array.from(carousel.querySelectorAll('.camp-card')).forEach(card => {
+      card.style.scrollSnapAlign = 'none';
+    });
+    cards.forEach((card, i) => {
+      if (i % visible === 0) {
+        card.style.scrollSnapAlign = 'start';
+      }
+    });
+  }
+
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    const visible = getVisibleCount();
+    const total = Math.ceil(getCards().length / visible);
+    
+    // Si solo hay una página, ocultamos los puntitos
+    if (total <= 1) {
+      dotsContainer.style.display = 'none';
+      updateSnapping();
+      return;
+    }
+    dotsContainer.style.display = 'flex';
+
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Ir al grupo ${i + 1}`);
+      dot.addEventListener('click', () => {
+        stopAutoplay();
+        goTo(i);
+        startAutoplay();
+      });
+      dotsContainer.appendChild(dot);
+    }
+
+    updateSnapping();
+  }
+
+  function updateDots() {
+    if (!dotsContainer) return;
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function goTo(index) {
+    const cards    = getCards();
+    const visible  = getVisibleCount();
+    const maxIndex = Math.ceil(cards.length / visible) - 1;
+
+    // Lógica de bucle infinito/circular:
+    // Si index < 0, va a la última página; si index > maxIndex, vuelve al principio.
+    if (index < 0) {
+      currentIndex = Math.max(0, maxIndex);
+    } else if (index > maxIndex) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+
+    const targetCard = cards[currentIndex * visible];
+    if (targetCard) {
+      isScrolling = true;
+      const targetOffset = targetCard.offsetLeft - 4;
+      
+      carousel.style.scrollSnapType = 'none';
+      carousel.scrollTo({ left: targetOffset, behavior: 'smooth' });
+      
+      setTimeout(() => {
+        carousel.style.scrollSnapType = 'x mandatory';
+        isScrolling = false;
+      }, 500);
+    }
+
+    updateDots();
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayTimer = setInterval(() => {
+      const visible = getVisibleCount();
+      const maxIndex = Math.ceil(getCards().length / visible) - 1;
+      if (maxIndex <= 0) return;
+      
+      goTo(currentIndex >= maxIndex ? 0 : currentIndex + 1);
+    }, AUTOPLAY_INTERVAL);
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  }
+
+  // Escuchar scroll manual (swipe/touch en móviles)
+  let scrollTimeout;
+  carousel.addEventListener('scroll', () => {
+    if (isScrolling) return;
+    
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const scrollLeft = carousel.scrollLeft;
+      const card = carousel.querySelector('.camp-card');
+      if (!card) return;
+      const cardWidth = card.offsetWidth + 24;
+      const visible = getVisibleCount();
+      const cards = getCards();
+      
+      const newIndex = Math.round(scrollLeft / (cardWidth * visible));
+      const maxIndex = Math.ceil(cards.length / visible) - 1;
+      currentIndex = Math.max(0, Math.min(newIndex, maxIndex));
+      
+      updateDots();
+    }, 100);
+  });
+
+  prevBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex - 1);
+    startAutoplay();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex + 1);
+    startAutoplay();
+  });
+
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', startAutoplay);
+
+  // Manejo de redimensión
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      buildDots();
+      goTo(currentIndex);
+    }, 200);
+  });
+
+  // Re-build API expuesta para los filtros
+  function rebuild() {
+    buildDots();
+    goTo(0);
+  }
+
+  // Inicializar
+  buildDots();
+  goTo(0);
+  startAutoplay();
+
+  return {
+    rebuild,
+    goTo
+  };
 }

@@ -269,31 +269,41 @@
       <button class="filter-btn" data-filter="accion-social">Acción Social</button>
     </div>
     
-    <!-- Campaigns Carousel with Scroll Snap -->
-    <div class="camps-carousel" id="campaigns-container">
-      <?php foreach ($campanas as $camp): ?>
-        <article class="camp-card" data-category="<?= htmlspecialchars($camp['categoria']) ?>">
-          <div class="camp-img-wrapper">
-            <img src="<?= !empty($camp['imagen']) ? BASE_URL . $camp['imagen'] : BASE_URL . 'img/camp_placeholder.png' ?>" alt="<?= htmlspecialchars($camp['titulo']) ?>" class="camp-img">
-            <span class="camp-cat-badge <?= $camp['badge_clase'] ?>"><?= htmlspecialchars($camp['categoria_label']) ?></span>
-          </div>
-          <div class="camp-content">
-            <span class="camp-org"><?= htmlspecialchars($camp['org']) ?></span>
-            <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
-            <p class="camp-desc"><?= htmlspecialchars($camp['descripcion']) ?></p>
-            
-            
-            
-            <div class="camp-meta-list">
-              <div class="camp-meta-item"><i data-lucide="map-pin"></i> <span><?= htmlspecialchars($camp['ubicacion']) ?></span></div>
-              <div class="camp-meta-item"><i data-lucide="calendar"></i> <span><?= htmlspecialchars($camp['fecha']) ?></span></div>
+    <!-- Campaigns Carousel with Scroll Snap and Navigation Arrows -->
+    <div class="camps-carousel-wrapper">
+      <button class="carousel-arrow carousel-arrow-prev" id="camps-prev" aria-label="Anterior">
+        <i data-lucide="chevron-left"></i>
+      </button>
+
+      <div class="camps-carousel" id="campaigns-container">
+        <?php foreach ($campanas as $camp): ?>
+          <article class="camp-card" data-category="<?= htmlspecialchars($camp['categoria']) ?>">
+            <div class="camp-img-wrapper">
+              <img src="<?= !empty($camp['imagen']) ? BASE_URL . $camp['imagen'] : BASE_URL . 'img/camp_placeholder.png' ?>" alt="<?= htmlspecialchars($camp['titulo']) ?>" class="camp-img">
+              <span class="camp-cat-badge <?= $camp['badge_clase'] ?>"><?= htmlspecialchars($camp['categoria_label']) ?></span>
             </div>
-            
-            <button class="btn btn-primary" onclick="openCampaignDetails(<?= $camp['id'] ?>)">Ver campaña</button>
-          </div>
-        </article>
-      <?php endforeach; ?>
+            <div class="camp-content">
+              <span class="camp-org"><?= htmlspecialchars($camp['org']) ?></span>
+              <h3 class="camp-title"><?= htmlspecialchars($camp['titulo']) ?></h3>
+              <p class="camp-desc"><?= htmlspecialchars($camp['descripcion']) ?></p>
+              
+              <div class="camp-meta-list">
+                <div class="camp-meta-item"><i data-lucide="map-pin"></i> <span><?= htmlspecialchars($camp['ubicacion']) ?></span></div>
+                <div class="camp-meta-item"><i data-lucide="calendar"></i> <span><?= htmlspecialchars($camp['fecha']) ?></span></div>
+              </div>
+              
+              <button class="btn btn-primary" onclick="openCampaignDetails(<?= $camp['id'] ?>)">Ver campaña</button>
+            </div>
+          </article>
+        <?php endforeach; ?>
+      </div>
+
+      <button class="carousel-arrow carousel-arrow-next" id="camps-next" aria-label="Siguiente">
+        <i data-lucide="chevron-right"></i>
+      </button>
     </div>
+
+    <div class="carousel-dots" id="camps-dots"></div>
     
   </div>
 </section>
