@@ -598,29 +598,15 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 680px) {
   .org-card,
   .camp-card {
-    flex: 0 0 calc(100% - 8px);
+    flex: 0 0 100%;
   }
 
   .carousel-arrow {
     width: 34px;
     height: 34px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .org-card,
-  .camp-card {
-    flex: 0 0 calc(50% - 12px);
-  }
-}
-
-@media (max-width: 680px) {
-  .org-card,
-  .camp-card {
-    flex: 0 0 100%;
   }
 }
 

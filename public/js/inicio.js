@@ -486,30 +486,44 @@ function initOrgsCarousel() {
 
   if (!carousel || !prevBtn || !nextBtn) return;
 
-  const AUTOPLAY_INTERVAL = 4000;
+  const AUTOPLAY_INTERVAL = 5000;
   let autoplayTimer = null;
   let currentIndex  = 0;
-
-  function getVisibleCount() {
-    const card = carousel.querySelector('.org-card');
-    if (!card) return 1;
-    const cardWidth = card.offsetWidth + 24; // 24 = gap
-    return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
-  }
+  let isScrolling   = false;
 
   function getCards() {
     return Array.from(carousel.querySelectorAll('.org-card'));
   }
 
+  function getVisibleCount() {
+    const card = carousel.querySelector('.org-card');
+    if (!card) return 1;
+    const cardWidth = card.offsetWidth + 24; // card width + gap (24px)
+    return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
+  }
+
   function buildDots() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
-    const total = Math.ceil(getCards().length / getVisibleCount());
+    const visible = getVisibleCount();
+    const total = Math.ceil(getCards().length / visible);
+    
+    // Si solo hay una página, ocultamos los puntitos
+    if (total <= 1) {
+      dotsContainer.style.display = 'none';
+      return;
+    }
+    dotsContainer.style.display = 'flex';
+
     for (let i = 0; i < total; i++) {
       const dot = document.createElement('button');
       dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
       dot.setAttribute('aria-label', `Ir al grupo ${i + 1}`);
-      dot.addEventListener('click', () => goTo(i));
+      dot.addEventListener('click', () => {
+        stopAutoplay();
+        goTo(i);
+        startAutoplay();
+      });
       dotsContainer.appendChild(dot);
     }
   }
@@ -530,7 +544,19 @@ function initOrgsCarousel() {
 
     const targetCard = cards[currentIndex * visible];
     if (targetCard) {
-      carousel.scrollTo({ left: targetCard.offsetLeft - 4, behavior: 'smooth' });
+      isScrolling = true;
+      const targetOffset = targetCard.offsetLeft - carousel.offsetLeft;
+      
+      // Desactivamos temporalmente el snap para hacer el desplazamiento suave
+      carousel.style.scrollSnapType = 'none';
+      
+      carousel.scrollTo({ left: targetOffset, behavior: 'smooth' });
+      
+      // Reactivamos el scroll snap tras completarse la animación
+      setTimeout(() => {
+        carousel.style.scrollSnapType = 'x mandatory';
+        isScrolling = false;
+      }, 500);
     }
 
     prevBtn.disabled = currentIndex === 0;
@@ -541,7 +567,10 @@ function initOrgsCarousel() {
   function startAutoplay() {
     stopAutoplay();
     autoplayTimer = setInterval(() => {
-      const maxIndex = Math.ceil(getCards().length / getVisibleCount()) - 1;
+      const visible = getVisibleCount();
+      const maxIndex = Math.ceil(getCards().length / visible) - 1;
+      if (maxIndex <= 0) return;
+      
       goTo(currentIndex >= maxIndex ? 0 : currentIndex + 1);
     }, AUTOPLAY_INTERVAL);
   }
@@ -550,18 +579,56 @@ function initOrgsCarousel() {
     if (autoplayTimer) clearInterval(autoplayTimer);
   }
 
-  prevBtn.addEventListener('click', () => { goTo(currentIndex - 1); stopAutoplay(); startAutoplay(); });
-  nextBtn.addEventListener('click', () => { goTo(currentIndex + 1); stopAutoplay(); startAutoplay(); });
+  // Escuchar scroll manual (swipe/touch en móviles)
+  let scrollTimeout;
+  carousel.addEventListener('scroll', () => {
+    if (isScrolling) return; // Ignorar si el scroll fue programático
+    
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const scrollLeft = carousel.scrollLeft;
+      const card = carousel.querySelector('.org-card');
+      if (!card) return;
+      const cardWidth = card.offsetWidth + 24;
+      const visible = getVisibleCount();
+      
+      const newIndex = Math.round(scrollLeft / (cardWidth * visible));
+      const maxIndex = Math.ceil(getCards().length / visible) - 1;
+      currentIndex = Math.max(0, Math.min(newIndex, maxIndex));
+      
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex >= maxIndex;
+      updateDots();
+    }, 100);
+  });
 
+  prevBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex - 1);
+    startAutoplay();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex + 1);
+    startAutoplay();
+  });
+
+  // Pausar autoplay en hover del cursor
   carousel.addEventListener('mouseenter', stopAutoplay);
   carousel.addEventListener('mouseleave', startAutoplay);
 
+  // Manejo de redimensión de ventana
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { buildDots(); goTo(currentIndex); }, 200);
+    resizeTimer = setTimeout(() => {
+      buildDots();
+      goTo(currentIndex);
+    }, 200);
   });
 
+  // Inicializar
   buildDots();
   goTo(0);
   startAutoplay();

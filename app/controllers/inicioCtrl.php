@@ -85,6 +85,36 @@ class inicioCtrl extends Controlador {
                 'campanas_activas' => '2 campañas activas',
                 'ubicacion' => 'Rosario',
                 'imagen' => ''
+            ],
+            [
+                'nombre' => 'Patitas Felices',
+                'categoria' => 'Acción Social',
+                'avatar_clase' => 'avatar-2',
+                'iniciales' => 'PF',
+                'descripcion' => 'Refugio animal abocado al rescate, rehabilitación y búsqueda de familias responsables para perros y gatos en situación de calle.',
+                'campanas_activas' => '5 campañas activas',
+                'ubicacion' => 'Mendoza',
+                'imagen' => ''
+            ],
+            [
+                'nombre' => 'Huellas del Mañana',
+                'categoria' => 'Educación',
+                'avatar_clase' => 'avatar-3',
+                'iniciales' => 'HM',
+                'descripcion' => 'Programa de mentoría escolar que busca inspirar y motivar a estudiantes de secundaria para continuar sus estudios universitarios.',
+                'campanas_activas' => '2 campañas activas',
+                'ubicacion' => 'Tucumán',
+                'imagen' => ''
+            ],
+            [
+                'nombre' => 'EcoRed',
+                'categoria' => 'Medio Ambiente',
+                'avatar_clase' => 'avatar-1',
+                'iniciales' => 'ER',
+                'descripcion' => 'Red de voluntarios ecológicos que promueve el reciclaje doméstico, limpiezas de playas locales y compostaje comunitario.',
+                'campanas_activas' => '3 campañas activas',
+                'ubicacion' => 'Mar del Plata',
+                'imagen' => ''
             ]
         ];
 
