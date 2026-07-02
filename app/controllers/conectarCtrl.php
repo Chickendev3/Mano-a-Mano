@@ -22,7 +22,7 @@ class conectarCtrl extends Controlador {
             $endDate = $camp['fecha_finalizacion'];
             
             // Filtrar sólo activas: hoy mayor a inicio y menor a finalización
-            if ($today > $startDate && $today < $endDate) {
+            if ($today >= $startDate && $today <= $endDate) {
                 $campanias[] = $camp;
             }
         }
