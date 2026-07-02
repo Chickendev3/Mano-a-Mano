@@ -519,11 +519,11 @@
 }
 
 .carousel-arrow-prev {
-  left: 10px !important;
+  left: -50px !important;
 }
 
 .carousel-arrow-next {
-  right: 10px !important;
+  right: -50px !important;
 }
 
 .carousel-arrow:hover {
@@ -545,13 +545,22 @@
   stroke-width: 2.5;
 }
 
-/* Ajustes responsivos para las flechas en pantallas chicas para que no queden fuera de la pantalla */
-@media (max-width: 768px) {
+/* Ajustes responsivos para las flechas según ancho de pantalla */
+@media (max-width: 1300px) {
   .carousel-arrow-prev {
-    left: 4px;
+    left: -20px !important;
   }
   .carousel-arrow-next {
-    right: 4px;
+    right: -20px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-arrow-prev {
+    left: 4px !important;
+  }
+  .carousel-arrow-next {
+    right: 4px !important;
   }
 }
 

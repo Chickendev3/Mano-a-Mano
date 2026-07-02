@@ -119,6 +119,56 @@ const campaignsData = [
     skills: 'Trabajo en cocina, servicio de comida, empatía social.',
     location: 'Rosario',
     img: 'img/campaign_food.png'
+  },
+  {
+    id: 13,
+    title: 'Cuidado de Senderos',
+    org: 'EcoRed',
+    category: 'medio-ambiente',
+    desc: 'Ayudanos a restaurar y señalizar los senderos del Parque Reserva Natural para proteger la flora autóctona.',
+    skills: 'Buena condición física, amor por la naturaleza, orientación.',
+    location: 'Mendoza',
+    img: 'img/campaign_park.png'
+  },
+  {
+    id: 14,
+    title: 'Comprensión Lectora',
+    org: 'Huellas del Mañana',
+    category: 'educacion',
+    desc: 'Buscamos voluntarios para realizar lecturas compartidas y dinámicas de comprensión de textos con niños de primaria.',
+    skills: 'Paciencia, pedagogía básica, lectura expresiva.',
+    location: 'Salta',
+    img: 'img/campaign_tutoring.png'
+  },
+  {
+    id: 15,
+    title: 'Pintura Solidaria',
+    org: 'Corazones Abiertos',
+    category: 'accion-social',
+    desc: 'Sumate a pintar y refaccionar las salas del club deportivo barrial que asiste a más de 200 jóvenes.',
+    skills: 'Destrezas de pintura básica, proactividad, trabajo en equipo.',
+    location: 'La Plata',
+    img: 'img/campaign_food.png'
+  },
+  {
+    id: 16,
+    title: 'Alfabetización Adultos',
+    org: 'Mentes Brillantes',
+    category: 'educacion',
+    desc: 'Buscamos tutores para dictar clases básicas de lectura, escritura y cálculo a adultos mayores del centro vecinal.',
+    skills: 'Mucha paciencia, calidez humana, facilidad de enseñanza.',
+    location: 'Córdoba',
+    img: 'img/campaign_tutoring.png'
+  },
+  {
+    id: 17,
+    title: 'Refugio de Noche',
+    org: 'Corazones Abiertos',
+    category: 'accion-social',
+    desc: 'Colaborá en la recepción de personas en situación de calle, sirviendo la cena y acondicionando las camas.',
+    skills: 'Empatía, escucha activa, vocación de servicio social.',
+    location: 'Rosario',
+    img: 'img/campaign_food.png'
   }
 ];
 
