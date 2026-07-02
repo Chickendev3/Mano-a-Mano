@@ -23,7 +23,7 @@ class Organizacion extends Usuario {
             $parametros[':q'] = '%' . $filtros['q'] . '%';
         }
         if (!empty($filtros['category'])) {
-            $condiciones[] = "u.id IN (SELECT oc.organizacion_id FROM organizaciones_causas oc JOIN causas c ON oc.causa_id = c.id WHERE c.causa = :category)";
+            $condiciones[] = "o.id IN (SELECT oc.organizacion_id FROM organizaciones_causas oc JOIN causas c ON oc.causa_id = c.id WHERE c.causa = :category)";
             $parametros[':category'] = $filtros['category'];
         }
         if (!empty($filtros['location'])) {

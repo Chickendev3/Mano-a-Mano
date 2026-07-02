@@ -24,7 +24,7 @@ class Voluntario extends Usuario{
             $parametros[':q'] = '%' . $filtros['q'] . '%';
         }
         if (!empty($filtros['category'])) {
-            $condiciones[] = "u.id IN (SELECT vo.voluntario_id FROM voluntarios_oficios vo JOIN oficios o ON vo.oficio_id = o.id WHERE o.oficio = :category)";
+            $condiciones[] = "v.id IN (SELECT vo.voluntario_id FROM voluntarios_oficios vo JOIN oficios o ON vo.oficio_id = o.id WHERE o.oficio = :category)";
             $parametros[':category'] = $filtros['category'];
         }
         if (!empty($filtros['location'])) {
