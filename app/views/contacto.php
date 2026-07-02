@@ -1,47 +1,28 @@
-<!-- HERO INTRODUCTORIO PEQUEÑO -->
-<section class="section" style="padding-top: 140px; background-color: var(--color-background); border-bottom: 1px solid var(--color-border);">
-  <div class="container">
-    <div class="wireframe-grid">
-      
-      <!-- Column Left: Round blob shape -->
-      <div class="col-img" style="display: flex; justify-content: center; align-items: center;">
-        <div class="wireframe-placeholder" style="border-radius: 50%; width: 320px; height: 320px; min-height: auto;" aria-hidden="true">
-          <div class="wireframe-placeholder-inner" style="border-radius: 50%;">
-            <i data-lucide="help-circle"></i>
-            <span>Soporte</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Column Right: Hero Text -->
-      <div class="col-form" style="display: flex; flex-direction: column; justify-content: center; gap: 16px;">
-        <span class="section-tag" style="align-self: flex-start;">Contacto</span>
-        <h1 class="wireframe-title" style="font-size: 40px; margin-bottom: 8px;">Comunícate con nosotros</h1>
-        <p class="wireframe-subtitle" style="margin-bottom: 24px; font-size: 16px;">
-          Estamos aquí para ayudarte. Si tenés dudas sobre cómo registrarte, verificar tu organización social, publicar campañas o postularte, envíanos tu consulta.
-        </p>
-        <a href="#formulario-contacto" class="btn btn-primary" style="align-self: flex-start; padding: 14px 28px;">
-          Contáctanos <i data-lucide="arrow-down" style="margin-left: 4px;"></i>
-        </a>
-      </div>
-      
-    </div>
+<!-- HERO INTRODUCTORIO CON IMAGEN DE FONDO CLARA/DESVANECIDA -->
+<section class="section contact-hero">
+  <!-- Contenedor absoluto para la imagen desvanecida -->
+  <div class="contact-hero-bg" style="background-image: url('<?= BASE_URL ?>img/banner-contacto.webp');"></div>
+
+  <div class="container contact-hero-container">
+    <span class="section-tag">Contacto</span>
+    <h1 class="wireframe-title contact-hero-title">Comunícate con nosotros</h1>
+    <p class="wireframe-subtitle contact-hero-subtitle">
+      Estamos aquí para ayudarte. Si tenés dudas sobre cómo registrarte, verificar tu organización social, publicar campañas o postularte, envíanos tu consulta.
+    </p>
+    <a href="#formulario-contacto" class="btn btn-primary contact-hero-btn">
+      Contáctanos <i data-lucide="arrow-down" style="width: 18px; height: 18px;"></i>
+    </a>
   </div>
 </section>
 
 <!-- FORMULARIO SECCIÓN -->
 <section class="section" id="formulario-contacto" style="background-color: var(--color-surface); border-bottom: 1px solid var(--color-border);">
   <div class="container">
-    <div class="wireframe-grid reverse-layout">
+    <div class="contact-form-grid">
       
-      <!-- Column 1: Placeholder Image (Left on desktop) -->
+      <!-- Column 1: Google Map (Left on desktop) -->
       <div class="col-img">
-        <div class="wireframe-placeholder" aria-hidden="true">
-          <div class="wireframe-placeholder-inner">
-            <i data-lucide="image"></i>
-            <span>Imagen del Formulario</span>
-          </div>
-        </div>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14256.215686669038!2d-58.60061863630412!3d-34.64744590751182!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bc951c0fe2d9f5%3A0x9f1c540898efecbe!2sUTN%20HAEDO!5e0!3m2!1ses-419!2sar!4v1782950753336!5m2!1ses-419!2sar" class="contact-map-iframe" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
       </div>
       
       <!-- Column 2: Form (Right on desktop) -->
@@ -109,7 +90,7 @@
         <!-- Accordion Item 1 -->
         <div class="accordion-item">
           <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-1">
-            <span>¿Quiénes pueden usar la plataforma? / Who should use the app?</span>
+            <span>¿Quiénes pueden usar la plataforma?</span>
             <i data-lucide="chevron-down"></i>
           </button>
           <div class="accordion-content" id="faq-ans-1" role="region">
@@ -122,7 +103,7 @@
         <!-- Accordion Item 2 -->
         <div class="accordion-item">
           <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-2">
-            <span>¿Qué incluye el servicio y registro? / What is included with my subscription?</span>
+            <span>¿Qué incluye el servicio y registro?</span>
             <i data-lucide="chevron-down"></i>
           </button>
           <div class="accordion-content" id="faq-ans-2" role="region">
@@ -135,12 +116,12 @@
         <!-- Accordion Item 3 -->
         <div class="accordion-item">
           <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-3">
-            <span>¿El trabajo de voluntariado es pago? / How do I get paid?</span>
+            <span>¿El trabajo de voluntariado es pago?</span>
             <i data-lucide="chevron-down"></i>
           </button>
           <div class="accordion-content" id="faq-ans-3" role="region">
             <div class="accordion-inner">
-              El voluntariado es una actividad solidaria, libre y no remunerada. La recompensa principal es el impacto positivo en la comunidad y el desarrollo personal. Sin embargo, algunas ONGs coordinan apoyos específicos como viáticos o refrigerios para jornadas extensas.
+              El voluntariado es una actividad solidaria, libre y no remunerada. La recompensa principal es el impacto positivo en la comunidad y el desarrollo personal. Sin embargo, algunas ONGs coordinan apoyos específicos como viáticos o refrigerios para jornadas extensas, pero la plataforma no servirá como intermediara para esos casos.
             </div>
           </div>
         </div>
@@ -148,7 +129,7 @@
         <!-- Accordion Item 4 -->
         <div class="accordion-item">
           <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-4">
-            <span>¿Mis datos personales están seguros? / Is my personal information safe?</span>
+            <span>¿Mis datos personales están seguros?</span>
             <i data-lucide="chevron-down"></i>
           </button>
           <div class="accordion-content" id="faq-ans-4" role="region">
@@ -161,12 +142,12 @@
         <!-- Accordion Item 5 -->
         <div class="accordion-item">
           <button class="accordion-header" aria-expanded="false" aria-controls="faq-ans-5">
-            <span>¿Cómo podemos ponernos en contacto? / How can we get in touch?</span>
+            <span>¿Cómo podemos ponernos en contacto con soporte?</span>
             <i data-lucide="chevron-down"></i>
           </button>
           <div class="accordion-content" id="faq-ans-5" role="region">
             <div class="accordion-inner">
-              Podés escribirnos a través del formulario de contacto superior de esta página, o enviarnos un correo electrónico directo a <strong>contacto@manoamano.org</strong>. Nuestro equipo de soporte universitario te responderá a la brevedad.
+              Podés escribirnos a través del formulario de contacto superior de esta página, o enviarnos un correo electrónico directo a <strong>mano.a.mano.proy@gmail.com</strong>. Nuestro equipo de soporte universitario te responderá a la brevedad.
             </div>
           </div>
         </div>
