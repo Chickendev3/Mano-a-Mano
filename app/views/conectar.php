@@ -25,16 +25,16 @@ if (!function_exists('truncateDescription')) {
       <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px;" class="form-row">
         <div class="form-group" style="margin-bottom: 0;">
           <label for="search-input" class="form-label" style="display: none;">Buscar</label>
-          <input type="text" id="keyword-search-input" class="form-input" placeholder="Buscar por palabra clave..." style="background-color: var(--color-background);" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+          <input type="text" id="keyword-search-input" class="form-input" placeholder="Buscar por palabra clave..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
         </div>
         <div class="form-group" style="margin-bottom: 0;">
           <label for="category-select" class="form-label" style="display: none;">Categoría</label>
-          <select id="category-select" class="form-input" style="background-color: var(--color-background);">
+          <select id="category-select" class="form-input">
             <!-- Se completa dinámicamente con js -->
           </select>
         </div>
         <div class="form-group" style="margin-bottom: 0;">
-          <input type="text" id="location-search-input" class="form-input" placeholder="Buscar por ubicación..." style="background-color: var(--color-background);" value="<?= htmlspecialchars($_GET['location'] ?? '') ?>">
+          <input type="text" id="location-search-input" class="form-input" placeholder="Buscar por ubicación..." value="<?= htmlspecialchars($_GET['location'] ?? '') ?>">
         </div>
       </div>
       

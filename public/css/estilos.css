@@ -1633,7 +1633,7 @@ select:focus-visible {
   padding: 10px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-background);
+  background-color: rgba(255, 255, 255, 0.09);
   color: var(--color-text-primary);
   font-family: inherit;
   font-size: 14px;
@@ -1641,8 +1641,20 @@ select:focus-visible {
 }
 .edit-input:focus {
   outline: none;
+  background-color: rgba(255, 255, 255, 0.15);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+[data-theme="light"] .edit-input {
+  background-color: #FFFFFF;
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+[data-theme="light"] .edit-input:focus {
+  background-color: #FFFFFF;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(76, 127, 107, 0.15);
 }
 
 /* Listado de Etiquetas y Sugerencias de Causas/Oficios */
