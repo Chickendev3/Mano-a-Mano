@@ -79,11 +79,11 @@
   --color-surface-light: #FFFFFF;
   --color-surface-dark: rgba(255, 255, 255, 0.85);
 
-  --color-light: #2D3B45;
-  --color-text-primary: #2D3B45;
-  --color-text-secondary: #4C7F6B;
+  --color-light: #1E293B;
+  --color-text-primary: #1E293B;
+  --color-text-secondary: #64748B;
   --color-text-dark: #0F172A;
-  --color-text-muted: #5F8A7A; /* Texto secundario más oscuro para legibilidad */
+  --color-text-muted: #94A3B8; /* Texto secundario más oscuro para legibilidad */
 
   --color-border: #BCCEC3; /* Bordes ligeramente más oscuros para separar mejor elementos */
   --color-accent-yellow: #F2B24C;
