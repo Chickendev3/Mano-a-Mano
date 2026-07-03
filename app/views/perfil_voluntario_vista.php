@@ -40,6 +40,15 @@ if (!function_exists('truncateDescription')) {
           <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
         </p>
 
+        <?php if (!empty($usuario['ubicacion'])): ?>
+          <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 12px;">
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span><?= htmlspecialchars($usuario['ubicacion']) ?></span>
+            </div>
+          </div>
+        <?php endif; ?>
+
         <!-- Insignias and Statistics -->
         <div class="profile-badges-container">
           <?php if (!empty($insignias)): ?>

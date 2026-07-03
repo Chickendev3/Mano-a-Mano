@@ -63,14 +63,19 @@ function renderProfileData() {
      // Causes Badges (Read-Only)
    if (viewCauses) {
      viewCauses.innerHTML = "";
-     orgProfile.causes.forEach(cause => {
-       const span = document.createElement("span");
-       
-      span.className = "tag-badge";
-       span.innerHTML = `<i data-lucide="tag"></i> ${cause}`;
-       
-       viewCauses.appendChild(span);
-     });
+     const viewSkillsRow = document.getElementById("view-skills-row");
+     
+     if (orgProfile.causes && orgProfile.causes.length > 0) {
+       orgProfile.causes.forEach(cause => {
+         const span = document.createElement("span");
+         span.className = "tag-badge";
+         span.innerHTML = `<i data-lucide="tag"></i> ${cause}`;
+         viewCauses.appendChild(span);
+       });
+       if (viewSkillsRow) viewSkillsRow.style.display = "flex";
+     } else {
+       if (viewSkillsRow) viewSkillsRow.style.display = "none";
+     }
    }
 
   // Update navbar if logged in

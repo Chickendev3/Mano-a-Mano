@@ -37,6 +37,22 @@ if (!function_exists('truncateDescription')) {
         <p class="profile-desc-text">
           <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
         </p>
+
+        <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 12px;">
+          <?php if (!empty($usuario['ubicacion'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span><?= htmlspecialchars($usuario['ubicacion']) ?></span>
+            </div>
+          <?php endif; ?>
+          <?php if (!empty($usuario['email'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="mail"></i>
+              <span><?= htmlspecialchars($usuario['email']) ?></span>
+            </div>
+          <?php endif; ?>
+        </div>
+
         <div class="profile-tags-wrapper">
           <?php if (!empty($causas_organizacion)): ?>
             <?php foreach ($causas_organizacion as $causa): ?>
