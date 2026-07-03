@@ -368,13 +368,13 @@ function renderModalesComunesPerfil( $causas = [], $campaniasUsuario = [] ) {
     <div style="width: 56px; height: 56px; background-color: rgba(239, 68, 68, 0.1); color: #EF4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
       <i data-lucide="alert-triangle" style="width: 28px; height: 28px;"></i>
     </div>
-    <h3 class="modal-title" id="delete-account-title" style="color: #800020; font-size: 20px; margin-bottom: 12px; font-weight: 700;">¿Eliminar tu cuenta permanentemente?</h3>
+    <h3 class="modal-title" id="delete-account-title" style="font-size: 20px; margin-bottom: 12px; font-weight: 700;">¿Eliminar tu cuenta permanentemente?</h3>
     <p style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; line-height: 1.6; text-align: left;">
       <strong>Esta acción es irreversible.</strong> Al confirmar, se eliminarán de forma permanente todos tus datos personales, historial de voluntariados, postulaciones, campañas creadas, invitaciones y asociaciones vinculadas a tu cuenta.
     </p>
     <div style="display: flex; gap: 12px; justify-content: center;">
       <button class="btn btn-ghost" onclick="closeModal('modal-delete-account-confirm')">Cancelar</button>
-      <button class="btn btn-primary" id="confirm-delete-account-btn" style="background-color: #800020; border-color: #800020; color: #ffffff; font-weight: 600;">Eliminar cuenta</button>
+      <button class="btn btn-danger" id="confirm-delete-account-btn">Eliminar cuenta</button>
     </div>
   </div>
 </div>
@@ -451,7 +451,7 @@ function renderModalDetalleCampania() {
 
     <!-- Sección de Gestión de Postulaciones (Visible solo para el Creador de la Campaña) -->
     <div class="modal-owner-postulations-sec" id="m-camp-owner-postulations-sec" style="display: none; margin-top: 24px;">
-      <h4 style="margin-bottom: 16px; font-weight: 600; color: var(--color-text-dark); border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
+      <h4 style="margin-bottom: 16px; font-weight: 600; color: var(--color-text-primary); border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
         Gestión de Voluntarios
       </h4>
       

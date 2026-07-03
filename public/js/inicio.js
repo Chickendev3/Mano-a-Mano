@@ -1,47 +1,4 @@
 // HOME PAGE SPECIFIC SCRIPT
-const campaignsData = [
-  {
-    id: 1,
-    title: 'Reforestación Parque Central',
-    org: 'Techo Verde',
-    category: 'medio-ambiente',
-    desc: 'Sumate a nuestra jornada de plantación de árboles nativos para recuperar el pulmón verde de la ciudad. Apto para toda la familia y personas que disfruten del trabajo al aire libre.',
-    skills: 'Empatía, trabajo físico básico, buena predisposición y ganas de trabajar en equipo.',
-    location: 'Buenos Aires',
-    img: 'img/campaign_park.png'
-  },
-  {
-    id: 2,
-    title: 'Clases de Apoyo Digital',
-    org: 'Mentes Brillantes',
-    category: 'educacion',
-    desc: 'Buscamos tutores para enseñar el uso de herramientas de oficina básicas, navegación segura por internet y programación web inicial a jóvenes y adolescentes del barrio de San Martín.',
-    skills: 'Paciencia, conocimientos de informática básica, facilidad para explicar temas a jóvenes.',
-    location: 'Rosario',
-    date: '18 Jun, 2026',
-    time: '16:00 - 18:00',
-    volunteersRequired: 10,
-    volunteersRegistered: 4,
-    progress: 40,
-    img: 'img/campaign_tutoring.png'
-  },
-  {
-    id: 3,
-    title: 'Colecta de Alimentos',
-    org: 'Corazones Abiertos',
-    category: 'accion-social',
-    desc: 'Ayudanos a clasificar, empaquetar y distribuir las donaciones del banco de alimentos destinadas a 5 comedores comedores comunitarios infantiles que asisten a familias del sector.',
-    skills: 'Clasificación de stock, organización, trabajo colaborativo dinámico.',
-    location: 'Córdoba',
-    date: '21 Jun, 2026',
-    time: '08:30 - 14:00',
-    volunteersRequired: 15,
-    volunteersRegistered: 13,
-    progress: 86,
-    img: 'img/campaign_food.png'
-  }
-];
-
 const appliedCampaigns = new Set(); // Store campaign IDs user has applied to
 let currentCampaignContext = null;
 let currentViewedCampaignId = null;
@@ -351,97 +308,43 @@ function setupPostulationHandler() {
   }
 }
 
-function initCampsCarousel() {
-  const carousel      = document.getElementById('campaigns-container');
-  const prevBtn       = document.getElementById('camps-prev');
-  const nextBtn       = document.getElementById('camps-next');
-  const dotsContainer = document.getElementById('camps-dots');
-
-  if (!carousel || !prevBtn || !nextBtn) return;
-
-  const AUTOPLAY_INTERVAL = 5000;
-  let autoplayTimer = null;
-  let currentIndex  = 0;
-
-  function getVisibleCount() {
-    const card = carousel.querySelector('.camp-card');
-    if (!card) return 1;
-    const cardWidth = card.offsetWidth + 24; 
-    return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
-  }
-
-  function getCards() {
-    return Array.from(carousel.querySelectorAll('.camp-card'));
-  }
-
-  function buildDots() {
-    if (!dotsContainer) return;
-    dotsContainer.innerHTML = '';
-    const total = Math.ceil(getCards().length / getVisibleCount());
-    for (let i = 0; i < total; i++) {
-      const dot = document.createElement('button');
-      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('aria-label', `Ir al grupo ${i + 1}`);
-      dot.addEventListener('click', () => goTo(i));
-      dotsContainer.appendChild(dot);
-    }
-  }
-
-  function updateDots() {
-    if (!dotsContainer) return;
-    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentIndex);
+// MOCK CAMPAIGN FORM SUBMIT
+function initializeCampaignForm() {
+  const createCampaignForm = document.getElementById('create-campaign-form');
+  if (createCampaignForm) {
+    createCampaignForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const title = document.getElementById('create-title').value;
+      const org = document.getElementById('create-org').value;
+      const category = document.getElementById('create-category').value;
+      const desc = document.getElementById('create-desc').value;
+      const location = document.getElementById('create-location').value;
+      const volNeeded = parseInt(document.getElementById('create-vol-needed').value);
+      const dateInput = document.getElementById('create-date').value;
+      const time = document.getElementById('create-time').value;
+      
+      const dateObj = new Date(dateInput);
+      const options = { day: 'numeric', month: 'short', year: 'numeric' };
+      const formattedDate = dateObj.toLocaleDateString('es-ES', options);
+      
+      closeModal('modal-create-campaign');
+      showToast('Campaña creada con éxito', `"${title}" ya está visible para todos los voluntarios.`, true);
+      
+      createCampaignForm.reset();
     });
   }
+}
 
-  function goTo(index) {
-    const cards    = getCards();
-    const visible  = getVisibleCount();
-    const maxIndex = Math.ceil(cards.length / visible) - 1;
-
-    currentIndex = Math.max(0, Math.min(index, maxIndex));
-
-    const targetCard = cards[currentIndex * visible];
-    if (targetCard) {
-      carousel.scrollTo({ left: targetCard.offsetLeft - 4, behavior: 'smooth' });
-    }
-
-    prevBtn.disabled = currentIndex === 0;
-    nextBtn.disabled = currentIndex >= maxIndex;
-    updateDots();
+function initializeOrgProfileContactLink() {
+  const directCreateBtn = document.getElementById('direct-create-campaign-btn');
+  if (directCreateBtn) {
+    directCreateBtn.addEventListener('click', () => openModal('modal-create-campaign'));
   }
-
-  function startAutoplay() {
-    stopAutoplay();
-    autoplayTimer = setInterval(() => {
-      const maxIndex = Math.ceil(getCards().length / getVisibleCount()) - 1;
-      goTo(currentIndex >= maxIndex ? 0 : currentIndex + 1);
-    }, AUTOPLAY_INTERVAL);
-  }
-
-  function stopAutoplay() {
-    if (autoplayTimer) clearInterval(autoplayTimer);
-  }
-
-  prevBtn.addEventListener('click', () => { goTo(currentIndex - 1); stopAutoplay(); startAutoplay(); });
-  nextBtn.addEventListener('click', () => { goTo(currentIndex + 1); stopAutoplay(); startAutoplay(); });
-
-  carousel.addEventListener('mouseenter', stopAutoplay);
-  carousel.addEventListener('mouseleave', startAutoplay);
-
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { buildDots(); goTo(currentIndex); }, 200);
-  });
-
-  buildDots();
-  goTo(0);
-  startAutoplay();
 }
 
 // ==========================================================================
-// CARRUSEL ORGANIZACIONES — flechas + autoplay + dots
+// CARRUSEL ORGANIZACIONES — flechas + autoplay + dots + bucle infinito
 // ==========================================================================
 function initOrgsCarousel() {
   const carousel      = document.getElementById('orgs-container');
@@ -454,6 +357,7 @@ function initOrgsCarousel() {
   const AUTOPLAY_INTERVAL = 4000;
   let autoplayTimer = null;
   let currentIndex  = 0;
+  let isScrolling   = false;
 
   function getVisibleCount() {
     const card = carousel.querySelector('.org-card');
@@ -469,12 +373,24 @@ function initOrgsCarousel() {
   function buildDots() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
-    const total = Math.ceil(getCards().length / getVisibleCount());
+    const visible = getVisibleCount();
+    const total = Math.ceil(getCards().length / visible);
+    
+    if (total <= 1) {
+      dotsContainer.style.display = 'none';
+      return;
+    }
+    dotsContainer.style.display = 'flex';
+
     for (let i = 0; i < total; i++) {
       const dot = document.createElement('button');
       dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
       dot.setAttribute('aria-label', `Ir al grupo ${i + 1}`);
-      dot.addEventListener('click', () => goTo(i));
+      dot.addEventListener('click', () => {
+        stopAutoplay();
+        goTo(i);
+        startAutoplay();
+      });
       dotsContainer.appendChild(dot);
     }
   }
@@ -491,22 +407,39 @@ function initOrgsCarousel() {
     const visible  = getVisibleCount();
     const maxIndex = Math.ceil(cards.length / visible) - 1;
 
-    currentIndex = Math.max(0, Math.min(index, maxIndex));
+    // Lógica de bucle circular
+    if (index < 0) {
+      currentIndex = Math.max(0, maxIndex);
+    } else if (index > maxIndex) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
 
     const targetCard = cards[currentIndex * visible];
     if (targetCard) {
-      carousel.scrollTo({ left: targetCard.offsetLeft - 4, behavior: 'smooth' });
+      isScrolling = true;
+      const targetOffset = targetCard.offsetLeft - 4;
+      
+      carousel.style.scrollSnapType = 'none';
+      carousel.scrollTo({ left: targetOffset, behavior: 'smooth' });
+      
+      setTimeout(() => {
+        carousel.style.scrollSnapType = 'x mandatory';
+        isScrolling = false;
+      }, 500);
     }
 
-    prevBtn.disabled = currentIndex === 0;
-    nextBtn.disabled = currentIndex >= maxIndex;
     updateDots();
   }
 
   function startAutoplay() {
     stopAutoplay();
     autoplayTimer = setInterval(() => {
-      const maxIndex = Math.ceil(getCards().length / getVisibleCount()) - 1;
+      const visible = getVisibleCount();
+      const maxIndex = Math.ceil(getCards().length / visible) - 1;
+      if (maxIndex <= 0) return;
+      
       goTo(currentIndex >= maxIndex ? 0 : currentIndex + 1);
     }, AUTOPLAY_INTERVAL);
   }
@@ -515,8 +448,37 @@ function initOrgsCarousel() {
     if (autoplayTimer) clearInterval(autoplayTimer);
   }
 
-  prevBtn.addEventListener('click', () => { goTo(currentIndex - 1); stopAutoplay(); startAutoplay(); });
-  nextBtn.addEventListener('click', () => { goTo(currentIndex + 1); stopAutoplay(); startAutoplay(); });
+  let scrollTimeout;
+  carousel.addEventListener('scroll', () => {
+    if (isScrolling) return;
+    
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const scrollLeft = carousel.scrollLeft;
+      const card = carousel.querySelector('.org-card');
+      if (!card) return;
+      const cardWidth = card.offsetWidth + 24;
+      const visible = getVisibleCount();
+      
+      const newIndex = Math.round(scrollLeft / (cardWidth * visible));
+      const maxIndex = Math.ceil(getCards().length / visible) - 1;
+      currentIndex = Math.max(0, Math.min(newIndex, maxIndex));
+      
+      updateDots();
+    }, 100);
+  });
+
+  prevBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex - 1);
+    startAutoplay();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex + 1);
+    startAutoplay();
+  });
 
   carousel.addEventListener('mouseenter', stopAutoplay);
   carousel.addEventListener('mouseleave', startAutoplay);
@@ -524,10 +486,193 @@ function initOrgsCarousel() {
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { buildDots(); goTo(currentIndex); }, 200);
+    resizeTimer = setTimeout(() => {
+      buildDots();
+      goTo(currentIndex);
+    }, 200);
   });
 
   buildDots();
   goTo(0);
   startAutoplay();
+}
+
+// ==========================================================================
+// CARRUSEL CAMPAÑAS — flechas + autoplay + dots + bucle infinito
+// ==========================================================================
+function initCampsCarousel() {
+  const carousel      = document.getElementById('campaigns-container');
+  const prevBtn       = document.getElementById('camps-prev');
+  const nextBtn       = document.getElementById('camps-next');
+  const dotsContainer = document.getElementById('camps-dots');
+
+  if (!carousel || !prevBtn || !nextBtn) return null;
+
+  const AUTOPLAY_INTERVAL = 6000;
+  let autoplayTimer = null;
+  let currentIndex  = 0;
+  let isScrolling   = false;
+
+  function getCards() {
+    return Array.from(carousel.querySelectorAll('.camp-card')).filter(card => card.style.display !== 'none');
+  }
+
+  function getVisibleCount() {
+    const card = carousel.querySelector('.camp-card');
+    if (!card) return 1;
+    const cardWidth = card.offsetWidth + 24; 
+    return Math.max(1, Math.round(carousel.clientWidth / cardWidth));
+  }
+
+  function updateSnapping() {
+    const cards = getCards();
+    const visible = getVisibleCount();
+    Array.from(carousel.querySelectorAll('.camp-card')).forEach(card => {
+      card.style.scrollSnapAlign = 'none';
+    });
+    cards.forEach((card, i) => {
+      if (i % visible === 0) {
+        card.style.scrollSnapAlign = 'start';
+      }
+    });
+  }
+
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    const visible = getVisibleCount();
+    const total = Math.ceil(getCards().length / visible);
+    
+    if (total <= 1) {
+      dotsContainer.style.display = 'none';
+      updateSnapping();
+      return;
+    }
+    dotsContainer.style.display = 'flex';
+
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Ir al grupo ${i + 1}`);
+      dot.addEventListener('click', () => {
+        stopAutoplay();
+        goTo(i);
+        startAutoplay();
+      });
+      dotsContainer.appendChild(dot);
+    }
+
+    updateSnapping();
+  }
+
+  function updateDots() {
+    if (!dotsContainer) return;
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function goTo(index) {
+    const cards    = getCards();
+    const visible  = getVisibleCount();
+    const maxIndex = Math.ceil(cards.length / visible) - 1;
+
+    if (index < 0) {
+      currentIndex = Math.max(0, maxIndex);
+    } else if (index > maxIndex) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+
+    const targetCard = cards[currentIndex * visible];
+    if (targetCard) {
+      isScrolling = true;
+      const targetOffset = targetCard.offsetLeft - 4;
+      
+      carousel.style.scrollSnapType = 'none';
+      carousel.scrollTo({ left: targetOffset, behavior: 'smooth' });
+      
+      setTimeout(() => {
+        carousel.style.scrollSnapType = 'x mandatory';
+        isScrolling = false;
+      }, 500);
+    }
+
+    updateDots();
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayTimer = setInterval(() => {
+      const visible = getVisibleCount();
+      const maxIndex = Math.ceil(getCards().length / visible) - 1;
+      if (maxIndex <= 0) return;
+      
+      goTo(currentIndex >= maxIndex ? 0 : currentIndex + 1);
+    }, AUTOPLAY_INTERVAL);
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  }
+
+  let scrollTimeout;
+  carousel.addEventListener('scroll', () => {
+    if (isScrolling) return;
+    
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const scrollLeft = carousel.scrollLeft;
+      const card = carousel.querySelector('.camp-card');
+      if (!card) return;
+      const cardWidth = card.offsetWidth + 24;
+      const visible = getVisibleCount();
+      const cards = getCards();
+      
+      const newIndex = Math.round(scrollLeft / (cardWidth * visible));
+      const maxIndex = Math.ceil(cards.length / visible) - 1;
+      currentIndex = Math.max(0, Math.min(newIndex, maxIndex));
+      
+      updateDots();
+    }, 100);
+  });
+
+  prevBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex - 1);
+    startAutoplay();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    stopAutoplay();
+    goTo(currentIndex + 1);
+    startAutoplay();
+  });
+
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', startAutoplay);
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      buildDots();
+      goTo(currentIndex);
+    }, 200);
+  });
+
+  function rebuild() {
+    buildDots();
+    goTo(0);
+  }
+
+  buildDots();
+  goTo(0);
+  startAutoplay();
+
+  return {
+    rebuild,
+    goTo
+  };
 }

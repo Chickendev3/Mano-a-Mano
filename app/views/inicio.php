@@ -15,41 +15,79 @@ if (!function_exists('truncateDescription')) {
 ?>
 
 <!-- HERO SECTION -->
-<section class="hero" id="inicio">
-  <div class="container hero-grid">
+<section class="hero" id="inicio" style="background-image: url('<?= BASE_URL ?>img/hero.png?v=3.0');">
+  <div class="dots-grid-pattern"></div>
+  <div class="hero-overlay"></div>
+  
+  <div class="container hero-container">
     <div class="hero-content">
-      <div class="hero-tag">
-        <span class="hero-tag-pulse" aria-hidden="true"></span>
-        <span>+1,400 Voluntarios activos hoy</span>
+      <div class="hero-badge">
+        <i data-lucide="users"></i> +1.400 Voluntarios activos hoy
       </div>
-      <h1 class="hero-title">Conectamos personas con causas que generan impacto</h1>
-      <p class="hero-subtitle">Encontrá oportunidades de voluntariado o publicá campañas para sumar personas comprometidas con tu misión.</p>
+      
+      <h1 class="hero-title">
+        Conectamos personas<br>
+        con causas que<br>
+        <span class="highlight">generan impacto</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        Encontrá oportunidades de voluntariado o publicá campañas<br>
+        para sumar personas comprometidas con tu misión.
+      </p>
+      
+      <?php if (!isset($_SESSION['usuario_logueado']) || $_SESSION['usuario_logueado'] !== true): ?>
       <div class="hero-buttons">
         <a href="<?= BASE_URL ?>registro/voluntario" class="btn btn-primary btn-lg" id="hero-volunteer-btn">
-          Quiero ser voluntario <i data-lucide="arrow-right"></i>
+          Quiero ser voluntario
         </a>
         <a href="<?= BASE_URL ?>registro/organizacion" class="btn btn-outline btn-lg" id="hero-org-btn">
           Soy una organización
         </a>
       </div>
-      <div class="hero-stats">
+      <?php endif; ?>
+    </div>
+
+    <!-- TARJETAS FLOTANTES INFERIORES -->
+    <div class="hero-bottom-grid">
+      <div class="stats-bar">
         <div class="stat-item">
-          <h3 id="stat-campaigns">+180</h3>
-          <p>Campañas activas</p>
+          <div class="stat-icon icon-green"><i data-lucide="users"></i></div>
+          <div class="stat-text">
+            <h4 id="stat-campaigns">180+</h4>
+            <p>Campañas activas</p>
+          </div>
         </div>
+        <div class="stat-divider"></div>
         <div class="stat-item">
-          <h3 id="stat-orgs">95</h3>
-          <p>ONGs registradas</p>
+          <div class="stat-icon icon-purple"><i data-lucide="building"></i></div>
+          <div class="stat-text">
+            <h4 id="stat-orgs">95</h4>
+            <p>ONGs registradas</p>
+          </div>
         </div>
+        <div class="stat-divider"></div>
         <div class="stat-item">
-          <h3 id="stat-impact">+12k</h3>
-          <p>Horas de impacto</p>
+          <div class="stat-icon icon-gold"><i data-lucide="heart"></i></div>
+          <div class="stat-text">
+            <h4 id="stat-impact">12k+</h4>
+            <p>Horas de impacto</p>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="hero-image-wrapper">
-      <div class="hero-bg-blob"></div>
-      <img src="<?= BASE_URL ?>img/hero.png" alt="Ilustración de personas cooperando para generar impacto social" class="hero-img">
+      
+      <div class="action-card">
+        <div class="action-icon"><i data-lucide="leaf"></i></div>
+        <div class="action-text">
+          <h4>Pequeñas acciones,</h4>
+          <h4>grandes cambios.</h4>
+          <div class="wave-decoration">
+            <svg width="40" height="10" viewBox="0 0 40 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 5C5 5 5 1 10 1C15 1 15 9 20 9C25 9 25 1 30 1C35 1 35 5 40 5" stroke="#7E72BB" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -58,7 +96,7 @@ if (!function_exists('truncateDescription')) {
 <section class="section" id="quienes-somos" style="background-color: var(--color-surface);">
   <div class="container about-grid">
     <div class="about-img-wrapper">
-      <img src="<?= BASE_URL ?>img/about.png" alt="Grupo de voluntarios de diversas edades trabajando felices en equipo" class="about-img">
+      <img src="<?= BASE_URL ?>img/trabajo_en_equipo.png" alt="Grupo de voluntarios de diversas edades trabajando felices en equipo" class="about-img">
       <div class="about-badge-card">
         <h4>Nuestra Filosofía</h4>
         <p>Creemos en el poder transformador de la acción colectiva. Pequeñas manos hacen grandes puentes.</p>
@@ -79,11 +117,11 @@ if (!function_exists('truncateDescription')) {
         </div>
         <div class="about-feat-item">
           <i data-lucide="check-circle-2"></i>
-          <span>REDEFINIR</span>
+          <span>Verificación de organizaciones</span>
         </div>
         <div class="about-feat-item">
           <i data-lucide="check-circle-2"></i>
-          <span>REDEFINIR</span>
+          <span>Seguimiento de impacto</span>
         </div>
         <div class="about-feat-item">
           <i data-lucide="check-circle-2"></i>
@@ -93,8 +131,6 @@ if (!function_exists('truncateDescription')) {
     </div>
   </div>
 </section>
-
-
 
 <!-- CÓMO FUNCIONA -->
 <section class="section" id="como-funciona" style="background-color: var(--color-surface);">
@@ -182,7 +218,6 @@ if (!function_exists('truncateDescription')) {
       <p class="section-subtitle">Conocé algunas de las ONGs que ya están transformando realidades en la plataforma.</p>
     </div>
 
-<!-- ORGANIZACIONES DESTACADAS (Carrusel) -->
     <div class="orgs-carousel-wrapper">
       <button class="carousel-arrow carousel-arrow-prev" id="orgs-prev" aria-label="Anterior">
         <i data-lucide="chevron-left"></i>
@@ -222,7 +257,6 @@ if (!function_exists('truncateDescription')) {
   </div>
 </section>
 
-
 <!-- CAMPAÑAS SOLIDARIAS ACTIVAS (Carrusel) -->
 <section class="section" id="campanas" style="background-color: var(--color-surface);">
   <div class="container">
@@ -232,8 +266,7 @@ if (!function_exists('truncateDescription')) {
       <p class="section-subtitle">Encontrá el espacio ideal donde tu tiempo e intereses se alineen para generar una gran diferencia.</p>
     </div>
     
-    <!-- Campaigns Carousel with Scroll Snap -->
-    <div class="orgs-carousel-wrapper">
+    <div class="camps-carousel-wrapper">
       <button class="carousel-arrow carousel-arrow-prev" id="camps-prev" aria-label="Anterior">
         <i data-lucide="chevron-left"></i>
       </button>
@@ -266,6 +299,7 @@ if (!function_exists('truncateDescription')) {
       </button>
     </div>
     <div class="carousel-dots" id="camps-dots"></div>
+  </div>
 </section>
 
 <!-- CTA PRINCIPAL -->
@@ -389,8 +423,7 @@ if (!function_exists('truncateDescription')) {
     
     <div style="display: flex; justify-content: flex-end; gap: 12px;">
       <button class="btn btn-ghost" onclick="closeModal('modal-org-profile')">Cerrar</button>
-      <!-- "Más información" / "Ver perfil completo" button redirects to mock complete profile view -->
-      <a href="<?= BASE_URL ?>organizacion/perfil" class="btn btn-primary" id="org-profile-full-btn">Ver perfil completo</a>
+      <a href="<?= BASE_URL ?>perfil_organizacion_vista" class="btn btn-primary" id="org-profile-full-btn">Ver perfil completo</a>
     </div>
   </div>
 </div>

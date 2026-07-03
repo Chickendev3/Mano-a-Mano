@@ -32,6 +32,13 @@
         const BASE_URL = '<?= BASE_URL ?>';
         const SESSION_USER_ID = <?= json_encode($_SESSION['id_usuario'] ?? null) ?>;
         const SESSION_USER_ROL = <?= json_encode($_SESSION['usuario_rol'] ?? null) ?>;
+
+        // Cargar tema desde localStorage para evitar flickering
+        (function() {
+            if (localStorage.getItem('theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
     </script>
     
     <!-- Carga de JS Global-->

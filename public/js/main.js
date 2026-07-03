@@ -6,7 +6,26 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeMobileMenu();
   initializeHeaderScroll();
   setupLightboxGallery();
+  initializeThemeToggle();
 });
+
+// THEME SWITCHER TOGGLE
+function initializeThemeToggle() {
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      // Usamos el atributo data-theme para dark/light en estilos.css
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'light') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+      }
+    });
+  }
+}
 
 // HEADER SCROLL EFFECT
 function initializeHeaderScroll() {
