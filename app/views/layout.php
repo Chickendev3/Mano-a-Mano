@@ -12,7 +12,7 @@
     
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=3.1">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=3.2">
 
     <!-- Dynamic CSS load based on the view -->
     <?php 
@@ -20,7 +20,7 @@
         if ($rutaVista === 'registro_voluntario' || $rutaVista === 'registro_organizacion') {
             $base_css = 'registro';
         }
-        echo '<link rel="stylesheet" href="' . BASE_URL . 'css/' . $base_css . '.css?v=3.1">';
+        echo '<link rel="stylesheet" href="' . BASE_URL . 'css/' . $base_css . '.css?v=3.2">';
     ?>
 
     <!-- Lucide Icons -->

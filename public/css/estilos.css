@@ -4,7 +4,7 @@
 /* CSS Variables */
 :root {
   /* Color Palette - NUEVA PALETA DE COLORES (Mockup) */
-  --color-bg-dark: #0d1a17;
+  --color-bg-dark: #172c27;
   --color-bg-dark-sec: #1E2A2E;
   --color-primary-dark: #264B43;
   --color-primary: #3BA37A;
@@ -20,8 +20,8 @@
   --color-accent-beige: #D9C7A3;
   
   /* Textos y Superficies */
-  --color-background: #0d1a17;
-  --color-background-warm: #132521;
+  --color-background: #172c27;
+  --color-background-warm: #1d3731;
   --color-surface: #1E2A2E;
   --color-surface-light: #FFFFFF;
   --color-surface-dark: rgba(30, 42, 46, 0.85);
@@ -33,7 +33,7 @@
   --color-accent-yellow: #D9C7A3;
 
   /* Header specific variables */
-  --color-header-bg: rgba(13, 26, 23, 0.9);
+  --color-header-bg: rgba(30, 56, 50, 0.92);
   --color-header-border: rgba(255, 255, 255, 0.05);
   --color-header-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   --color-nav-active-bg: rgba(255, 255, 255, 0.03);
