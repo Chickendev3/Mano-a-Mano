@@ -73,7 +73,7 @@
   --color-success-dark: #2F4F4B;
   --color-success-light: rgba(76, 127, 107, 0.08);
 
-  --color-background: #DFE5E0; /* Fondo principal más definido (menos blanco) */
+  --color-background: #f0f4f1; /* Fondo principal más definido (menos blanco) */
   --color-background-warm: #E3D9C9; /* Fondo cálido más definido (menos blanco) */
   --color-surface: #FFFFFF;
   --color-surface-light: #FFFFFF;
@@ -2166,4 +2166,216 @@ select:focus-visible {
 [data-theme="light"] .btn-danger:hover {
   background-color: #600018;
   border-color: #600018;
+}
+
+/* Card specific blue theme override */
+.camp-card {
+  --color-card-primary: #367C9E;
+  --color-card-primary-dark: #2D6985;
+  --color-card-primary-light: rgba(54, 124, 158, 0.1);
+}
+
+.camp-card .camp-org {
+  color: var(--color-card-primary) !important;
+}
+
+.camp-card .camp-cat-badge,
+.camp-card .badge-soc {
+  background-color: var(--color-card-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.camp-card .btn-primary {
+  background-color: var(--color-card-primary) !important;
+  border-color: var(--color-card-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.camp-card .btn-primary:hover {
+  background-color: var(--color-card-primary-dark) !important;
+  border-color: var(--color-card-primary-dark) !important;
+}
+
+/* Conectar search button blue theme override */
+#search-action-btn {
+  background-color: #367C9E !important;
+  border-color: #367C9E !important;
+  color: var(--color-surface) !important;
+}
+
+#search-action-btn:hover {
+  background-color: #2D6985 !important;
+  border-color: #2D6985 !important;
+  color: var(--color-surface) !important;
+}
+
+/* Campaign details modal blue theme overrides */
+#modal-profile-camp-detail {
+  --color-modal-primary: #367C9E;
+  --color-modal-primary-dark: #2D6985;
+}
+
+#modal-profile-camp-detail .btn-primary {
+  background-color: var(--color-modal-primary) !important;
+  border-color: var(--color-modal-primary) !important;
+  color: var(--color-surface) !important;
+}
+
+#modal-profile-camp-detail .btn-primary:hover {
+  background-color: var(--color-modal-primary-dark) !important;
+  border-color: var(--color-modal-primary-dark) !important;
+  color: var(--color-surface) !important;
+}
+
+#modal-profile-camp-detail .modal-close-btn:hover {
+  color: var(--color-modal-primary) !important;
+}
+
+#modal-profile-camp-detail .modal-creator-container:hover {
+  border-color: var(--color-modal-primary) !important;
+}
+
+#modal-profile-camp-detail [style*="color: var(--color-primary)"],
+#modal-profile-camp-detail [style*="color:var(--color-primary)"],
+#modal-profile-camp-detail strong[style*="color: var(--color-primary)"],
+#modal-profile-camp-detail span[style*="color: var(--color-primary)"] {
+  color: var(--color-modal-primary) !important;
+}
+
+/* Additional Info alert box violet theme override */
+.unlocked-info-box {
+  background-color: rgba(126, 114, 187, 0.1) !important;
+  border-left: 5px solid #7E72BB !important;
+}
+
+.unlocked-info-box h4 {
+  color: #7E72BB !important;
+}
+
+[data-theme="light"] .unlocked-info-box {
+  background-color: rgba(126, 114, 187, 0.06) !important;
+  border-left: 5px solid #7E72BB !important;
+}
+
+[data-theme="light"] .unlocked-info-box h4 {
+  color: #6B5EAE !important; /* Slightly darker violet for high contrast in light theme */
+}
+
+/* Private Info Section Violet Theme */
+.private-info-section {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: rgba(126, 114, 187, 0.08) !important;
+  border: 1px solid rgba(126, 114, 187, 0.2) !important;
+  border-radius: var(--radius-md);
+}
+
+.private-info-section h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #7E72BB !important;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.private-info-section .profile-meta-item i {
+  color: #7E72BB !important;
+}
+
+[data-theme="light"] .private-info-section {
+  background-color: rgba(126, 114, 187, 0.04) !important;
+  border: 1px solid rgba(126, 114, 187, 0.15) !important;
+}
+
+[data-theme="light"] .private-info-section h4 {
+  color: #6B5EAE !important; /* Slightly darker violet for light theme contrast */
+}
+
+[data-theme="light"] .private-info-section .profile-meta-item i {
+  color: #6B5EAE !important;
+}
+
+/* Contact page and profile creation buttons blue overrides */
+.contact-hero-btn {
+  background-color: #367C9E !important;
+  border-color: #367C9E !important;
+  color: var(--color-surface) !important;
+}
+
+.contact-hero-btn:hover {
+  background-color: #2D6985 !important;
+  border-color: #2D6985 !important;
+  color: var(--color-surface) !important;
+}
+
+#contact-form-page button[type="submit"] {
+  background-color: #367C9E !important;
+  border-color: #367C9E !important;
+  color: var(--color-surface) !important;
+}
+
+#contact-form-page button[type="submit"]:hover {
+  background-color: #2D6985 !important;
+  border-color: #2D6985 !important;
+  color: var(--color-surface) !important;
+}
+
+#btn-create-campaign-modal {
+  background-color: #367C9E !important;
+  border-color: #367C9E !important;
+  color: var(--color-surface) !important;
+}
+
+#btn-create-campaign-modal:hover {
+  background-color: #2D6985 !important;
+  border-color: #2D6985 !important;
+  color: var(--color-surface) !important;
+}
+
+/* Para Voluntarios section blue theme overrides */
+#tab-btn-vol.active {
+  background-color: #367C9E !important;
+  border-color: #367C9E !important;
+  box-shadow: 0 4px 14px rgba(54, 124, 158, 0.3) !important;
+  color: var(--color-surface) !important;
+}
+
+#tab-btn-vol:not(.active):hover {
+  border-color: #367C9E !important;
+  color: #367C9E !important;
+}
+
+#pane-vol .step-card:hover {
+  border-color: rgba(54, 124, 158, 0.3) !important;
+}
+
+#pane-vol .step-card:hover .step-num {
+  color: rgba(54, 124, 158, 0.15) !important;
+}
+
+#pane-vol .step-icon {
+  background-color: rgba(54, 124, 158, 0.1) !important;
+  color: #367C9E !important;
+}
+
+/* Light Theme overrides for blue buttons (where text must be white #FFFFFF) */
+[data-theme="light"] .contact-hero-btn,
+[data-theme="light"] #contact-form-page button[type="submit"],
+[data-theme="light"] #btn-create-campaign-modal,
+[data-theme="light"] #search-action-btn,
+[data-theme="light"] #modal-profile-camp-detail .btn-primary,
+[data-theme="light"] #tab-btn-vol.active {
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] .contact-hero-btn:hover,
+[data-theme="light"] #contact-form-page button[type="submit"]:hover,
+[data-theme="light"] #btn-create-campaign-modal:hover,
+[data-theme="light"] #search-action-btn:hover,
+[data-theme="light"] #modal-profile-camp-detail .btn-primary:hover {
+  color: #FFFFFF !important;
 }

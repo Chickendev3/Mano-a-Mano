@@ -72,8 +72,8 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
           </div>
 
           <!-- Información Privada (Solo visible para el propio voluntario) -->
-          <div class="private-info-section" style="margin-top: 16px; padding: 16px; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.12); border-radius: var(--radius-md);">
-            <h4 style="font-size: 13px; font-weight: 700; color: var(--color-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+          <div class="private-info-section">
+            <h4>
               <i data-lucide="lock" style="width: 14px; height: 14px;"></i> Información Privada (Visible sólo al aceptar postulaciones)
             </h4>
             <div class="profile-meta-row" style="margin-top: 0; gap: 12px 24px;">
