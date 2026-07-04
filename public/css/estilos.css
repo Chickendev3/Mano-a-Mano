@@ -2379,3 +2379,46 @@ select:focus-visible {
 [data-theme="light"] #modal-profile-camp-detail .btn-primary:hover {
   color: #FFFFFF !important;
 }
+
+/* Crear and Editar Campaña modales blue theme overrides */
+#modal-create-campaign .btn-primary,
+#modal-modify-campaign .btn-primary {
+  background-color: #367C9E !important;
+  border-color: #367C9E !important;
+  color: var(--color-surface) !important;
+}
+
+#modal-create-campaign .btn-primary:hover,
+#modal-modify-campaign .btn-primary:hover {
+  background-color: #2D6985 !important;
+  border-color: #2D6985 !important;
+  color: var(--color-surface) !important;
+}
+
+#modal-create-campaign .image-upload-simulation:hover,
+#modal-modify-campaign .image-upload-simulation:hover {
+  border-color: #367C9E !important;
+}
+
+#modal-create-campaign .tag-suggestion-item:hover,
+#modal-modify-campaign .tag-suggestion-item:hover {
+  color: #367C9E !important;
+}
+
+#modal-create-campaign input[type="radio"],
+#modal-modify-campaign input[type="radio"],
+#modal-create-campaign input[type="checkbox"],
+#modal-modify-campaign input[type="checkbox"] {
+  accent-color: #367C9E !important;
+}
+
+/* Light Theme overrides for Crear/Editar Campaign buttons */
+[data-theme="light"] #modal-create-campaign .btn-primary,
+[data-theme="light"] #modal-modify-campaign .btn-primary {
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] #modal-create-campaign .btn-primary:hover,
+[data-theme="light"] #modal-modify-campaign .btn-primary:hover {
+  color: #FFFFFF !important;
+}

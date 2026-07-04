@@ -100,7 +100,7 @@ class Organizacion extends Usuario {
         if (!$idOrgArr) {
             return [];
         }
-        $consulta = "SELECT u.id as usuario_id, u.nombre, u.img_perfil 
+        $consulta = "SELECT u.id as usuario_id, CONCAT(u.nombre, ' ', v.apellido) as nombre, u.img_perfil 
                         FROM voluntarios_fijos vf 
                         JOIN voluntarios v ON vf.voluntario_id = v.id
                         JOIN usuarios u ON v.usuario_id = u.id
