@@ -5,14 +5,9 @@
     <div class="container">
       <div class="wireframe-grid reverse-layout">
         
-        <!-- Column 1: Placeholder Box (on Left) -->
+        <!-- Column 1: Imagen Decorativa (on Left) -->
         <div class="col-img">
-          <div class="wireframe-placeholder" aria-hidden="true">
-            <div class="wireframe-placeholder-inner">
-              <i data-lucide="image"></i>
-              <span>Imagen Decorativa</span>
-            </div>
-          </div>
+          <img src="<?= BASE_URL ?>../public/img/img-sesion.webp" alt="Imagen Decorativa Iniciar Sesión" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-lg);">
         </div>
         
         <!-- Column 2: Form (on Right) -->

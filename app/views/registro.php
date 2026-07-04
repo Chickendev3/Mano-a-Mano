@@ -21,14 +21,9 @@
         </div>
       </div>
       
-      <!-- Column 2: Placeholder Box -->
+      <!-- Column 2: Imagen Decorativa (on Right) -->
       <div class="col-img">
-        <div class="wireframe-placeholder" aria-hidden="true">
-          <div class="wireframe-placeholder-inner">
-            <i data-lucide="image"></i>
-            <span>Imagen Decorativa</span>
-          </div>
-        </div>
+        <img src="<?= BASE_URL ?>../public/img/img-registro.webp" alt="Registro Selección" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-lg);">
       </div>
       
     </div>
