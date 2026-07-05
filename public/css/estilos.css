@@ -349,6 +349,46 @@ button, input, textarea, select {
   height: 16px;
 }
 
+/* Animación del icono de Inicio con GIF al hacer hover */
+.nav-icon-wrapper {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.nav-icon-wrapper .static-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+.nav-icon-wrapper .hover-gif {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Efectos de hover sobre el menú de Inicio */
+#link-inicio:hover .nav-icon-wrapper {
+  transform: scale(1.35); /* Agranda sutilmente el icono al hacer hover */
+}
+
+#link-inicio:hover .static-icon {
+  display: none !important;
+}
+
+#link-inicio:hover .hover-gif {
+  display: inline-block !important;
+}
+
 .nav-link:hover,
 .nav-link.active {
   color: var(--color-primary);
