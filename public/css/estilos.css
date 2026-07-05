@@ -541,6 +541,17 @@ button, input, textarea, select {
   box-shadow: 0 0 0 3px rgba(76, 127, 107, 0.15);
 }
 
+/* Evitar que las opciones del desplegable se muestren invisibles en modo oscuro */
+select option {
+  background-color: var(--color-background-warm, #132521);
+  color: var(--color-text-primary, #E6EDE8);
+}
+
+[data-theme="light"] select option {
+  background-color: #FFFFFF;
+  color: var(--color-text-dark, #0F172A);
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
