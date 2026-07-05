@@ -260,7 +260,7 @@ if (!function_exists('truncateDescription')) {
       </p>
       
       <div class="form-group" style="margin-bottom: 20px;">
-        <select id="invite-campaign-select" class="edit-input" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background-color: var(--color-surface); color: var(--color-text-dark);">
+        <select id="invite-campaign-select" class="edit-input" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--color-border); background-color: var(--color-surface); color: var(--color-text-primary);">
           <!-- Convocatorias cargadas dinámicamente -->
         </select>
       </div>
