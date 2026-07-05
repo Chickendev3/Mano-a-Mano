@@ -143,6 +143,7 @@
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows var(--transition-normal);
+  overflow: hidden;
 }
 
 .accordion-inner {

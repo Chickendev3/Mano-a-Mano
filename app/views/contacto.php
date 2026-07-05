@@ -76,6 +76,16 @@
 </section>
 
 <!-- FAQ SECCIÓN -->
+<style>
+  /* Solución robusta para ocultar las respuestas del acordeón cuando está cerrado */
+  .faq-accordion .accordion-content {
+    display: none !important;
+    overflow: hidden !important;
+  }
+  .faq-accordion .accordion-item.active .accordion-content {
+    display: block !important;
+  }
+</style>
 <section class="section faq-section" id="faq">
   <div class="container">
     <div class="section-header">
