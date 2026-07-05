@@ -33,6 +33,33 @@
             <i data-lucide="mail"></i> <span>Contacto</span>
           </a>
         </li>
+
+        <!-- ACCIONES MÓVILES (Solo visibles en versión responsive) -->
+        <?php if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === true): ?>
+          <li class="mobile-only-action divider"></li>
+          <li class="mobile-only-action">
+            <a href="<?= BASE_URL ?>perfil" class="nav-link <?= ($rutaVista === 'perfil') ? 'active' : '' ?>">
+              <i data-lucide="user"></i> <span>Mi Perfil (<?= htmlspecialchars($_SESSION['nombre_usuario']) ?>)</span>
+            </a>
+          </li>
+          <li class="mobile-only-action">
+            <a href="<?= BASE_URL ?>cerrar-sesion" class="nav-link logout">
+              <i data-lucide="log-out"></i> <span>Cerrar sesión</span>
+            </a>
+          </li>
+        <?php else: ?>
+          <li class="mobile-only-action divider"></li>
+          <li class="mobile-only-action">
+            <a href="<?= BASE_URL ?>sesion" class="nav-link btn-mobile-login">
+              <i data-lucide="user"></i> <span>Iniciar sesión</span>
+            </a>
+          </li>
+          <li class="mobile-only-action">
+            <a href="<?= BASE_URL ?>registro" class="nav-link btn-mobile-register">
+              <i data-lucide="user-plus"></i> <span>Registrarse</span>
+            </a>
+          </li>
+        <?php endif; ?>
       </ul>
     </nav>
     

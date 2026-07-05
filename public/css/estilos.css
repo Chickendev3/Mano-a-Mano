@@ -332,6 +332,10 @@ button, input, textarea, select {
   padding: 0;
 }
 
+.mobile-only-action {
+  display: none !important;
+}
+
 .nav-link {
   position: relative;
   font-size: 16px;
@@ -511,12 +515,76 @@ button, input, textarea, select {
   left: 0;
   width: 100%;
   background-color: var(--color-surface);
-  padding: 30px 24px;
+  padding: 24px 20px;
   border-bottom: 1px solid var(--color-border);
-  gap: 20px;
-  box-shadow: var(--shadow-lg);
+  gap: 8px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
   z-index: 999;
   animation: slideDown var(--transition-normal);
+  box-sizing: border-box;
+}
+
+.nav-links.mobile-active li {
+  width: 100%;
+  list-style: none;
+}
+
+.nav-links.mobile-active .nav-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  text-decoration: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+/* Ocultar la línea inferior decorativa en la lista vertical de celulares */
+.nav-links.mobile-active .nav-link::after {
+  display: none !important;
+}
+
+.nav-links.mobile-active .nav-link:hover,
+.nav-links.mobile-active .nav-link.active {
+  background-color: var(--color-surface-hover);
+  color: var(--color-primary);
+}
+
+.nav-links.mobile-active .nav-link.logout {
+  color: #EF4444 !important;
+}
+
+.nav-links.mobile-active .nav-link.logout:hover {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+.nav-links.mobile-active .nav-link.btn-mobile-login {
+  background-color: var(--color-secondary);
+  color: #ffffff !important;
+  justify-content: center;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.nav-links.mobile-active .nav-link.btn-mobile-login:hover {
+  background-color: var(--color-secondary-dark, #6c60a9);
+}
+
+.nav-links.mobile-active .nav-link.btn-mobile-register {
+  background-color: var(--color-primary);
+  color: #ffffff !important;
+  justify-content: center;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.nav-links.mobile-active .nav-link.btn-mobile-register:hover {
+  background-color: var(--color-primary-dark);
 }
 
 @keyframes slideDown {
@@ -790,6 +858,18 @@ select:focus-visible {
   
   .mobile-menu-btn {
     display: block;
+  }
+
+  .mobile-only-action {
+    display: block !important;
+  }
+
+  .mobile-only-action.divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 12px 16px;
+    width: calc(100% - 32px);
+    display: block !important;
   }
   
   .footer-top {
