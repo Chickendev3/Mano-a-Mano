@@ -1062,6 +1062,7 @@ select:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden; /* Evita desbordamiento de imagen */
 }
 
 .alt-card-reverse .alt-card-img-col {
@@ -1073,95 +1074,10 @@ select:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--color-text-muted);
-}
-
-.alt-card-img-placeholder i {
-  width: 48px;
-  height: 48px;
-  stroke-width: 1.5;
-}
-
-.alt-card-content-col {
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.alt-card-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.alt-card-desc {
-  font-size: 15px;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-}
-
-.btn-info {
-  margin-top: 8px;
-}
-
-
-/* ALTERNATING GRID CARDS */
-.alternating-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-
-.alt-card {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.alt-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-.alt-card-reverse {
-  grid-template-columns: 1fr 320px;
-}
-
-.alt-card-reverse .alt-card-img-col {
-  order: 2;
-}
-
-.alt-card-reverse .alt-card-content-col {
-  order: 1;
-}
-
-.alt-card-img-col {
-  height: 220px;
-  background-color: var(--color-surface-hover);
-  border-right: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.alt-card-reverse .alt-card-img-col {
-  border-right: none;
-  border-left: 1px solid var(--color-border);
-}
-
-.alt-card-img-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   color: var(--color-text-muted);
+  width: 100%;
+  height: 100%;
 }
 
 .alt-card-img-placeholder i {
