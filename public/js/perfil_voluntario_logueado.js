@@ -825,19 +825,12 @@ function renderVolunteering() {
     article.className = cardClass;
     article.addEventListener("click", () => openCampaignDetailsView(item.id));
 
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const start = new Date(item.startDate);
-    start.setHours(0,0,0,0);
-    const end = new Date(item.endDate);
-    end.setHours(0,0,0,0);
-
     let statusLabel = "Activa";
     let statusPillClass = "accepted-pill";
-    if (today > end) {
+    if (item.status === "finalizada") {
       statusLabel = "Finalizada";
       statusPillClass = "rejected-pill";
-    } else if (today < start) {
+    } else if (item.status === "programada") {
       statusLabel = "Programada";
       statusPillClass = "scheduled-pill";
     }
