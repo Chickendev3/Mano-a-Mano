@@ -21,7 +21,7 @@ if (!function_exists('truncateDescription')) {
     </div>
 
     <!-- BARRAS DE BÚSQUEDA Y FILTROSs -->
-    <div style="background-color: var(--color-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); margin-bottom: 40px; display: flex; flex-direction: column; gap: 20px;">
+    <div class="search-filters-card">
       <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px;" class="form-row">
         <div class="form-group" style="margin-bottom: 0;">
           <label for="search-input" class="form-label" style="display: none;">Buscar</label>

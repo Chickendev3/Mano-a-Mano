@@ -51,10 +51,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     categorySelect.appendChild(defaultOption);
 
+    const isMobile = window.innerWidth <= 768;
+
     list.forEach(item => {
       const opt = document.createElement('option');
       opt.value = item;
-      opt.textContent = item;
+      
+      // Acortar etiquetas en mobile para evitar desbordamiento del desplegable nativo
+      let label = item;
+      if (isMobile) {
+        if (item === 'Asistencia Alimentaria') label = 'Alimentos';
+        else if (item === 'Educación y Desarrollo') label = 'Educación';
+        else if (item === 'Emergencias y Desastres') label = 'Emergencias';
+        else if (item === 'Género y Diversidad') label = 'Género/Div.';
+        else if (item === 'Deporte e Inclusión') label = 'Deportes';
+        else if (item === 'Salud y Bienestar') label = 'Salud/Bienestar';
+        else if (item === 'Bienestar Animal') label = 'Animales';
+      }
+      opt.textContent = label;
+      
       if (item === selectedValue) {
         opt.selected = true;
       }
