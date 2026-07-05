@@ -304,7 +304,7 @@ window.openCampaignDetailsModal = function(id) {
         const isOwner = camp.usuario_id == (typeof SESSION_USER_ID !== 'undefined' ? SESSION_USER_ID : null);
         
         if (mPostulateBtn) {
-          if (isOrg || isOwner) {
+          if (isOrg || isOwner || camp.type === "informativa") {
             mPostulateBtn.style.display = "none";
           } else {
             mPostulateBtn.style.display = "inline-flex";
