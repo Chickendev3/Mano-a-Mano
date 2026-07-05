@@ -10,7 +10,7 @@
     <title><?= htmlspecialchars($titulo); ?></title>
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=4.1">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=4.2">
 
     <!-- CSS Dinámicos según la vista cargada -->
     <?php if (isset($cssPropio) && !empty($cssPropio)){
@@ -20,7 +20,7 @@
             foreach($cssPropio as $css){
         ?>
         
-        <link rel="stylesheet" href="<?= BASE_URL ?>css/<?php echo htmlspecialchars($css); ?>?v=4.1">
+        <link rel="stylesheet" href="<?= BASE_URL ?>css/<?php echo htmlspecialchars($css); ?>?v=4.2">
     <?php }} ?>
 
     <!-- Lucide Icons -->
