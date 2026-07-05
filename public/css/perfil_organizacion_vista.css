@@ -112,6 +112,9 @@
   .carousel-nav-btn {
     display: none;
   }
+  .carousel-container-outer {
+    padding: 0 16px !important;
+  }
   .vol-carousel-card {
     flex: 0 0 calc(50% - 10px);
   }

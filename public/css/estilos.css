@@ -1107,38 +1107,6 @@ select:focus-visible {
   margin-top: 8px;
 }
 
-/* Responsivo para Listados Alternados */
-@media (max-width: 768px) {
-  .alt-card {
-    grid-template-columns: 1fr;
-  }
-  
-  .alt-card-reverse {
-    grid-template-columns: 1fr;
-  }
-  
-  .alt-card-img-col {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
-    height: 180px;
-  }
-
-  .alt-card-reverse .alt-card-img-col {
-    border-left: none;
-    border-bottom: 1px solid var(--color-border);
-    order: 0;
-  }
-  
-  .alt-card-reverse .alt-card-content-col {
-    order: 1;
-  }
-  
-  .alt-card-content-col {
-    padding: 24px;
-    align-items: stretch;
-    text-align: left;
-  }
-}
 
 /* ALTERNATING GRID CARDS */
 .alternating-grid {
@@ -1221,6 +1189,105 @@ select:focus-visible {
   font-size: 15px;
   color: var(--color-text-secondary);
   line-height: 1.6;
+}
+
+/* Responsivo para Listados Alternados */
+@media (max-width: 768px) {
+  .alt-card {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .alt-card-reverse {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .alt-card-img-col {
+    border-right: none !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    height: 180px !important;
+    width: 100% !important;
+  }
+
+  .alt-card-reverse .alt-card-img-col {
+    border-left: none !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    order: 0 !important;
+    width: 100% !important;
+  }
+  
+  .alt-card-reverse .alt-card-content-col {
+    order: 1 !important;
+  }
+  
+  .alt-card-content-col {
+    padding: 24px !important;
+    align-items: stretch !important;
+    text-align: left !important;
+  }
+}
+
+/* Responsivo para Tarjetas de Invitaciones y Perfiles */
+@media (max-width: 600px) {
+  .invite-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+  
+  .invite-card-img-col {
+    align-self: center !important;
+  }
+  
+  .invite-card-content-col {
+    text-align: center !important;
+    align-items: center !important;
+  }
+
+  .invite-card-actions-col {
+    margin-left: 0 !important;
+    width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    justify-content: center !important;
+  }
+  
+  .aceptar-invite-btn, .rechazar-invite-btn {
+    flex: 1 !important;
+    min-width: 120px !important;
+    width: auto !important;
+    margin-top: 0 !important;
+  }
+
+  .profile-name {
+    font-size: 26px !important;
+  }
+  
+  .tabs-nav-bar {
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 6px !important;
+  }
+
+  .profile-tab-btn {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .volunteer-search-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  
+  .volunteer-search-btn {
+    width: 100% !important;
+  }
 }
 
 /* ==========================================================================
