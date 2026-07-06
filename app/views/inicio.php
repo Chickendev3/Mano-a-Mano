@@ -12,10 +12,21 @@ if (!function_exists('truncateDescription')) {
         return $text;
     }
 }
+
+$heroImage = 'hero.png';
+if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === true) {
+    if (isset($_SESSION['usuario_rol'])) {
+        if ($_SESSION['usuario_rol'] === 'voluntario') {
+            $heroImage = 'hero_voluntario.png';
+        } elseif ($_SESSION['usuario_rol'] === 'organizacion') {
+            $heroImage = 'hero_organizacion.png';
+        }
+    }
+}
 ?>
 
 <!-- HERO SECTION -->
-<section class="hero" id="inicio" style="background-image: url('<?= BASE_URL ?>img/hero.png?v=3.0');">
+<section class="hero" id="inicio" style="background-image: url('<?= BASE_URL ?>img/<?= $heroImage ?>?v=3.0');">
   <div class="dots-grid-pattern"></div>
   <div class="hero-overlay"></div>
   
