@@ -260,18 +260,21 @@ button, input, textarea, select {
   color: var(--color-primary);
 }
 
-/* HEADER */
+/* HEADER / NAVBAR REDISEÑADO (Estilo pastilla flotante) */
 .header {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 90px;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 1400px;
+  height: 80px;
   background-color: var(--color-header-bg);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-header-border);
-  box-shadow: var(--color-header-shadow);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-header-border);
+  border-radius: var(--radius-full);
   z-index: 1000;
+  box-shadow: var(--color-header-shadow);
   transition: all var(--transition-normal);
 }
 
@@ -280,9 +283,11 @@ button, input, textarea, select {
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  position: relative;
+  z-index: 10;
 }
 
-/* LOGO */
+/* LOGO GROUP */
 .logo-wrapper {
   display: flex;
   align-items: center;
@@ -291,14 +296,14 @@ button, input, textarea, select {
 }
 
 .logo-img {
-  height: 55px;
+  height: 48px;
   width: auto;
   object-fit: contain;
-  transition: transform .3s ease;
+  transition: transform var(--transition-fast);
 }
 
 .logo-img:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .logo-text-group {
@@ -594,16 +599,17 @@ button, input, textarea, select {
 
 /* Keep header scroll styles */
 .header-scrolled {
-  background-color: var(--color-header-bg) !important;
-  border-bottom: 1px solid var(--color-header-border) !important;
-  height: 80px !important;
-  box-shadow: var(--color-header-shadow) !important;
+  height: 76px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
 }
 .header-scrolled .logo-img {
-  height: 45px !important;
+  height: 38px !important;
 }
-.header-scrolled .nav-links.mobile-active {
-  top: 80px !important;
+.header-scrolled .logo-title {
+  font-size: 18px !important;
+}
+.header-scrolled .logo-subtitle {
+  display: none;
 }
 
 /* Forms Base */

@@ -16,11 +16,7 @@
       <ul class="nav-links">
         <li>
           <a href="<?= BASE_URL ?>" class="nav-link <?= ($rutaVista === 'inicio') ? 'active' : '' ?>" id="link-inicio">
-            <span class="nav-icon-wrapper">
-              <i data-lucide="home" class="static-icon"></i>
-              <img src="<?= BASE_URL ?>img/home_animado.gif" alt="Inicio" class="hover-gif" style="display: none;">
-            </span>
-            <span>Inicio</span>
+            <i data-lucide="home"></i> <span>Inicio</span>
           </a>
         </li>
         <li>
