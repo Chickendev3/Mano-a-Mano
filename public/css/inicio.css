@@ -58,7 +58,48 @@
   margin-bottom: 30px;
   backdrop-filter: blur(10px);
 }
-.hero-badge i { width: 14px; height: 14px; color: var(--color-primary); }
+
+/* Animación del icono de Voluntarios con GIF al hacer hover */
+.badge-icon-wrapper {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  width: 14px;
+  height: 14px;
+  transition: transform 0.15s ease-in-out; /* Animación de escala rápida */
+}
+
+.badge-icon-wrapper .static-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  color: var(--color-primary);
+}
+
+.badge-icon-wrapper .hover-gif {
+  width: 20px; /* Un poco más grande para mejor visualización */
+  height: 20px;
+  object-fit: contain;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Efectos de hover sobre la pastilla hero-badge */
+.hero-badge:hover .badge-icon-wrapper {
+  transform: scale(1.25); /* Agranda sutilmente el icono al hacer hover */
+}
+
+.hero-badge:hover .static-icon {
+  display: none !important;
+}
+
+.hero-badge:hover .hover-gif {
+  display: inline-block !important;
+}
 
 .hero-title {
   font-size: 56px;

@@ -33,7 +33,11 @@ if (isset($_SESSION['usuario_logueado']) && $_SESSION['usuario_logueado'] === tr
   <div class="container hero-container">
     <div class="hero-content">
       <div class="hero-badge">
-        <i data-lucide="users"></i> +1.400 Voluntarios activos hoy
+        <span class="badge-icon-wrapper">
+          <i data-lucide="users-round" class="static-icon"></i>
+          <img src="<?= BASE_URL ?>img/personas arriba.gif" alt="Voluntarios" class="hover-gif" style="display: none;">
+        </span>
+        <span>+1.400 Voluntarios activos hoy</span>
       </div>
       
       <h1 class="hero-title">
