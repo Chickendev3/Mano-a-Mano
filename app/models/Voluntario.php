@@ -20,8 +20,18 @@ class Voluntario extends Usuario{
         $parametros = [];
 
         if (!empty($filtros['q'])) {
-            $condiciones[] = "(u.nombre LIKE :q OR v.apellido LIKE :q OR u.descripcion LIKE :q)";
-            $parametros[':q'] = '%' . $filtros['q'] . '%';
+            $words = array_filter(explode(' ', trim($filtros['q'])));
+            $wordConds = [];
+            $i = 0;
+            foreach ($words as $word) {
+                $paramKey = ":q" . $i;
+                $wordConds[] = "(u.nombre LIKE $paramKey OR v.apellido LIKE $paramKey OR u.descripcion LIKE $paramKey OR CONCAT(u.nombre, ' ', v.apellido) LIKE $paramKey)";
+                $parametros[$paramKey] = '%' . $word . '%';
+                $i++;
+            }
+            if (!empty($wordConds)) {
+                $condiciones[] = "(" . implode(" AND ", $wordConds) . ")";
+            }
         }
         if (!empty($filtros['category'])) {
             $condiciones[] = "v.id IN (SELECT vo.voluntario_id FROM voluntarios_oficios vo JOIN oficios o ON vo.oficio_id = o.id WHERE o.oficio = :category)";
