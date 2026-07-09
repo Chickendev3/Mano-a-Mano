@@ -40,14 +40,20 @@ if (!function_exists('truncateDescription')) {
           <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
         </p>
 
-        <?php if (!empty($usuario['ubicacion'])): ?>
-          <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 12px;">
+        <div class="profile-meta-row">
+          <?php if (!empty($usuario['ubicacion'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="map-pin"></i>
               <span><?= htmlspecialchars($usuario['ubicacion']) ?></span>
             </div>
-          </div>
-        <?php endif; ?>
+          <?php endif; ?>
+          <?php if (!empty($usuario['disponibilidad_horaria'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="clock"></i>
+              <span><?= htmlspecialchars($usuario['disponibilidad_horaria']) ?></span>
+            </div>
+          <?php endif; ?>
+        </div>
 
         <!-- Insignias and Statistics -->
         <div class="profile-badges-container">
