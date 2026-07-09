@@ -23,7 +23,9 @@ class Invitacion {
         }
 
         /* Vista desde Destinatarios (Lista de Invitaciones recibidas por el Destinatario) */
-        $consulta = "SELECT i.id, i.campania_id, c.titulo, c.descripcion, c.ubicacion, e.estado, u.id as emisor_id, u.nombre as emisor_nombre, u.img_perfil as emisor_img_perfil,
+        $consulta = "SELECT i.id, i.campania_id, c.titulo, c.descripcion, c.ubicacion, e.estado, u.id as emisor_id, 
+                            CASE WHEN v_e.id IS NOT NULL THEN CONCAT(u.nombre, ' ', v_e.apellido) ELSE u.nombre END as emisor_nombre, 
+                            u.img_perfil as emisor_img_perfil,
                             CASE WHEN v_e.id IS NOT NULL THEN 'voluntario' ELSE 'organizacion' END as emisor_rol
                      FROM invitaciones i 
                      JOIN campanias c ON i.campania_id = c.id
@@ -54,7 +56,9 @@ class Invitacion {
         }
 
         /* Vista desde Emisores (Lista de Invitaciones que fueron enviadas por los Usuarios) */
-        $consulta = "SELECT i.id, i.campania_id, c.titulo, c.descripcion, c.ubicacion, e.estado, u.id as destinatario_id, u.nombre as destinatario_nombre, u.img_perfil as destinatario_img_perfil,
+        $consulta = "SELECT i.id, i.campania_id, c.titulo, c.descripcion, c.ubicacion, e.estado, u.id as destinatario_id, 
+                            CASE WHEN v_d.id IS NOT NULL THEN CONCAT(u.nombre, ' ', v_d.apellido) ELSE u.nombre END as destinatario_nombre, 
+                            u.img_perfil as destinatario_img_perfil,
                             CASE WHEN v_d.id IS NOT NULL THEN 'voluntario' ELSE 'organizacion' END as destinatario_rol
                      FROM invitaciones i 
                      JOIN campanias c ON i.campania_id = c.id
