@@ -1,5 +1,6 @@
 <?php
-/* --------------------- Definición de CONSTANTES --------------------- */
+/* --------------------- Definición de CONSTANTES y CONFIGURACIÓN --------------------- */
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 /* Credenciales de BD */
 define('BD_HOST','localhost');
