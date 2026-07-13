@@ -530,11 +530,12 @@ function _renderCampaignModal(camp, options = {}) {
   }
 
   if (mSensitive) {
-    if (showAdditionalInfo && camp.info_adicional && camp.info_adicional.trim() !== "") {
+    const additionalText = camp.additionalInfo || camp.info_adicional;
+    if (showAdditionalInfo && additionalText && additionalText.trim() !== "") {
       mSensitive.innerHTML = `
         <h4>Información de coordinación</h4>
         <div class="info-alert-content">
-          <p>${camp.info_adicional}</p>
+          <p>${additionalText}</p>
         </div>
       `;
       mSensitive.style.display = "block";
