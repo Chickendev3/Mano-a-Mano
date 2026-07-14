@@ -59,7 +59,8 @@ class Invitacion {
         $consulta = "SELECT i.id, i.campania_id, c.titulo, c.descripcion, c.ubicacion, e.estado, u.id as destinatario_id, 
                             CASE WHEN v_d.id IS NOT NULL THEN CONCAT(u.nombre, ' ', v_d.apellido) ELSE u.nombre END as destinatario_nombre, 
                             u.img_perfil as destinatario_img_perfil,
-                            CASE WHEN v_d.id IS NOT NULL THEN 'voluntario' ELSE 'organizacion' END as destinatario_rol
+                            CASE WHEN v_d.id IS NOT NULL THEN 'voluntario' ELSE 'organizacion' END as destinatario_rol,
+                            CASE WHEN v_d.id IS NOT NULL AND EXISTS (SELECT 1 FROM asistencias a WHERE a.voluntario_id = v_d.id AND a.campania_id = i.campania_id) THEN 1 ELSE 0 END as tiene_asistencia
                      FROM invitaciones i 
                      JOIN campanias c ON i.campania_id = c.id
                      JOIN usuarios u ON i.destinatario_id = u.id
@@ -169,6 +170,19 @@ class Invitacion {
         $this->bd->consulta($consulta);
         $this->bd->asignar(":id_inv", $idInvitacion);
         return $this->bd->ejecutar();
+    }
+
+    public function tieneAsistenciaRegistrada( int $idInvitacion ) :bool {
+        $consulta = "SELECT COUNT(*) as cant 
+                     FROM asistencias a 
+                     JOIN voluntarios v ON a.voluntario_id = v.id 
+                     JOIN invitaciones i ON i.destinatario_id = v.usuario_id AND i.campania_id = a.campania_id 
+                     WHERE i.id = :id_inv;";
+        $this->bd->consulta($consulta);
+        $this->bd->asignar(":id_inv", $idInvitacion);
+        $this->bd->ejecutar();
+        $res = $this->bd->resultado();
+        return (int)($res['cant'] ?? 0) > 0;
     }
 }
 ?>

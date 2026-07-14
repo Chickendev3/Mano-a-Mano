@@ -999,7 +999,8 @@ class perfilCtrl extends Controlador {
                 'destinatarioId' => (int)$inv['destinatario_id'],
                 'destinatarioName' => $inv['destinatario_nombre'],
                 'destinatarioImg' => $inv['destinatario_img_perfil'],
-                'destinatarioRole' => $inv['destinatario_role'] ?? $inv['destinatario_rol']
+                'destinatarioRole' => $inv['destinatario_role'] ?? $inv['destinatario_rol'],
+                'tieneAsistencia' => (bool)($inv['tiene_asistencia'] ?? 0)
             ];
         }
 
@@ -1091,6 +1092,10 @@ class perfilCtrl extends Controlador {
         }
 
         $modeloInvitacion = $this->cargarModelo('Invitacion');
+        if ($modeloInvitacion->tieneAsistenciaRegistrada($idInvitacion)) {
+            echo json_encode(['success' => false, 'message' => 'No puedes cancelar la invitación porque el voluntario ya registró asistencia en la campaña.']);
+            return;
+        }
         $ok = $modeloInvitacion->cancelarInvitacion($idInvitacion);
 
         if ($ok) {

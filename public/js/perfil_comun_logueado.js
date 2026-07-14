@@ -1711,7 +1711,7 @@ function renderSentInvitations() {
       statusClass = "rechazado";
     }
 
-    const cancelHTML = (inv.status === "pendiente" || inv.status === "aceptado")
+    const cancelHTML = (inv.status === "pendiente" || (inv.status === "aceptado" && !inv.tieneAsistencia))
       ? `<button class="post-cancel-btn" type="button" onclick="event.stopPropagation(); openCancelInvitationConfirmModal(${inv.id});">
           Cancelar invitación
          </button>`
