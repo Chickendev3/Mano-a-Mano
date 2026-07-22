@@ -7,7 +7,7 @@
         <p class="footer-desc">Una plataforma moderna creada para democratizar, agilizar y visibilizar el voluntariado y la colaboración social.</p>
         <div class="footer-socials">
           <a href="https://www.instagram.com/mano.a.mano.proy/" target="_blank" class="social-btn" aria-label="Instagram"><img src="<?= BASE_URL ?>img/instagram.png" alt="instagram"></a>
-          <a href="#" class="social-btn" aria-label="Youtube" target="_blank"><img src="<?= BASE_URL ?>img/youtube.png" alt="youtube"></a>
+          <a href="https://www.youtube.com/@Mano_A_Mano1-z8s" class="social-btn" aria-label="Youtube" target="_blank"><img src="<?= BASE_URL ?>img/youtube.png" alt="youtube"></a>
           <a href="https://github.com/Chickendev3/Mano-a-Mano" target="_blank" class="social-btn" aria-label="Github"><img src="<?= BASE_URL ?>img/github.png" alt="github"></a>
         </div>
       </div>

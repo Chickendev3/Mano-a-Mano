@@ -9,6 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($titulo); ?></title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>img/favicon.png">
+
     <!-- Global CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=4.8">
 

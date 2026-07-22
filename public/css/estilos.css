@@ -296,7 +296,7 @@ button, input, textarea, select {
 }
 
 .logo-img {
-  height: 48px;
+  height: 64px;
   width: auto;
   object-fit: contain;
   transition: transform var(--transition-fast);
@@ -599,17 +599,7 @@ button, input, textarea, select {
 
 /* Keep header scroll styles */
 .header-scrolled {
-  height: 76px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
-}
-.header-scrolled .logo-img {
-  height: 38px !important;
-}
-.header-scrolled .logo-title {
-  font-size: 18px !important;
-}
-.header-scrolled .logo-subtitle {
-  display: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
 }
 
 /* Forms Base */
