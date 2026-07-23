@@ -1159,6 +1159,13 @@ select:focus-visible {
   height: 100%;
 }
 
+.alt-card-img-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .alt-card-img-placeholder i {
   width: 48px;
   height: 48px;
