@@ -40,12 +40,14 @@ if (!function_exists('truncateDescription')) {
 
         <!-- Causes / Tags Container Box -->
         <?php if (!empty($causas_organizacion)): ?>
-          <div class="profile-badges-container org-causes-container badge-row-item skills-list-row">
-            <i data-lucide="tag" class="badge-icon-tag" style="margin-top: 4px;"></i>
-            <div class="skills-badges profile-tags" style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <?php foreach ($causas_organizacion as $causa): ?>
-                <span class="tag-badge"><?= htmlspecialchars($causa) ?></span>
-              <?php endforeach; ?>
+          <div class="profile-badges-container org-causes-container">
+            <div class="badge-row-item skills-list-row">
+              <i data-lucide="tag" class="badge-icon-tag" style="margin-top: 4px;"></i>
+              <div class="skills-badges profile-tags" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <?php foreach ($causas_organizacion as $causa): ?>
+                  <span class="tag-badge"><?= htmlspecialchars($causa) ?></span>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
         <?php endif; ?>
