@@ -1106,6 +1106,7 @@ select:focus-visible {
 .alt-card {
   display: grid;
   grid-template-columns: 320px 1fr;
+  min-height: 220px; /* Asegura un alto mínimo por defecto */
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -1133,7 +1134,8 @@ select:focus-visible {
 }
 
 .alt-card-img-col {
-  height: 220px;
+  height: 100%; /* Permite estirarse al alto dinámico del contenedor */
+  min-height: 220px; /* Mantiene el alto por defecto en pantallas grandes */
   background-color: var(--color-surface-hover);
   border-right: 1px solid var(--color-border);
   display: flex;
