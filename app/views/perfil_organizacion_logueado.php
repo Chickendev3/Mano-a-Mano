@@ -9,7 +9,7 @@
 
 include '../app/views/componentes/perfil_comun_logueado.php'; 
 ?>
-<main class="profile-view-container">
+<main class="profile-view-container org-profile-page">
   
   <!-- PROFILE HEADER -->
   <section class="profile-header-sec">

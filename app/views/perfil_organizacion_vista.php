@@ -16,7 +16,7 @@ if (!function_exists('truncateDescription')) {
     }
 }
 ?>
-<main class="profile-view-container">
+<main class="profile-view-container org-profile-page">
   
   <!-- PROFILE HEADER -->
   <section class="profile-header-sec">

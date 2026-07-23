@@ -2533,3 +2533,40 @@ select:focus-visible {
 [data-theme="light"] #modal-modify-campaign .btn-primary:hover {
   color: #FFFFFF !important;
 }
+
+/* Cabecera con imagen de fondo para perfiles de organizaciones */
+.org-profile-page {
+  padding-top: 0 !important;
+}
+
+.org-profile-page .profile-header-sec {
+  position: relative;
+  padding-top: 160px; /* Desplaza el contenido debajo de la barra de navegación fija */
+  padding-bottom: 48px;
+  background-color: transparent !important; /* Permite ver el pseudo-elemento ::before */
+  z-index: 1;
+}
+
+.org-profile-page .profile-header-sec::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(to bottom, rgba(23, 44, 39, 0.85) 0%, rgba(23, 44, 39, 0.85) 60%, var(--color-background) 100%),
+    url('../img/hero_perfil_organizaciones_oscuro.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Modo claro para perfiles de organizaciones */
+[data-theme="light"] .org-profile-page .profile-header-sec::before {
+  background-image: 
+    linear-gradient(to bottom, rgba(240, 244, 241, 0.88) 0%, rgba(240, 244, 241, 0.88) 60%, var(--color-background) 100%),
+    url('../img/hero_perfil_organizaciones_claro.webp');
+}
