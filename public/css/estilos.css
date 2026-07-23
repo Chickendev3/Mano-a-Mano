@@ -2744,3 +2744,33 @@ select:focus-visible {
   height: 18px;
   color: var(--color-primary);
 }
+
+/* Clases comunes de alineación para filas de insignias/etiquetas en perfiles */
+.badge-row-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.badge-row-item i {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.skills-list-row {
+  align-items: flex-start;
+}
+
+.skills-list-row i {
+  margin-top: 4px;
+}
+
+.skills-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
