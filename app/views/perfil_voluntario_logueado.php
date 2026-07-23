@@ -31,7 +31,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
   window.availableSkills = <?= json_encode($oficios ?? []) ?>
 </script>
 
-<main class="profile-view-container">
+<main class="profile-view-container vol-profile-page">
   
   <!-- CABECERA DEL PERFIL DE VOLUNTARIO -->
   <section class="profile-header-sec">

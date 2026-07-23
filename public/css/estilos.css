@@ -2603,3 +2603,49 @@ select:focus-visible {
     linear-gradient(to bottom, var(--color-background) 0%, rgba(240, 244, 241, 0.80) 20%, rgba(240, 244, 241, 0.80) 100%),
     url('../img/hero_perfil_organizaciones_claro.webp');
 }
+
+/* Cabecera con imagen de fondo para perfiles de voluntarios */
+.vol-profile-page {
+  padding-top: 0 !important;
+}
+
+.vol-profile-page .profile-header-sec {
+  position: relative;
+  padding-top: 160px; /* Desplaza el contenido debajo de la barra de navegación fija */
+  padding-bottom: 90px; /* Mostrar más imagen de fondo hacia abajo */
+  background-color: transparent !important; /* Permite ver el pseudo-elemento ::before */
+  border-bottom: none !important; /* Quita la línea divisoria del final de la cabecera */
+  z-index: 1;
+}
+
+.vol-profile-page .profile-header-sec::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(to bottom, rgba(23, 44, 39, 0.72) 0%, rgba(23, 44, 39, 0.72) 82%, var(--color-background) 100%),
+    url('../img/hero_perfil_voluntario_oscuro.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Modo claro para perfiles de voluntarios */
+[data-theme="light"] .vol-profile-page .profile-header-sec::before {
+  background-image: 
+    linear-gradient(to bottom, rgba(240, 244, 241, 0.80) 0%, rgba(240, 244, 241, 0.80) 82%, var(--color-background) 100%),
+    url('../img/hero_perfil_voluntario_claro.webp');
+}
+
+/* Asegurar que los contenedores del perfil de voluntarios sean sólidos y opacos para mejorar la lectura */
+.vol-profile-page .private-info-section,
+.vol-profile-page .profile-badges-container,
+.vol-profile-page .profile-info-edit-form {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+}
