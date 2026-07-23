@@ -1106,7 +1106,7 @@ select:focus-visible {
 .alt-card {
   display: grid;
   grid-template-columns: 320px 1fr;
-  min-height: 220px; /* Asegura un alto mínimo por defecto */
+  height: 220px; /* Alto fijo unificado para todas las tarjetas en desktop */
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -1134,8 +1134,7 @@ select:focus-visible {
 }
 
 .alt-card-img-col {
-  height: 100%; /* Permite estirarse al alto dinámico del contenedor */
-  min-height: 220px; /* Mantiene el alto por defecto en pantallas grandes */
+  height: 100%; /* Estira el contenedor al 100% de la tarjeta */
   background-color: var(--color-surface-hover);
   border-right: 1px solid var(--color-border);
   display: flex;
@@ -1173,12 +1172,14 @@ select:focus-visible {
 }
 
 .alt-card-content-col {
-  padding: 32px;
+  padding: 24px 32px; /* Margen interior levemente reducido para que quepa bien el contenido dentro del alto fijo */
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
+  overflow: hidden;
 }
 
 .alt-card-title {
@@ -1197,6 +1198,7 @@ select:focus-visible {
 @media (max-width: 768px) {
   .alt-card {
     grid-template-columns: 1fr !important;
+    height: auto !important; /* Alto automático en móviles para evitar recortes */
   }
   
   .alt-card-reverse {
