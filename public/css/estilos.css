@@ -268,7 +268,7 @@ button, input, textarea, select {
   transform: translateX(-50%);
   width: 95%;
   max-width: 1400px;
-  height: 80px;
+  height: 90px;
   background-color: var(--color-header-bg);
   backdrop-filter: blur(10px);
   border: 1px solid var(--color-header-border);
@@ -296,7 +296,8 @@ button, input, textarea, select {
 }
 
 .logo-img {
-  height: 64px;
+  height: 76px;
+  max-height: 76px;
   width: auto;
   object-fit: contain;
   transition: transform var(--transition-fast);
