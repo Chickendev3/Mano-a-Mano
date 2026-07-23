@@ -39,10 +39,11 @@ include '../app/views/componentes/perfil_comun_logueado.php';
           </p>
 
           <!-- Causes / Tags Container Box -->
-          <div class="profile-badges-container org-causes-container" id="view-skills-row" style="margin-top: 16px; <?= empty($causas_organizacion) ? 'display: none;' : '' ?>">
-            <div class="profile-tags" id="view-causes-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <div class="profile-badges-container org-causes-container badge-row-item skills-list-row" id="view-skills-row" style="<?= empty($causas_organizacion) ? 'display: none;' : '' ?>">
+            <i data-lucide="tag" class="badge-icon-tag" style="margin-top: 4px;"></i>
+            <div class="skills-badges profile-tags" id="view-causes-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
               <?php foreach ($causas_organizacion as $causa): ?>
-                <span class="tag-badge"><i data-lucide="tag"></i> <?php echo htmlspecialchars($causa); ?></span>
+                <span class="tag-badge"><?php echo htmlspecialchars($causa); ?></span>
               <?php endforeach; ?>
             </div>
           </div>

@@ -2647,24 +2647,45 @@ select:focus-visible {
 .org-causes-container,
 .private-info-section,
 .profile-desc-text {
-  background-color: rgba(30, 42, 46, 0.65) !important; /* Ajustada la transparencia a un 35% */
+  background-color: rgba(30, 42, 46, 0.45) !important; /* Ajustada la opacidad al 45% para mayor transparencia */
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: var(--radius-md) !important;
   padding: 18px 20px !important;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px) saturate(120%);
 }
 
 [data-theme="light"] .profile-badges-container,
 [data-theme="light"] .org-causes-container,
 [data-theme="light"] .private-info-section,
 [data-theme="light"] .profile-desc-text {
-  background-color: rgba(255, 255, 255, 0.70) !important; /* Ajustada la transparencia en modo claro */
-  border: 1px solid var(--color-border) !important;
+  background-color: rgba(255, 255, 255, 0.45) !important; /* Ajustada la opacidad al 45% en modo claro */
+  border: 1px solid rgba(0, 0, 0, 0.12) !important; /* Borde sutil para delimitar en modo claro */
 }
 
-/* Margen de la descripción ajustado al ser ahora una caja */
+/* Espaciado vertical unificado y consistente en perfiles */
+.profile-name {
+  margin-bottom: 20px !important;
+}
+
 .profile-desc-text {
-  margin-bottom: 24px !important;
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+}
+
+.private-info-section {
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+}
+
+.profile-badges-container,
+.org-causes-container {
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+}
+
+.profile-meta-row {
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
 }
 
 /* Estética de las etiquetas de causa para organizaciones (Azul del logo con borde sutil) */
@@ -2682,20 +2703,18 @@ select:focus-visible {
   transition: all 0.2s ease;
 }
 
-.org-causes-container .tag-badge i {
-  width: 14px;
-  height: 14px;
+.org-causes-container .badge-icon-tag {
   color: #367C9E !important;
 }
 
-/* Modo claro para etiquetas de causa */
+/* Modo claro para etiquetas de causa y su icono */
 [data-theme="light"] .org-causes-container .tag-badge {
   background-color: rgba(54, 124, 158, 0.06) !important;
   color: #2D6985 !important;
   border: 1px solid rgba(54, 124, 158, 0.2) !important;
 }
 
-[data-theme="light"] .org-causes-container .tag-badge i {
+[data-theme="light"] .org-causes-container .badge-icon-tag {
   color: #2D6985 !important;
 }
 
