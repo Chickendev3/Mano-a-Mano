@@ -38,7 +38,19 @@ if (!function_exists('truncateDescription')) {
           <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
         </p>
 
-        <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 12px;">
+        <!-- Causes / Tags Container Box -->
+        <?php if (!empty($causas_organizacion)): ?>
+          <div class="profile-badges-container org-causes-container" style="margin-top: 16px;">
+            <div class="profile-tags" style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <?php foreach ($causas_organizacion as $causa): ?>
+                <span class="tag-badge"><i data-lucide="tag"></i> <?= htmlspecialchars($causa) ?></span>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        <?php endif; ?>
+
+        <!-- Ubicación y Correo -->
+        <div class="profile-meta-row" style="margin-top: 16px; margin-bottom: 12px;">
           <?php if (!empty($usuario['ubicacion'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="map-pin"></i>
@@ -50,14 +62,6 @@ if (!function_exists('truncateDescription')) {
               <i data-lucide="mail"></i>
               <span><?= htmlspecialchars($usuario['email']) ?></span>
             </div>
-          <?php endif; ?>
-        </div>
-
-        <div class="profile-tags-wrapper">
-          <?php if (!empty($causas_organizacion)): ?>
-            <?php foreach ($causas_organizacion as $causa): ?>
-              <span class="tag-badge"><i data-lucide="tag"></i> <?= htmlspecialchars($causa) ?></span>
-            <?php endforeach; ?>
           <?php endif; ?>
         </div>
 

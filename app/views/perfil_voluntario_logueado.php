@@ -60,17 +60,6 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             <?php echo !empty($usuario['descripcion']) ? htmlspecialchars($usuario['descripcion']) : 'Sin biografía cargada...'; ?>
           </p>
 
-          <div class="profile-meta-row">
-            <div class="profile-meta-item">
-              <i data-lucide="map-pin"></i>
-              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
-            </div>
-            <div class="profile-meta-item">
-              <i data-lucide="clock"></i>
-              <span id="view-profile-availability"><?php echo htmlspecialchars($usuario['disponibilidad_horaria'] ?? 'No especificada'); ?></span>
-            </div>
-          </div>
-
           <!-- Información Privada (Solo visible para el propio voluntario) -->
           <div class="private-info-section">
             <h4>
@@ -132,6 +121,18 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             </div>
           </div>
 
+          <!-- Ubicación y Disponibilidad Horaria -->
+          <div class="profile-meta-row" style="margin-top: 16px;">
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
+            </div>
+            <div class="profile-meta-item">
+              <i data-lucide="clock"></i>
+              <span id="view-profile-availability"><?php echo htmlspecialchars($usuario['disponibilidad_horaria'] ?? 'No especificada'); ?></span>
+            </div>
+          </div>
+
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; width: 100%; flex-wrap: wrap; gap: 12px;">
             <button class="btn btn-ghost" id="edit-profile-btn" style="margin-top: 0;">
               <i data-lucide="edit-3"></i> Editar perfil
@@ -144,7 +145,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
 
         <!-- FORMULARIO DE EDICIÓN DEL PERFIL (Oculto por defecto) -->
         <form class="profile-info-edit-form" id="profile-edit-state" style="display: none;" onsubmit="event.preventDefault();">
-          <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary);">Información Pública</h3>
+          <h3 class="edit-section-title"><i data-lucide="globe"></i> Información Pública</h3>
           
           <div class="form-group-row" style="margin-bottom: 12px;">
             <div class="edit-row">
@@ -157,7 +158,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             </div>
           </div>
 
-          <div class="edit-row">
+          <div class="edit-row" style="margin-bottom: 12px;">
               <label for="edit-location">Ubicación</label>
               <input type="text" name="ubicacion" placeholder="Provincia, Localidad, Ciudad" id="edit-location" class="edit-input">
             </div>
@@ -184,7 +185,7 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
             </div>
           </div>
 
-          <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary); margin-top: 20px;">Información Privada</h3>
+          <h3 class="edit-section-title" style="margin-top: 24px;"><i data-lucide="lock"></i> Información Privada</h3>
 
           <div class="edit-row" style="margin-bottom: 12px;">
             <label for="edit-email">Email</label>

@@ -2642,10 +2642,47 @@ select:focus-visible {
     url('../img/hero_perfil_voluntario_claro.webp');
 }
 
-/* Asegurar que los contenedores del perfil de voluntarios sean sólidos y opacos para mejorar la lectura */
-.vol-profile-page .private-info-section,
-.vol-profile-page .profile-badges-container,
-.vol-profile-page .profile-info-edit-form {
-  background-color: var(--color-surface) !important;
+/* Contenedores con ligera transparencia sobre el hero background (Organizaciones y Voluntarios) */
+.profile-badges-container,
+.org-causes-container,
+.private-info-section {
+  background-color: rgba(30, 42, 46, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 18px 20px !important;
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .profile-badges-container,
+[data-theme="light"] .org-causes-container,
+[data-theme="light"] .private-info-section {
+  background-color: rgba(255, 255, 255, 0.92) !important;
   border: 1px solid var(--color-border) !important;
+}
+
+/* Formulario de edición plano (sin caja contenedora brusca alrededor) */
+.profile-info-edit-form {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Títulos de sección para diferenciar Información Pública y Privada en la edición de voluntario */
+.edit-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-section-title i {
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
 }
