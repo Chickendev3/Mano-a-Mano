@@ -524,6 +524,7 @@
 .conectar-section {
   position: relative;
   width: 100%;
+  z-index: 1; /* Establece un contexto de apilamiento */
 }
 
 .conectar-section::before {
@@ -531,7 +532,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  right: 0;
   height: 600px;
   background-image: 
     linear-gradient(to bottom, rgba(23, 44, 39, 0) 60%, var(--color-background) 100%),
@@ -539,7 +540,7 @@
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
-  z-index: 1;
+  z-index: -1; /* Se posiciona detrás del contenido de la sección */
   pointer-events: none;
 }
 
@@ -548,10 +549,4 @@
   background-image: 
     linear-gradient(to bottom, rgba(240, 244, 241, 0) 60%, var(--color-background) 100%),
     url('../img/hero_conectar_claro.webp');
-}
-
-/* Ensure children render above the background */
-.conectar-section > * {
-  position: relative;
-  z-index: 2;
 }

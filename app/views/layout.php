@@ -13,7 +13,7 @@
     <link rel="icon" type="image/png" href="<?= BASE_URL ?>img/favicon.png">
 
     <!-- Global CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=5.0">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=5.1">
 
     <!-- CSS Dinámicos según la vista cargada -->
     <?php if (isset($cssPropio) && !empty($cssPropio)){
@@ -23,7 +23,7 @@
             foreach($cssPropio as $css){
         ?>
         
-        <link rel="stylesheet" href="<?= BASE_URL ?>css/<?php echo htmlspecialchars($css); ?>?v=5.0">
+        <link rel="stylesheet" href="<?= BASE_URL ?>css/<?php echo htmlspecialchars($css); ?>?v=5.1">
     <?php }} ?>
 
     <!-- Lucide Icons -->
