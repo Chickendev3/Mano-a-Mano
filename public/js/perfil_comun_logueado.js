@@ -429,16 +429,6 @@ function _renderCampaignModal(camp, options = {}) {
         </div>
 
         <div class="modal-info-card-row">
-          <div class="modal-info-card date-card end-date">
-            <div class="modal-card-icon-wrapper end-date-icon">
-              <i data-lucide="clock"></i>
-            </div>
-            <div class="modal-card-text">
-              <span class="modal-card-label">Fecha de finalización</span>
-              <p class="modal-card-value">${camp.endDate}</p>
-            </div>
-          </div>
-
           <div class="modal-info-card date-card start-date">
             <div class="modal-card-icon-wrapper start-date-icon">
               <i data-lucide="calendar"></i>
@@ -446,6 +436,16 @@ function _renderCampaignModal(camp, options = {}) {
             <div class="modal-card-text">
               <span class="modal-card-label">Fecha de inicio</span>
               <p class="modal-card-value">${camp.startDate}</p>
+            </div>
+          </div>
+
+          <div class="modal-info-card date-card end-date">
+            <div class="modal-card-icon-wrapper end-date-icon">
+              <i data-lucide="clock"></i>
+            </div>
+            <div class="modal-card-text">
+              <span class="modal-card-label">Fecha de finalización</span>
+              <p class="modal-card-value">${camp.endDate}</p>
             </div>
           </div>
         </div>
