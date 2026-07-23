@@ -2544,6 +2544,7 @@ select:focus-visible {
   padding-top: 160px; /* Desplaza el contenido debajo de la barra de navegación fija */
   padding-bottom: 90px; /* Incrementado para mostrar más imagen de fondo hacia abajo */
   background-color: transparent !important; /* Permite ver el pseudo-elemento ::before */
+  border-bottom: none !important; /* Quita la línea divisoria del final de la cabecera */
   z-index: 1;
 }
 
@@ -2555,7 +2556,7 @@ select:focus-visible {
   right: 0;
   bottom: 0;
   background-image: 
-    linear-gradient(to bottom, rgba(23, 44, 39, 0.15) 0%, rgba(23, 44, 39, 0.15) 82%, var(--color-background) 100%),
+    linear-gradient(to bottom, rgba(23, 44, 39, 0.32) 0%, rgba(23, 44, 39, 0.32) 82%, var(--color-background) 100%),
     url('../img/hero_perfil_organizaciones_oscuro.webp');
   background-size: cover;
   background-position: center top;
@@ -2567,7 +2568,7 @@ select:focus-visible {
 /* Modo claro para perfiles de organizaciones */
 [data-theme="light"] .org-profile-page .profile-header-sec::before {
   background-image: 
-    linear-gradient(to bottom, rgba(240, 244, 241, 0.20) 0%, rgba(240, 244, 241, 0.20) 82%, var(--color-background) 100%),
+    linear-gradient(to bottom, rgba(240, 244, 241, 0.38) 0%, rgba(240, 244, 241, 0.38) 82%, var(--color-background) 100%),
     url('../img/hero_perfil_organizaciones_claro.webp');
 }
 
@@ -2575,6 +2576,7 @@ select:focus-visible {
 .org-profile-page .volunteers-carousel-sec {
   position: relative;
   background-color: transparent !important; /* Oculta el fondo plano original */
+  border-top: none !important; /* Quita la línea divisoria superior para fundir con el degradado */
   z-index: 1;
 }
 
@@ -2586,7 +2588,7 @@ select:focus-visible {
   right: 0;
   bottom: 0;
   background-image: 
-    linear-gradient(to bottom, var(--color-background) 0%, rgba(23, 44, 39, 0.15) 20%, rgba(23, 44, 39, 0.15) 100%),
+    linear-gradient(to bottom, var(--color-background) 0%, rgba(23, 44, 39, 0.32) 20%, rgba(23, 44, 39, 0.32) 100%),
     url('../img/hero_perfil_organizaciones_oscuro.webp');
   background-size: cover;
   background-position: center bottom; /* Muestra la parte final del hero */
@@ -2598,6 +2600,6 @@ select:focus-visible {
 /* Modo claro para el carrusel de voluntarios */
 [data-theme="light"] .org-profile-page .volunteers-carousel-sec::before {
   background-image: 
-    linear-gradient(to bottom, var(--color-background) 0%, rgba(240, 244, 241, 0.20) 20%, rgba(240, 244, 241, 0.20) 100%),
+    linear-gradient(to bottom, var(--color-background) 0%, rgba(240, 244, 241, 0.38) 20%, rgba(240, 244, 241, 0.38) 100%),
     url('../img/hero_perfil_organizaciones_claro.webp');
 }
