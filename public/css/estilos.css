@@ -2774,3 +2774,98 @@ select:focus-visible {
   gap: 8px;
   flex-wrap: wrap;
 }
+
+/* Rediseño de tarjetas de información en los modales de campaña */
+.modal-info-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.modal-info-card:hover {
+  border-color: rgba(54, 124, 158, 0.3);
+}
+
+.modal-card-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+}
+
+.modal-card-icon-wrapper i {
+  width: 20px;
+  height: 20px;
+}
+
+/* Colores específicos de los íconos de las tarjetas en modales */
+.desc-icon {
+  color: #3b82f6; /* Azul brillante */
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.location-icon {
+  color: #10b981; /* Verde esmeralda */
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.end-date-icon {
+  color: #a855f7; /* Púrpura */
+  background-color: rgba(168, 85, 247, 0.1);
+}
+
+.start-date-icon {
+  color: #f59e0b; /* Amarillo/naranja */
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.modal-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.modal-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+}
+
+.modal-card-value {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Fila para las fechas (side-by-side) */
+.modal-info-card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .modal-info-card-row {
+    grid-template-columns: 1fr;
+  }
+}
