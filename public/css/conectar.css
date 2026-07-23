@@ -519,3 +519,39 @@
   box-shadow: var(--shadow-sm);
   margin-top: 24px;
 }
+
+/* Hero background section */
+.conectar-section {
+  position: relative;
+  width: 100%;
+}
+
+.conectar-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 600px;
+  background-image: 
+    linear-gradient(to bottom, rgba(23, 44, 39, 0) 60%, var(--color-background) 100%),
+    url('../img/hero_conectar_oscuro.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Light mode override for hero background */
+[data-theme="light"] .conectar-section::before {
+  background-image: 
+    linear-gradient(to bottom, rgba(240, 244, 241, 0) 60%, var(--color-background) 100%),
+    url('../img/hero_conectar_claro.webp');
+}
+
+/* Ensure children render above the background */
+.conectar-section > * {
+  position: relative;
+  z-index: 2;
+}
