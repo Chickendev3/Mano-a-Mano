@@ -533,9 +533,9 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0; /* Estira el fondo hasta el final de la sección (llegando al footer) */
+  height: 950px; /* Altura controlada para cubrir bastante hacia abajo sin deformar ni pixelar */
   background-image: 
-    linear-gradient(to bottom, rgba(23, 44, 39, 0) 85%, var(--color-background) 100%),
+    linear-gradient(to bottom, rgba(23, 44, 39, 0) 65%, var(--color-background) 100%),
     url('../img/hero_conectar_oscuro.webp');
   background-size: cover;
   background-position: center top;
@@ -547,6 +547,6 @@
 /* Light mode override for hero background */
 [data-theme="light"] .conectar-section::before {
   background-image: 
-    linear-gradient(to bottom, rgba(240, 244, 241, 0) 85%, var(--color-background) 100%),
+    linear-gradient(to bottom, rgba(240, 244, 241, 0) 65%, var(--color-background) 100%),
     url('../img/hero_conectar_claro.webp');
 }
