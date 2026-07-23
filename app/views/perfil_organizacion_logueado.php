@@ -42,7 +42,7 @@ include '../app/views/componentes/perfil_comun_logueado.php';
           <div class="profile-badges-container org-causes-container" id="view-skills-row" style="margin-top: 16px; <?= empty($causas_organizacion) ? 'display: none;' : '' ?>">
             <div class="profile-tags" id="view-causes-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
               <?php foreach ($causas_organizacion as $causa): ?>
-                <span class="tag-badge"><?php echo htmlspecialchars($causa); ?></span>
+                <span class="tag-badge"><i data-lucide="tag"></i> <?php echo htmlspecialchars($causa); ?></span>
               <?php endforeach; ?>
             </div>
           </div>
@@ -71,6 +71,7 @@ include '../app/views/componentes/perfil_comun_logueado.php';
 
         <!-- INLINE EDIT STATE (Hidden by default) -->
         <div class="profile-info-edit-form" id="profile-edit-state" style="display: none;">
+          <h3 class="edit-section-title"><i data-lucide="globe"></i> Información Pública</h3>
           
           <div class="form-group-row" style="margin-bottom: 12px;">
             <div class="edit-row">

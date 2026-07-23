@@ -2645,8 +2645,9 @@ select:focus-visible {
 /* Contenedores con ligera transparencia sobre el hero background (Organizaciones y Voluntarios) */
 .profile-badges-container,
 .org-causes-container,
-.private-info-section {
-  background-color: rgba(30, 42, 46, 0.88) !important;
+.private-info-section,
+.profile-desc-text {
+  background-color: rgba(30, 42, 46, 0.65) !important; /* Ajustada la transparencia a un 35% */
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: var(--radius-md) !important;
   padding: 18px 20px !important;
@@ -2655,9 +2656,47 @@ select:focus-visible {
 
 [data-theme="light"] .profile-badges-container,
 [data-theme="light"] .org-causes-container,
-[data-theme="light"] .private-info-section {
-  background-color: rgba(255, 255, 255, 0.92) !important;
+[data-theme="light"] .private-info-section,
+[data-theme="light"] .profile-desc-text {
+  background-color: rgba(255, 255, 255, 0.70) !important; /* Ajustada la transparencia en modo claro */
   border: 1px solid var(--color-border) !important;
+}
+
+/* Margen de la descripción ajustado al ser ahora una caja */
+.profile-desc-text {
+  margin-bottom: 24px !important;
+}
+
+/* Estética de las etiquetas de causa para organizaciones (Azul del logo con borde sutil) */
+.org-causes-container .tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px !important; /* Pill-shaped */
+  font-size: 12px;
+  font-weight: 600;
+  background-color: rgba(54, 124, 158, 0.1) !important;
+  color: #367C9E !important;
+  border: 1px solid rgba(54, 124, 158, 0.3) !important;
+  transition: all 0.2s ease;
+}
+
+.org-causes-container .tag-badge i {
+  width: 14px;
+  height: 14px;
+  color: #367C9E !important;
+}
+
+/* Modo claro para etiquetas de causa */
+[data-theme="light"] .org-causes-container .tag-badge {
+  background-color: rgba(54, 124, 158, 0.06) !important;
+  color: #2D6985 !important;
+  border: 1px solid rgba(54, 124, 158, 0.2) !important;
+}
+
+[data-theme="light"] .org-causes-container .tag-badge i {
+  color: #2D6985 !important;
 }
 
 /* Formulario de edición plano (sin caja contenedora brusca alrededor) */
