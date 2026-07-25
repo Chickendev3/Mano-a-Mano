@@ -458,7 +458,7 @@ function renderModalDetalleCampania() {
       <!-- Desplegable 1: Postulados (Pendientes) -->
       <details class="postulations-accordion" id="acc-pending">
         <summary style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span>Voluntarios Postulados</span>
+          <span>Postulados</span>
           <span class="count-badge" id="count-pending" style="background-color: var(--color-border); padding: 2px 8px; border-radius: 12px; font-size: 11px;">0</span>
         </summary>
         <div class="accordion-content" id="list-pending" style="padding: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">
@@ -469,7 +469,7 @@ function renderModalDetalleCampania() {
       <!-- Desplegable 2: Aceptados -->
       <details class="postulations-accordion" id="acc-accepted">
         <summary style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span>Participantes Aceptados</span>
+          <span>Aceptados</span>
           <span class="count-badge" id="count-accepted" style="background-color: var(--color-success-light); color: var(--color-success); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">0</span>
         </summary>
         <div class="accordion-content" id="list-accepted" style="padding: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">
@@ -480,7 +480,7 @@ function renderModalDetalleCampania() {
       <!-- Desplegable 3: Rechazados -->
       <details class="postulations-accordion" id="acc-rejected">
         <summary style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span>Postulantes Rechazados</span>
+          <span>Rechazados</span>
           <span class="count-badge" id="count-rejected" style="background-color: rgba(239,68,68,0.15); color: #EF4444; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">0</span>
         </summary>
         <div class="accordion-content" id="list-rejected" style="padding: 12px 0 0 0; display: flex; flex-direction: column; gap: 8px;">
