@@ -769,11 +769,21 @@ function renderPostulationsList(campaignId, postulantesList, participantesList) 
     </div>
   `);
 
-  renderAccordionCategory("list-accepted", acceptedList, (item) => `
-    <div class="postulant-actions">
-      <button class="btn btn-ghost btn-sm" style="color: #EF4444;" onclick="deleteParticipant(${campaignId}, ${item.asociacion_id}, '${item.tipo_asociacion}')">Eliminar</button>
-    </div>
-  `);
+  renderAccordionCategory("list-accepted", acceptedList, (item) => {
+    if (item.tipo_asociacion === 'postulacion') {
+      return `
+        <div class="postulant-actions">
+          <button class="btn btn-ghost btn-sm" style="color: #EF4444;" onclick="changePostulationStatus(${campaignId}, ${item.asociacion_id}, 'RECHAZADO')">Rechazar</button>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="postulant-actions">
+          <span class="badge-role" style="font-size: 11px; padding: 4px 8px; background-color: rgba(186, 187, 227, 0.21); color: var(--color-primary); border-radius: var(--radius-sm); font-weight: 600;">Invitado</span>
+        </div>
+      `;
+    }
+  });
 
   renderAccordionCategory("list-rejected", rejectedList, () => "");
 }
