@@ -256,7 +256,7 @@ window.openCampaignDetailsModal = function(id) {
               a.className = "association-circle";
               a.title = org.nombre;
               a.innerHTML = org.img_perfil 
-                ? `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`
+                ? `<img src="${BASE_URL + org.img_perfil}" alt="${org.nombre}" class="association-logo-img" style="width:55px; height:55px; border-radius:50%; object-fit:cover;">`
                 : `<div class="association-logo-placeholder" style="width:40px; height:40px; border-radius:50%; background-color:var(--color-border); display:flex; align-items:center; justify-content:center; color:var(--color-text-light);"><i data-lucide="building" style="width:16px; height:16px;"></i></div>`;
               assocList.appendChild(a);
             });

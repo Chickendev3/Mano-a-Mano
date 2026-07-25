@@ -21,8 +21,8 @@ class conectarCtrl extends Controlador {
             $startDate = $camp['fecha_inicio'];
             $endDate = $camp['fecha_finalizacion'];
             
-            // Filtrar sólo activas: hoy mayor a inicio y menor a finalización
-            if ($today >= $startDate && $today <= $endDate) {
+            // Filtra campañas activas y programadas: fecha de hoy menor a la fecha de finalización
+            if ($today <= $endDate) {
                 $campanias[] = $camp;
             }
         }
