@@ -34,6 +34,23 @@ if (!function_exists('truncateDescription')) {
       <!-- Right: Org Name, Desc, Tags -->
       <div class="profile-info-content">
         <h1 class="profile-name"><?= htmlspecialchars($usuario['nombre'] ?? '') ?></h1>
+
+        <!-- Ubicación y Correo -->
+        <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 16px;">
+          <?php if (!empty($usuario['ubicacion'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span><?= htmlspecialchars($usuario['ubicacion']) ?></span>
+            </div>
+          <?php endif; ?>
+          <?php if (!empty($usuario['email'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="mail"></i>
+              <span><?= htmlspecialchars($usuario['email']) ?></span>
+            </div>
+          <?php endif; ?>
+        </div>
+        
         <p class="profile-desc-text">
           <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
         </p>
@@ -51,22 +68,6 @@ if (!function_exists('truncateDescription')) {
             </div>
           </div>
         <?php endif; ?>
-
-        <!-- Ubicación y Correo -->
-        <div class="profile-meta-row" style="margin-top: 16px; margin-bottom: 12px;">
-          <?php if (!empty($usuario['ubicacion'])): ?>
-            <div class="profile-meta-item">
-              <i data-lucide="map-pin"></i>
-              <span><?= htmlspecialchars($usuario['ubicacion']) ?></span>
-            </div>
-          <?php endif; ?>
-          <?php if (!empty($usuario['email'])): ?>
-            <div class="profile-meta-item">
-              <i data-lucide="mail"></i>
-              <span><?= htmlspecialchars($usuario['email']) ?></span>
-            </div>
-          <?php endif; ?>
-        </div>
 
         <?php if (isset($_SESSION['id_usuario']) && $_SESSION['id_usuario'] != $usuario['id']): ?>
           <button class="btn btn-primary" id="btn-open-invite-modal" style="background-color: #87b189; border-color: #87b189; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; align-self: flex-end;">

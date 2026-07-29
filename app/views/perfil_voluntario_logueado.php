@@ -55,6 +55,18 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
         <!-- ESTADO LECTURA (Visible por defecto) -->
         <div id="profile-view-state">
           <h1 class="profile-name" id="view-profile-name"> <?php echo htmlspecialchars($usuario['nombre completo'] ?? ''); ?> </h1>
+
+          <!-- Ubicación y Disponibilidad Horaria -->
+          <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 16px;">
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
+            </div>
+            <div class="profile-meta-item">
+              <i data-lucide="clock"></i>
+              <span id="view-profile-availability"><?php echo htmlspecialchars($usuario['disponibilidad_horaria'] ?? 'No especificada'); ?></span>
+            </div>
+          </div>
           
           <p class="profile-desc-text" id="view-profile-desc">
             <?php echo !empty($usuario['descripcion']) ? htmlspecialchars($usuario['descripcion']) : 'Sin biografía cargada...'; ?>
@@ -118,18 +130,6 @@ include_once '../app/views/componentes/perfil_comun_logueado.php';
                   <?php endforeach; ?>
                 <?php endif; ?>
               </div>
-            </div>
-          </div>
-
-          <!-- Ubicación y Disponibilidad Horaria -->
-          <div class="profile-meta-row" style="margin-top: 16px;">
-            <div class="profile-meta-item">
-              <i data-lucide="map-pin"></i>
-              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
-            </div>
-            <div class="profile-meta-item">
-              <i data-lucide="clock"></i>
-              <span id="view-profile-availability"><?php echo htmlspecialchars($usuario['disponibilidad_horaria'] ?? 'No especificada'); ?></span>
             </div>
           </div>
 

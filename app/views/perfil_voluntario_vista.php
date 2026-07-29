@@ -35,6 +35,22 @@ if (!function_exists('truncateDescription')) {
       <!-- Right: Name, Personal Desc, Statistics/Insignias -->
       <div class="profile-info-content">
         <h1 class="profile-name"><?= htmlspecialchars($usuario['nombre completo'] ?? '') ?></h1>
+
+        <!-- Ubicación y Disponibilidad Horaria -->
+        <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 16px;">
+          <?php if (!empty($usuario['ubicacion'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span><?= htmlspecialchars($usuario['ubicacion']) ?></span>
+            </div>
+          <?php endif; ?>
+          <?php if (!empty($usuario['disponibilidad_horaria'])): ?>
+            <div class="profile-meta-item">
+              <i data-lucide="clock"></i>
+              <span><?= htmlspecialchars($usuario['disponibilidad_horaria']) ?></span>
+            </div>
+          <?php endif; ?>
+        </div>
         
         <p class="profile-desc-text">
           <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
@@ -72,22 +88,6 @@ if (!function_exists('truncateDescription')) {
               <?php endif; ?>
             </div>
           </div>
-        </div>
-
-        <!-- Ubicación y Disponibilidad Horaria -->
-        <div class="profile-meta-row" style="margin-top: 16px;">
-          <?php if (!empty($usuario['ubicacion'])): ?>
-            <div class="profile-meta-item">
-              <i data-lucide="map-pin"></i>
-              <span><?= htmlspecialchars($usuario['ubicacion']) ?></span>
-            </div>
-          <?php endif; ?>
-          <?php if (!empty($usuario['disponibilidad_horaria'])): ?>
-            <div class="profile-meta-item">
-              <i data-lucide="clock"></i>
-              <span><?= htmlspecialchars($usuario['disponibilidad_horaria']) ?></span>
-            </div>
-          <?php endif; ?>
         </div>
         
         <?php if (isset($_SESSION['id_usuario']) && $_SESSION['id_usuario'] != $usuario['id']): ?>

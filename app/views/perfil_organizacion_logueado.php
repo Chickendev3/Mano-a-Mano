@@ -33,6 +33,18 @@ include '../app/views/componentes/perfil_comun_logueado.php';
         <!-- ESTADO LECTURA (Visible por defecto) -->
         <div id="profile-view-state">
           <h1 class="profile-name" id="view-profile-name"><?php echo htmlspecialchars($usuario['nombre'] ?? ''); ?></h1>
+
+          <!-- Ubicación y Correo -->
+          <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 16px;">
+            <div class="profile-meta-item">
+              <i data-lucide="map-pin"></i>
+              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
+            </div>
+            <div class="profile-meta-item">
+              <i data-lucide="mail"></i>
+              <span id="view-profile-email"><?php echo htmlspecialchars($usuario['email'] ?? ''); ?></span>
+            </div>
+          </div>
           
           <p class="profile-desc-text" id="view-profile-desc">
             <?php echo !empty($usuario['descripcion']) ? htmlspecialchars($usuario['descripcion']) : 'Sin biografía cargada...'; ?>
@@ -47,18 +59,6 @@ include '../app/views/componentes/perfil_comun_logueado.php';
                   <span class="tag-badge"><?php echo htmlspecialchars($causa); ?></span>
                 <?php endforeach; ?>
               </div>
-            </div>
-          </div>
-
-          <!-- Ubicación y Correo -->
-          <div class="profile-meta-row" style="margin-top: 16px;">
-            <div class="profile-meta-item">
-              <i data-lucide="map-pin"></i>
-              <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
-            </div>
-            <div class="profile-meta-item">
-              <i data-lucide="mail"></i>
-              <span id="view-profile-email"><?php echo htmlspecialchars($usuario['email'] ?? ''); ?></span>
             </div>
           </div>
 
