@@ -482,33 +482,42 @@ function _renderCampaignModal(camp, options = {}) {
   if (mBadge) {
     mBadge.style.display = "none";
     if (typeof SESSION_USER_ROL !== 'undefined' && SESSION_USER_ROL === "voluntario") {
-      // 1. Si existe postulación en el perfil privado
-      if (typeof postulations !== 'undefined') {
-        const post = postulations.find(p => p.campaignId === camp.id);
-        if (post) {
-          const statusLabels = {
-            pendiente: "PENDIENTE",
-            aceptado: "ACEPTADO",
-            rechazado: "RECHAZADO"
-          };
-          mBadge.textContent = statusLabels[post.status] || "PENDIENTE";
-          mBadge.className = `modal-status-badge ${post.status === "aceptado" ? "accepted-pill" : (post.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
-          mBadge.style.display = "inline-block";
+      let finalStatus = null;
+
+      if (camp.asistencia_registrada) {
+        finalStatus = "asistio";
+      } else {
+        // Encontrar postulación e invitación correspondientes
+        const post = (typeof postulations !== 'undefined') ? postulations.find(p => p.campaignId === camp.id) : null;
+        const inv = (typeof receivedInvitations !== 'undefined') ? receivedInvitations.find(i => i.campaignId === camp.id) : null;
+
+        // Establecer estado por prioridad: Aceptado > Pendiente > Rechazado
+        if ((post && post.status === "aceptado") || (inv && inv.status === "aceptado")) {
+          finalStatus = "aceptado";
+        } else if ((post && post.status === "pendiente") || (inv && inv.status === "pendiente")) {
+          finalStatus = "pendiente";
+        } else if ((post && post.status === "rechazado") || (inv && inv.status === "rechazado")) {
+          finalStatus = "rechazado";
         }
       }
-      // 2. Si existe invitación recibida en el listado
-      if (typeof receivedInvitations !== 'undefined') {
-        const inv = receivedInvitations.find(i => i.campaignId === camp.id);
-        if (inv) {
-          const statusLabels = {
-            pendiente: "PENDIENTE",
-            aceptado: "ACEPTADO",
-            rechazado: "RECHAZADO"
-          };
-          mBadge.textContent = statusLabels[inv.status] || "PENDIENTE";
-          mBadge.className = `modal-status-badge ${inv.status === "aceptado" ? "accepted-pill" : (inv.status === "rechazado" ? "rejected-pill" : "pending-pill")}`;
-          mBadge.style.display = "inline-block";
-        }
+
+      if (finalStatus) {
+        const statusLabels = {
+          asistio: "ASISTIÓ",
+          aceptado: "ACEPTADO",
+          pendiente: "PENDIENTE",
+          rechazado: "RECHAZADO"
+        };
+        const statusPills = {
+          asistio: "accepted-pill",
+          aceptado: "accepted-pill",
+          pendiente: "pending-pill",
+          rechazado: "rejected-pill"
+        };
+
+        mBadge.textContent = statusLabels[finalStatus];
+        mBadge.className = `modal-status-badge ${statusPills[finalStatus]}`;
+        mBadge.style.display = "inline-block";
       }
     }
   }

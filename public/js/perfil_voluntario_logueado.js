@@ -823,7 +823,7 @@ function renderVolunteering() {
 
     const article = document.createElement("article");
     article.className = cardClass;
-    article.addEventListener("click", () => openCampaignDetailsView(item.id));
+    article.addEventListener("click", () => openCampaignDetailsView(item.id, { hidePostulateBtn: true }));
 
     let statusLabel = "Activa";
     let statusPillClass = "accepted-pill";
