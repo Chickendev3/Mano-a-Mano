@@ -27,18 +27,9 @@ function initializeThemeToggle() {
   }
 }
 
-// HEADER SCROLL EFFECT
+// HEADER SCROLL EFFECT (Desactivado para mantener la barra y el logo 100% fijos sin achicar ni mover)
 function initializeHeaderScroll() {
-  const header = document.getElementById('header');
-  if (header) {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        header.classList.add('header-scrolled');
-      } else {
-        header.classList.remove('header-scrolled');
-      }
-    });
-  }
+  // Sin modificaciones de clase al scrollear
 }
 
 // MOBILE MENU TOGGLE

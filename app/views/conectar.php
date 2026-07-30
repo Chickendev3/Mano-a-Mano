@@ -12,7 +12,7 @@ if (!function_exists('truncateDescription')) {
 }
 ?>
 
-<section class="section" style="padding-top: 140px; min-height: calc(100vh - 90px); display: flex; align-items: center;">
+<section class="section conectar-section" style="padding-top: 140px; min-height: calc(100vh - 90px); display: flex; align-items: center;">
   <div class="container">
     <div class="section-header" style="margin-bottom: 40px;">
       <span class="section-tag">Conectar</span>

@@ -519,3 +519,34 @@
   box-shadow: var(--shadow-sm);
   margin-top: 24px;
 }
+
+/* Hero background section */
+.conectar-section {
+  position: relative;
+  width: 100%;
+  z-index: 1; /* Establece un contexto de apilamiento */
+}
+
+.conectar-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 950px; /* Altura controlada para cubrir bastante hacia abajo sin deformar ni pixelar */
+  background-image: 
+    linear-gradient(to bottom, rgba(23, 44, 39, 0.85) 0%, rgba(23, 44, 39, 0.85) 60%, var(--color-background) 100%),
+    url('../img/hero_conectar_oscuro.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  z-index: -1; /* Se posiciona detrás del contenido de la sección */
+  pointer-events: none;
+}
+
+/* Light mode override for hero background */
+[data-theme="light"] .conectar-section::before {
+  background-image: 
+    linear-gradient(to bottom, rgba(240, 244, 241, 0.88) 0%, rgba(240, 244, 241, 0.88) 60%, var(--color-background) 100%),
+    url('../img/hero_conectar_claro.webp');
+}

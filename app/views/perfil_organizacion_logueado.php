@@ -9,7 +9,7 @@
 
 include '../app/views/componentes/perfil_comun_logueado.php'; 
 ?>
-<main class="profile-view-container">
+<main class="profile-view-container org-profile-page">
   
   <!-- PROFILE HEADER -->
   <section class="profile-header-sec">
@@ -33,12 +33,9 @@ include '../app/views/componentes/perfil_comun_logueado.php';
         <!-- ESTADO LECTURA (Visible por defecto) -->
         <div id="profile-view-state">
           <h1 class="profile-name" id="view-profile-name"><?php echo htmlspecialchars($usuario['nombre'] ?? ''); ?></h1>
-          
-          <p class="profile-desc-text" id="view-profile-desc">
-            <?php echo !empty($usuario['descripcion']) ? htmlspecialchars($usuario['descripcion']) : 'Sin biografía cargada...'; ?>
-          </p>
 
-          <div class="profile-meta-row">
+          <!-- Ubicación y Correo -->
+          <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 16px;">
             <div class="profile-meta-item">
               <i data-lucide="map-pin"></i>
               <span id="view-profile-location"><?php echo htmlspecialchars($usuario['ubicacion'] ?? 'No especificada'); ?></span>
@@ -48,18 +45,22 @@ include '../app/views/componentes/perfil_comun_logueado.php';
               <span id="view-profile-email"><?php echo htmlspecialchars($usuario['email'] ?? ''); ?></span>
             </div>
           </div>
+          
+          <p class="profile-desc-text" id="view-profile-desc">
+            <?php echo !empty($usuario['descripcion']) ? htmlspecialchars($usuario['descripcion']) : 'Sin biografía cargada...'; ?>
+          </p>
 
-          <!-- Causes / Tags -->
-          <div class="profile-tags-wrapper" style="margin-top: 16px;">
-            <div class="badge-row-item skills-list-row" id="view-skills-row" style="align-items: flex-start; <?= empty($causas_organizacion) ? 'display: none;' : '' ?>">
-             <div class="profile-tags" id="view-causes-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
-               <?php foreach ($causas_organizacion as $causa): ?>
-                <span class="tag-badge"><?php echo htmlspecialchars($causa); ?></span>
-               <?php endforeach; ?>
+          <!-- Causes / Tags Container Box -->
+          <div class="profile-badges-container org-causes-container" id="view-skills-row" style="<?= empty($causas_organizacion) ? 'display: none;' : '' ?>">
+            <div class="badge-row-item skills-list-row">
+              <i data-lucide="tag" class="badge-icon-tag" style="margin-top: 4px;"></i>
+              <div class="skills-badges profile-tags" id="view-causes-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <?php foreach ($causas_organizacion as $causa): ?>
+                  <span class="tag-badge"><?php echo htmlspecialchars($causa); ?></span>
+                <?php endforeach; ?>
               </div>
             </div>
           </div>
-
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; width: 100%; flex-wrap: wrap; gap: 12px;">
             <button class="btn btn-ghost" id="edit-profile-btn" style="margin-top: 0;">
@@ -73,7 +74,7 @@ include '../app/views/componentes/perfil_comun_logueado.php';
 
         <!-- INLINE EDIT STATE (Hidden by default) -->
         <div class="profile-info-edit-form" id="profile-edit-state" style="display: none;">
-          <h3 style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 6px; margin-bottom: 16px; color: var(--color-text-primary);">Editar Perfil de Organización</h3>
+          <h3 class="edit-section-title"><i data-lucide="globe"></i> Información Pública</h3>
           
           <div class="form-group-row" style="margin-bottom: 12px;">
             <div class="edit-row">

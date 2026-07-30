@@ -181,11 +181,53 @@ window.openCampaignDetailsModal = function(id) {
         if (mTitle) mTitle.textContent = camp.title;
         if (mDesc) {
           mDesc.innerHTML = `
-            <p style="margin-bottom:12px;"><strong>Descripción:</strong> ${camp.desc}</p>
-            <p style="margin-bottom:12px;"><strong>Ubicación:</strong> ${camp.location}</p>
-            <p style="margin-bottom:12px;"><strong>Fecha de inicio:</strong> ${camp.startDate}</p>
-            <p><strong>Fecha de finalización:</strong> ${camp.endDate}</p>
+            <div class="modal-info-cards-grid">
+              <div class="modal-info-card desc-card">
+                <div class="modal-card-icon-wrapper desc-icon">
+                  <i data-lucide="file-text"></i>
+                </div>
+                <div class="modal-card-text">
+                  <span class="modal-card-label">Descripción</span>
+                  <p class="modal-card-value">${camp.desc}</p>
+                </div>
+              </div>
+
+              <div class="modal-info-card location-card">
+                <div class="modal-card-icon-wrapper location-icon">
+                  <i data-lucide="map-pin"></i>
+                </div>
+                <div class="modal-card-text">
+                  <span class="modal-card-label">Ubicación</span>
+                  <p class="modal-card-value">${camp.location}</p>
+                </div>
+              </div>
+
+              <div class="modal-info-card-row">
+                <div class="modal-info-card date-card start-date">
+                  <div class="modal-card-icon-wrapper start-date-icon">
+                    <i data-lucide="calendar"></i>
+                  </div>
+                  <div class="modal-card-text">
+                    <span class="modal-card-label">Fecha de inicio</span>
+                    <p class="modal-card-value">${camp.startDate}</p>
+                  </div>
+                </div>
+
+                <div class="modal-info-card date-card end-date">
+                  <div class="modal-card-icon-wrapper end-date-icon">
+                    <i data-lucide="clock"></i>
+                  </div>
+                  <div class="modal-card-text">
+                    <span class="modal-card-label">Fecha de finalización</span>
+                    <p class="modal-card-value">${camp.endDate}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           `;
+          if (typeof lucide !== "undefined") {
+            lucide.createIcons();
+          }
         }
         
         if (mTags) {

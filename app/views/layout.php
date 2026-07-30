@@ -9,8 +9,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($titulo); ?></title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>img/favicon.png">
+
     <!-- Global CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=4.8">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/estilos.css?v=7.9">
 
     <!-- CSS Dinámicos según la vista cargada -->
     <?php if (isset($cssPropio) && !empty($cssPropio)){
@@ -20,7 +23,7 @@
             foreach($cssPropio as $css){
         ?>
         
-        <link rel="stylesheet" href="<?= BASE_URL ?>css/<?php echo htmlspecialchars($css); ?>?v=4.8">
+        <link rel="stylesheet" href="<?= BASE_URL ?>css/<?php echo htmlspecialchars($css); ?>?v=7.9">
     <?php }} ?>
 
     <!-- Lucide Icons -->
@@ -60,7 +63,7 @@
             foreach($jsPropio as $js){
         ?>
         
-        <script src="<?= BASE_URL ?>js/<?php echo htmlspecialchars($js); ?>"></script>
+        <script src="<?= BASE_URL ?>js/<?php echo htmlspecialchars($js); ?>?v=7.8"></script>
     <?php }} ?>
 
     <!-- Contenedor Global para Notificaciones Flotantes (Toasts) -->

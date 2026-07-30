@@ -16,7 +16,7 @@ if (!function_exists('truncateDescription')) {
     }
 }
 ?>
-<main class="profile-view-container">
+<main class="profile-view-container org-profile-page">
   
   <!-- PROFILE HEADER -->
   <section class="profile-header-sec">
@@ -34,11 +34,9 @@ if (!function_exists('truncateDescription')) {
       <!-- Right: Org Name, Desc, Tags -->
       <div class="profile-info-content">
         <h1 class="profile-name"><?= htmlspecialchars($usuario['nombre'] ?? '') ?></h1>
-        <p class="profile-desc-text">
-          <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
-        </p>
 
-        <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 12px;">
+        <!-- Ubicación y Correo -->
+        <div class="profile-meta-row" style="margin-top: 12px; margin-bottom: 16px;">
           <?php if (!empty($usuario['ubicacion'])): ?>
             <div class="profile-meta-item">
               <i data-lucide="map-pin"></i>
@@ -52,14 +50,24 @@ if (!function_exists('truncateDescription')) {
             </div>
           <?php endif; ?>
         </div>
+        
+        <p class="profile-desc-text">
+          <?= htmlspecialchars($usuario['descripcion'] ?? 'Sin biografía cargada...') ?>
+        </p>
 
-        <div class="profile-tags-wrapper">
-          <?php if (!empty($causas_organizacion)): ?>
-            <?php foreach ($causas_organizacion as $causa): ?>
-              <span class="tag-badge"><i data-lucide="tag"></i> <?= htmlspecialchars($causa) ?></span>
-            <?php endforeach; ?>
-          <?php endif; ?>
-        </div>
+        <!-- Causes / Tags Container Box -->
+        <?php if (!empty($causas_organizacion)): ?>
+          <div class="profile-badges-container org-causes-container">
+            <div class="badge-row-item skills-list-row">
+              <i data-lucide="tag" class="badge-icon-tag" style="margin-top: 4px;"></i>
+              <div class="skills-badges profile-tags" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <?php foreach ($causas_organizacion as $causa): ?>
+                  <span class="tag-badge"><?= htmlspecialchars($causa) ?></span>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </div>
+        <?php endif; ?>
 
         <?php if (isset($_SESSION['id_usuario']) && $_SESSION['id_usuario'] != $usuario['id']): ?>
           <button class="btn btn-primary" id="btn-open-invite-modal" style="background-color: #87b189; border-color: #87b189; margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; align-self: flex-end;">

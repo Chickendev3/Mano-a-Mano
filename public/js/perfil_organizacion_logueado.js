@@ -69,7 +69,7 @@ function renderProfileData() {
        orgProfile.causes.forEach(cause => {
          const span = document.createElement("span");
          span.className = "tag-badge";
-         span.innerHTML = `<i data-lucide="tag"></i> ${cause}`;
+         span.textContent = cause;
          viewCauses.appendChild(span);
        });
        if (viewSkillsRow) viewSkillsRow.style.display = "flex";
