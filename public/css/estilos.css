@@ -2786,76 +2786,101 @@ select:focus-visible {
   flex-wrap: wrap;
 }
 
-/* Rediseño de tarjetas de información en los modales de campaña */
+/* Rediseño de información en los modales de campaña (Diseño Intermedio Limpio) */
 .modal-info-cards-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
+/* La descripción se muestra como un bloque limpio sin fondo ni borde */
+.modal-info-card.desc-card {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 0 20px 0;
+  border-radius: 0;
+  display: block;
+}
+
+/* Ocultamos el icono en la descripción para dar un aspecto de texto continuo */
+.desc-card .modal-card-icon-wrapper {
+  display: none;
+}
+
+.desc-card .modal-card-label {
+  font-size: 12px;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.desc-card .modal-card-value {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+/* Metadatos (Ubicación y Fechas) ordenados sin rectángulos de fondo */
 .modal-info-card {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 16px 20px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  transition: none;
 }
 
 .modal-info-card:hover {
-  border-color: rgba(54, 124, 158, 0.3);
+  background-color: transparent;
+  border-color: transparent;
 }
 
+/* Iconos circulares más sutiles y limpios */
 .modal-card-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  background-color: rgba(255, 255, 255, 0.04);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
 .modal-card-icon-wrapper i {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
-/* Colores específicos de los íconos de las tarjetas en modales */
-.desc-icon {
-  color: #3b82f6; /* Azul brillante */
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
+/* Colores de iconos adaptados para fondos transparentes */
 .location-icon {
-  color: #10b981; /* Verde esmeralda */
+  color: #10b981;
   background-color: rgba(16, 185, 129, 0.1);
 }
 
 .end-date-icon {
-  color: #a855f7; /* Púrpura */
+  color: #a855f7;
   background-color: rgba(168, 85, 247, 0.1);
 }
 
 .start-date-icon {
-  color: #f59e0b; /* Amarillo/naranja */
+  color: #f59e0b;
   background-color: rgba(245, 158, 11, 0.1);
 }
 
 .modal-card-text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   text-align: left;
 }
 
 .modal-card-label {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-text-secondary);
@@ -2863,7 +2888,7 @@ select:focus-visible {
 
 .modal-card-value {
   font-size: 14px;
-  line-height: 1.5;
+  font-weight: 500;
   color: var(--color-text-primary);
   margin: 0;
 }
@@ -2872,11 +2897,12 @@ select:focus-visible {
 .modal-info-card-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (max-width: 600px) {
   .modal-info-card-row {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
